@@ -30,7 +30,7 @@ export default function GenderStep() {
         {GENDERS.map((g) => {
           const on = gender === g.v;
           return (
-            <Pressable key={g.v} onPress={() => select(g.v)} style={[s.row, on && s.rowOn]}>
+            <Pressable key={g.v} onPress={() => select(g.v)} style={[s.row, on && s.rowOn]} accessibilityRole="button">
               <Text style={[s.text, on && s.textOn]}>{g.label}</Text>
               {on && <Text style={s.check}>✓</Text>}
             </Pressable>

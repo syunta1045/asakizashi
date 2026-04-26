@@ -31,7 +31,7 @@ export default function BloodStep() {
         {BLOODS.map((b) => {
           const on = bloodType === b.v;
           return (
-            <Pressable key={b.v} onPress={() => select(b.v)} style={[s.row, on && s.rowOn]}>
+            <Pressable key={b.v} onPress={() => select(b.v)} style={[s.row, on && s.rowOn]} accessibilityRole="button">
               <Text style={[s.text, on && s.textOn]}>{b.label}</Text>
               {on && <Text style={s.check}>✓</Text>}
             </Pressable>

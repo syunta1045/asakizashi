@@ -69,7 +69,7 @@ export default function AddRelation() {
     <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
       <SafeAreaView style={s.safe}>
         <View style={s.headerRow}>
-          <Pressable onPress={() => step === 1 ? router.back() : setStep((step - 1) as 1 | 2 | 3)}>
+          <Pressable onPress={() => step === 1 ? router.back() : setStep((step - 1) as 1 | 2 | 3)} accessibilityRole="button">
             <Text style={s.back}>‹</Text>
           </Pressable>
           <View style={{ flex: 1, flexDirection: "row", gap: 6 }}>
@@ -92,7 +92,7 @@ export default function AddRelation() {
                     key={key}
                     onPress={() => setGenre(key)}
                     style={[s.gCard, on && s.gCardOn]}
-                  >
+                  accessibilityRole="button">
                     <Text style={[s.gIcon, on && s.gIconOn]}>{g.icon}</Text>
                     <Text style={[s.gLabel, on && s.gLabelOn]}>{g.label}</Text>
                     <Text style={[s.gSub, on && s.gSubOn]}>{g.sub}</Text>
@@ -122,7 +122,7 @@ export default function AddRelation() {
               {SUB_LABELS[genre].map((l) => {
                 const on = label === l;
                 return (
-                  <Pressable key={l} onPress={() => setLabel(l)} style={[s.chip, on && s.chipOn]}>
+                  <Pressable key={l} onPress={() => setLabel(l)} style={[s.chip, on && s.chipOn]} accessibilityRole="button">
                     <Text style={[s.chipText, on && s.chipTextOn]}>{l}</Text>
                   </Pressable>
                 );
@@ -146,7 +146,7 @@ export default function AddRelation() {
               else if (step === 2 && name && label) onSave();
             }}
             disabled={(step === 1 && !genre) || (step === 2 && (!name || !label))}
-          >
+          accessibilityRole="button">
             <Text style={s.ctaText}>{step === 2 ? "登録する" : "次へ"}</Text>
           </Pressable>
         )}

@@ -24,7 +24,7 @@ export default function MbtiStep() {
         {TYPES.map((t) => {
           const on = mbti === t;
           return (
-            <Pressable key={t} onPress={() => select(t)} style={[s.cell, on && s.cellActive]}>
+            <Pressable key={t} onPress={() => select(t)} style={[s.cell, on && s.cellActive]} accessibilityRole="button">
               <Text style={[s.text, on && s.textActive]}>{t}</Text>
             </Pressable>
           );
@@ -34,7 +34,7 @@ export default function MbtiStep() {
       <Pressable
         onPress={() => select(null)}
         style={[s.skip, mbti === null && s.cellActive]}
-      >
+      accessibilityRole="button">
         <Text style={[s.skipText, mbti === null && s.textActive]}>設定しない</Text>
       </Pressable>
 

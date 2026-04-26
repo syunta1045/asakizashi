@@ -44,7 +44,7 @@ export default function ThemesStep() {
         {THEMES.map((t) => {
           const on = themes.includes(t);
           return (
-            <Pressable key={t} onPress={() => toggle(t)} style={[s.chip, on && s.chipOn]}>
+            <Pressable key={t} onPress={() => toggle(t)} style={[s.chip, on && s.chipOn]} accessibilityRole="button">
               {on && <Text style={s.check}>✓</Text>}
               <Text style={[s.chipText, on && s.chipTextOn]}>{t}</Text>
             </Pressable>

@@ -23,7 +23,7 @@ function NumWheel({ values, value, onChange, unit }: {
       <Text style={s.wheelLabel}>{unit}</Text>
       <ScrollView ref={ref} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, gap: 4 }}>
         {values.map((v) => (
-          <Pressable key={v} onPress={() => onChange(v)} style={[s.wheelCell, v === value && s.wheelCellOn]}>
+          <Pressable key={v} onPress={() => onChange(v)} style={[s.wheelCell, v === value && s.wheelCellOn]} accessibilityRole="button">
             <Text style={[s.wheelText, v === value && s.wheelTextOn]}>{v}</Text>
           </Pressable>
         ))}
@@ -83,7 +83,7 @@ export default function BirthStep() {
             key={p}
             onPress={() => setField("birthPlace", p)}
             style={[s.chip, birthPlace === p && s.chipActive]}
-          >
+          accessibilityRole="button">
             <Text style={[s.chipText, birthPlace === p && s.chipTextActive]}>{p}</Text>
           </Pressable>
         ))}

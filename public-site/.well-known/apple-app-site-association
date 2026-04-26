@@ -1,0 +1,16 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["TEAMID.jp.asakizashi.app"],
+        "components": [
+          { "/": "/today", "comment": "今日のお告げ" },
+          { "/": "/journal", "comment": "振り返り" },
+          { "/": "/relations", "comment": "つながり" },
+          { "/": "/", "comment": "アプリトップ" }
+        ]
+      }
+    ]
+  }
+}

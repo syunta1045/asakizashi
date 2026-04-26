@@ -83,7 +83,7 @@ export default function Help() {
 
           <View style={s.contactBlock}>
             <Text style={s.contactText}>解決しなかった場合は</Text>
-            <Pressable onPress={() => router.push("/contact")}>
+            <Pressable onPress={() => router.push("/contact")} accessibilityRole="button">
               <Text style={s.contactLink}>お問い合わせへ ›</Text>
             </Pressable>
           </View>

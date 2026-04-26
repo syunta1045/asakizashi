@@ -37,21 +37,21 @@ export default function Contact() {
           </Text>
 
           <View style={s.group}>
-            <Pressable style={s.row} onPress={() => onMail("【旭兆】不具合の報告")}>
+            <Pressable style={s.row} onPress={() => onMail("【旭兆】不具合の報告")} accessibilityRole="button">
               <View style={{ flex: 1 }}>
                 <Text style={s.rowTitle}>不具合を報告する</Text>
                 <Text style={s.rowSub}>表示や挙動の問題があれば</Text>
               </View>
               <Text style={s.arrow}>›</Text>
             </Pressable>
-            <Pressable style={s.row} onPress={() => onMail("【旭兆】機能のご要望")}>
+            <Pressable style={s.row} onPress={() => onMail("【旭兆】機能のご要望")} accessibilityRole="button">
               <View style={{ flex: 1 }}>
                 <Text style={s.rowTitle}>機能のご要望</Text>
                 <Text style={s.rowSub}>こんな機能が欲しい、等</Text>
               </View>
               <Text style={s.arrow}>›</Text>
             </Pressable>
-            <Pressable style={s.row} onPress={() => onMail("【旭兆】お問い合わせ")}>
+            <Pressable style={s.row} onPress={() => onMail("【旭兆】お問い合わせ")} accessibilityRole="button">
               <View style={{ flex: 1 }}>
                 <Text style={s.rowTitle}>その他のお問い合わせ</Text>
                 <Text style={s.rowSub}>{SUPPORT_EMAIL}</Text>

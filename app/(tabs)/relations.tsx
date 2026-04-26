@@ -72,11 +72,11 @@ export default function Relations() {
 
         {/* ジャンルフィルタ */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={s.filterRow} contentContainerStyle={{ paddingHorizontal: 16, gap: 6 }}>
-          <Pressable onPress={() => setFilter("all")} style={[s.filterChip, filter === "all" && s.filterChipOn]}>
+          <Pressable onPress={() => setFilter("all")} style={[s.filterChip, filter === "all" && s.filterChipOn]} accessibilityRole="button">
             <Text style={[s.filterText, filter === "all" && s.filterTextOn]}>すべて</Text>
           </Pressable>
           {(Object.entries(GENRE_INFO) as [Genre, typeof GENRE_INFO[Genre]][]).map(([key, g]) => (
-            <Pressable key={key} onPress={() => setFilter(key)} style={[s.filterChip, filter === key && s.filterChipOn]}>
+            <Pressable key={key} onPress={() => setFilter(key)} style={[s.filterChip, filter === key && s.filterChipOn]} accessibilityRole="button">
               <Text style={[s.filterText, filter === key && s.filterTextOn]}>{g.label}</Text>
             </Pressable>
           ))}
@@ -113,7 +113,7 @@ export default function Relations() {
             );
           })}
 
-          <Pressable style={s.addBtn} onPress={onAdd}>
+          <Pressable style={s.addBtn} onPress={onAdd} accessibilityRole="button">
             <Text style={s.addText}>＋ 新しいつながりを登録</Text>
           </Pressable>
           <Text style={s.limit}>無料は{FREE_RELATION_LIMIT}件まで・プレミアムは無制限</Text>
@@ -149,7 +149,7 @@ function Empty({ onAdd }: { onAdd: () => void }) {
               </View>
             ))}
           </View>
-          <Pressable style={s.cta} onPress={onAdd}>
+          <Pressable style={s.cta} onPress={onAdd} accessibilityRole="button">
             <Text style={s.ctaText}>ジャンルを選んで登録</Text>
           </Pressable>
           <Text style={s.limit}>無料は{FREE_RELATION_LIMIT}件まで</Text>

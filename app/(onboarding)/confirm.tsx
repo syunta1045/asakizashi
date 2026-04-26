@@ -21,7 +21,7 @@ export default function ConfirmStep() {
       <SafeAreaView style={s.safe} edges={["top","bottom"]}>
         {/* Progress 7/7 */}
         <View style={s.progressRow}>
-          <Pressable onPress={() => router.back()} hitSlop={12}>
+          <Pressable onPress={() => router.back()} hitSlop={12} accessibilityRole="button">
             <Text style={s.back}>‹</Text>
           </Pressable>
           {Array.from({ length: 7 }).map((_, i) => (
@@ -64,10 +64,10 @@ export default function ConfirmStep() {
           </Text>
         </ScrollView>
 
-        <Pressable style={s.cta} onPress={onConfirm}>
+        <Pressable style={s.cta} onPress={onConfirm} accessibilityRole="button">
           <Text style={s.ctaText}>命式を見る</Text>
         </Pressable>
-        <Pressable style={s.editBtn} onPress={() => router.back()}>
+        <Pressable style={s.editBtn} onPress={() => router.back()} accessibilityRole="button">
           <Text style={s.editText}>修正する</Text>
         </Pressable>
       </SafeAreaView>

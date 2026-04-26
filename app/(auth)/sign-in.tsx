@@ -136,7 +136,7 @@ export default function SignIn() {
           )}
 
           {!loading && (
-            <Pressable style={s.googleBtn} onPress={onGoogleSignIn}>
+            <Pressable style={s.googleBtn} onPress={onGoogleSignIn} accessibilityRole="button">
               <Text style={s.googleBtnText}>Google で続ける</Text>
             </Pressable>
           )}
@@ -144,7 +144,7 @@ export default function SignIn() {
           <Pressable
             style={s.skip}
             onPress={() => { haptics.light(); router.replace("/(onboarding)/name"); }}
-          >
+          accessibilityRole="button">
             <Text style={s.skipText}>サインインせずに使う</Text>
           </Pressable>
           <Text style={s.note}>

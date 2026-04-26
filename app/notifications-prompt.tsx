@@ -33,10 +33,10 @@ export default function NotificationsPrompt() {
           </Text>
         </View>
         <View style={s.bottom}>
-          <Pressable style={s.cta} onPress={onAllow}>
+          <Pressable style={s.cta} onPress={onAllow} accessibilityRole="button">
             <Text style={s.ctaText}>通知を受け取る</Text>
           </Pressable>
-          <Pressable onPress={() => router.back()}>
+          <Pressable onPress={() => router.back()} accessibilityRole="button">
             <Text style={s.skip}>あとで設定する</Text>
           </Pressable>
         </View>

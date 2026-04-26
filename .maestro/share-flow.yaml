@@ -1,0 +1,14 @@
+# シェアメニュー開閉フロー
+appId: jp.asakizashi.app
+---
+- launchApp
+# Today タブで御神籤カードが表示されるまで待つ
+- assertVisible: "今朝のお告げをシェアする"
+- tapOn: "今朝のお告げをシェアする"
+# メニュー展開
+- assertVisible: "LINEで送る"
+- assertVisible: "Xにポストする"
+- assertVisible: "その他のアプリ"
+# 閉じる
+- tapOn: "× とじる"
+- assertNotVisible: "LINEで送る"

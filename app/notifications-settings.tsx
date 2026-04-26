@@ -98,7 +98,7 @@ export default function NotificationsSettings() {
                 ) : (
                   <View style={s.timeRow}>
                     {EVENING_TIMES.map((t) => (
-                      <Pressable key={t} onPress={() => onPickEveningTime(t)} style={[s.timeChip, u.eveningTime === t && s.timeChipOn]}>
+                      <Pressable key={t} onPress={() => onPickEveningTime(t)} style={[s.timeChip, u.eveningTime === t && s.timeChipOn]} accessibilityRole="button">
                         <Text style={[s.timeChipText, u.eveningTime === t && s.timeChipTextOn]}>{t}</Text>
                       </Pressable>
                     ))}
@@ -117,7 +117,7 @@ export default function NotificationsSettings() {
               u.setField("morningEnabled", false);
               u.setField("eveningEnabled", false);
             }}
-          >
+          accessibilityRole="button">
             <Text style={s.dangerText}>すべての通知を停止</Text>
           </Pressable>
         </ScrollView>

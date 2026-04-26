@@ -145,20 +145,20 @@ export default function Settings() {
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
           <Section num="01" title="プロフィール" />
           <Group>
-            <Pressable onPress={() => router.push("/edit/nickname")}><Row label="ニックネーム" value={u.nickname} arrow /></Pressable>
-            <Pressable onPress={() => router.push("/edit/birth")}><Row label="生年月日" value={`${u.birthYear}年${u.birthMonth}月${u.birthDay}日`} arrow /></Pressable>
-            <Pressable onPress={() => router.push("/edit/place")}><Row label="生まれた場所" value={u.birthPlace} arrow /></Pressable>
-            <Pressable onPress={() => router.push("/edit/mbti")}><Row label="MBTI" value={u.mbti || "未設定"} arrow /></Pressable>
-            <Pressable onPress={() => router.push("/edit/blood")}><Row label="血液型" value={u.bloodType ? (u.bloodType === "unknown" ? "わからない" : `${u.bloodType}型`) : "—"} arrow /></Pressable>
-            <Pressable onPress={() => router.push("/edit/gender")}><Row label="性別" value={genderLabel(u.gender)} arrow /></Pressable>
-            <Pressable onPress={() => router.push("/edit/themes")}><Row label="関心テーマ" value={`${u.themes.length}つ選択中`} arrow /></Pressable>
+            <Pressable onPress={() => router.push("/edit/nickname")} accessibilityRole="button"><Row label="ニックネーム" value={u.nickname} arrow /></Pressable>
+            <Pressable onPress={() => router.push("/edit/birth")} accessibilityRole="button"><Row label="生年月日" value={`${u.birthYear}年${u.birthMonth}月${u.birthDay}日`} arrow /></Pressable>
+            <Pressable onPress={() => router.push("/edit/place")} accessibilityRole="button"><Row label="生まれた場所" value={u.birthPlace} arrow /></Pressable>
+            <Pressable onPress={() => router.push("/edit/mbti")} accessibilityRole="button"><Row label="MBTI" value={u.mbti || "未設定"} arrow /></Pressable>
+            <Pressable onPress={() => router.push("/edit/blood")} accessibilityRole="button"><Row label="血液型" value={u.bloodType ? (u.bloodType === "unknown" ? "わからない" : `${u.bloodType}型`) : "—"} arrow /></Pressable>
+            <Pressable onPress={() => router.push("/edit/gender")} accessibilityRole="button"><Row label="性別" value={genderLabel(u.gender)} arrow /></Pressable>
+            <Pressable onPress={() => router.push("/edit/themes")} accessibilityRole="button"><Row label="関心テーマ" value={`${u.themes.length}つ選択中`} arrow /></Pressable>
           </Group>
 
           <Section num="02" title="通知" />
           <Group>
-            <Pressable onPress={() => router.push("/edit/wakeup")}><Row label="起床時間" value={u.wakeUpTime} arrow /></Pressable>
+            <Pressable onPress={() => router.push("/edit/wakeup")} accessibilityRole="button"><Row label="起床時間" value={u.wakeUpTime} arrow /></Pressable>
             <Row label="通知が届く時刻" value={notifyTimeFrom(u.wakeUpTime)} hint="起床の10分後" />
-            <Pressable onPress={() => router.push("/notifications-settings")}><Row label="通知の詳細設定" value="" arrow /></Pressable>
+            <Pressable onPress={() => router.push("/notifications-settings")} accessibilityRole="button"><Row label="通知の詳細設定" value="" arrow /></Pressable>
             <View style={s.row}>
               <View style={{ flex: 1 }}>
                 <Text style={s.rowKey}>朝の通知を受け取る</Text>
@@ -185,7 +185,7 @@ export default function Settings() {
                 <Section num={next()} title="プラン" />
                 <Group>
                   {!sub.isPremium && (
-                    <Pressable onPress={() => router.push("/premium")}>
+                    <Pressable onPress={() => router.push("/premium")} accessibilityRole="button">
                       <Row label="プレミアムにアップグレード" value="" arrow />
                     </Pressable>
                   )}
@@ -194,8 +194,8 @@ export default function Settings() {
 
                 <Section num={next()} title="コンテンツ" />
                 <Group>
-                  <Pressable onPress={() => router.push("/calendar")}><Row label="月の流れ" value="" arrow /></Pressable>
-                  <Pressable onPress={() => router.push("/chart")}><Row label="命式の詳細" value="" arrow /></Pressable>
+                  <Pressable onPress={() => router.push("/calendar")} accessibilityRole="button"><Row label="月の流れ" value="" arrow /></Pressable>
+                  <Pressable onPress={() => router.push("/chart")} accessibilityRole="button"><Row label="命式の詳細" value="" arrow /></Pressable>
                 </Group>
 
                 <Section num={next()} title="その他" />
@@ -203,31 +203,31 @@ export default function Settings() {
             );
           })()}
           <Group>
-            <Pressable onPress={() => router.push("/help")}><Row label="よくあるご質問" value="" arrow /></Pressable>
-            <Pressable onPress={() => router.push("/legal/terms")}><Row label="利用規約" value="" arrow /></Pressable>
-            <Pressable onPress={() => router.push("/legal/privacy")}><Row label="プライバシーポリシー" value="" arrow /></Pressable>
-            <Pressable onPress={() => router.push("/contact")}><Row label="お問い合わせ" value="" arrow /></Pressable>
-            <Pressable onPress={() => exportUserData()}><Row label="データをエクスポート" value="" arrow /></Pressable>
-            <Pressable onPress={onClearCache}><Row label="キャッシュを整理" value="" arrow /></Pressable>
+            <Pressable onPress={() => router.push("/help")} accessibilityRole="button"><Row label="よくあるご質問" value="" arrow /></Pressable>
+            <Pressable onPress={() => router.push("/legal/terms")} accessibilityRole="button"><Row label="利用規約" value="" arrow /></Pressable>
+            <Pressable onPress={() => router.push("/legal/privacy")} accessibilityRole="button"><Row label="プライバシーポリシー" value="" arrow /></Pressable>
+            <Pressable onPress={() => router.push("/contact")} accessibilityRole="button"><Row label="お問い合わせ" value="" arrow /></Pressable>
+            <Pressable onPress={() => exportUserData()} accessibilityRole="button"><Row label="データをエクスポート" value="" arrow /></Pressable>
+            <Pressable onPress={onClearCache} accessibilityRole="button"><Row label="キャッシュを整理" value="" arrow /></Pressable>
             <Row label="バージョン" value="0.1.2" />
           </Group>
 
           {signedIn && (
-            <Pressable style={s.signOut} onPress={onSignOut}>
+            <Pressable style={s.signOut} onPress={onSignOut} accessibilityRole="button">
               <Text style={s.signOutText}>サインアウト</Text>
             </Pressable>
           )}
           {!signedIn && isSupabaseConfigured && (
-            <Pressable style={s.signOut} onPress={() => router.push("/(auth)/sign-in")}>
+            <Pressable style={s.signOut} onPress={() => router.push("/(auth)/sign-in")} accessibilityRole="button">
               <Text style={s.signOutText}>サインインしてデータを同期</Text>
             </Pressable>
           )}
 
-          <Pressable style={s.danger} onPress={onReset}>
+          <Pressable style={s.danger} onPress={onReset} accessibilityRole="button">
             <Text style={s.dangerText}>ローカルデータをリセット</Text>
           </Pressable>
           {signedIn && (
-            <Pressable style={s.danger} onPress={onDeleteAccount}>
+            <Pressable style={s.danger} onPress={onDeleteAccount} accessibilityRole="button">
               <Text style={s.dangerText}>アカウントを完全に削除</Text>
             </Pressable>
           )}

@@ -108,14 +108,14 @@ export default function Premium() {
             <Pressable
               onPress={() => setPlan("yearly")}
               style={[s.planChip, plan === "yearly" && s.planChipOn]}
-            >
+            accessibilityRole="button">
               <Text style={[s.planChipText, plan === "yearly" && s.planChipTextOn]}>年額 ¥3,800</Text>
               {plan === "yearly" && <Text style={s.planSale}>33%OFF</Text>}
             </Pressable>
             <Pressable
               onPress={() => setPlan("monthly")}
               style={[s.planChip, plan === "monthly" && s.planChipOn]}
-            >
+            accessibilityRole="button">
               <Text style={[s.planChipText, plan === "monthly" && s.planChipTextOn]}>月額 ¥480</Text>
             </Pressable>
           </View>
@@ -140,7 +140,7 @@ export default function Premium() {
             ))}
           </View>
 
-          <Pressable style={s.cta} onPress={onStartTrial}>
+          <Pressable style={s.cta} onPress={onStartTrial} accessibilityRole="button">
             <Text style={s.ctaText}>
               {sub.isPremium ? (onTrial ? `トライアル残り ${daysLeft} 日` : "ご利用中") : "7日間無料で試す"}
             </Text>
@@ -162,7 +162,7 @@ export default function Premium() {
                 Alert.alert("購入が見つかりませんでした", "Apple ID / Google アカウントを確認してください。");
               }
             }}
-          >
+          accessibilityRole="button">
             <Text style={s.restoreText}>購入を復元</Text>
           </Pressable>
 

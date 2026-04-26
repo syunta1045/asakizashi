@@ -56,7 +56,7 @@ export default function EditField() {
           {field === "themes" && <ThemesEditor />}
         </ScrollView>
 
-        <Pressable style={s.cta} onPress={() => router.back()}>
+        <Pressable style={s.cta} onPress={() => router.back()} accessibilityRole="button">
           <Text style={s.ctaText}>完了</Text>
         </Pressable>
       </SafeAreaView>
@@ -102,7 +102,7 @@ function PlaceEditor() {
   return (
     <View style={s.chips}>
       {PLACES.map((p) => (
-        <Pressable key={p} onPress={() => setField("birthPlace", p)} style={[s.chip, birthPlace === p && s.chipOn]}>
+        <Pressable key={p} onPress={() => setField("birthPlace", p)} style={[s.chip, birthPlace === p && s.chipOn]} accessibilityRole="button">
           <Text style={[s.chipText, birthPlace === p && s.chipTextOn]}>{p}</Text>
         </Pressable>
       ))}
@@ -116,12 +116,12 @@ function MbtiEditor() {
     <View>
       <View style={s.grid}>
         {MBTI_LIST.map((t) => (
-          <Pressable key={t} onPress={() => setField("mbti", t)} style={[s.cell, mbti === t && s.cellOn]}>
+          <Pressable key={t} onPress={() => setField("mbti", t)} style={[s.cell, mbti === t && s.cellOn]} accessibilityRole="button">
             <Text style={[s.cellText, mbti === t && s.cellTextOn]}>{t}</Text>
           </Pressable>
         ))}
       </View>
-      <Pressable onPress={() => setField("mbti", null)} style={[s.fullRow, mbti === null && s.fullRowOn]}>
+      <Pressable onPress={() => setField("mbti", null)} style={[s.fullRow, mbti === null && s.fullRowOn]} accessibilityRole="button">
         <Text style={[s.fullRowText, mbti === null && s.fullRowTextOn]}>設定しない</Text>
       </Pressable>
     </View>
@@ -133,7 +133,7 @@ function BloodEditor() {
   return (
     <View style={{ gap: 8 }}>
       {BLOODS.map((b) => (
-        <Pressable key={b.v} onPress={() => setField("bloodType", b.v)} style={[s.fullRow, bloodType === b.v && s.fullRowOn]}>
+        <Pressable key={b.v} onPress={() => setField("bloodType", b.v)} style={[s.fullRow, bloodType === b.v && s.fullRowOn]} accessibilityRole="button">
           <Text style={[s.fullRowText, bloodType === b.v && s.fullRowTextOn]}>{b.label}</Text>
           {bloodType === b.v && <Text style={s.checkRed}>✓</Text>}
         </Pressable>
@@ -147,7 +147,7 @@ function GenderEditor() {
   return (
     <View style={{ gap: 8 }}>
       {GENDERS.map((g) => (
-        <Pressable key={g.v} onPress={() => setField("gender", g.v)} style={[s.fullRow, gender === g.v && s.fullRowOn]}>
+        <Pressable key={g.v} onPress={() => setField("gender", g.v)} style={[s.fullRow, gender === g.v && s.fullRowOn]} accessibilityRole="button">
           <Text style={[s.fullRowText, gender === g.v && s.fullRowTextOn]}>{g.label}</Text>
           {gender === g.v && <Text style={s.checkRed}>✓</Text>}
         </Pressable>
@@ -168,7 +168,7 @@ function WakeUpEditor() {
       <Text style={s.note}>通知は {notifyTimeFrom(wakeUpTime)} に届きます</Text>
       <View style={s.chips}>
         {TIMES.map((t) => (
-          <Pressable key={t} onPress={() => onChange(t)} style={[s.chip, wakeUpTime === t && s.chipOn]}>
+          <Pressable key={t} onPress={() => onChange(t)} style={[s.chip, wakeUpTime === t && s.chipOn]} accessibilityRole="button">
             <Text style={[s.chipText, wakeUpTime === t && s.chipTextOn]}>{t}</Text>
           </Pressable>
         ))}
@@ -189,7 +189,7 @@ function ThemesEditor() {
         {THEMES.map((t) => {
           const on = themes.includes(t);
           return (
-            <Pressable key={t} onPress={() => toggle(t)} style={[s.chip, on && s.chipOn]}>
+            <Pressable key={t} onPress={() => toggle(t)} style={[s.chip, on && s.chipOn]} accessibilityRole="button">
               {on && <Text style={s.checkSm}>✓</Text>}
               <Text style={[s.chipText, on && s.chipTextOn]}>{t}</Text>
             </Pressable>
@@ -206,9 +206,9 @@ function NumRow({ label, value, setValue, min, max }: { label: string; value: nu
     <View style={s.numRow}>
       <Text style={s.numLabel}>{label}</Text>
       <View style={s.numCtrl}>
-        <Pressable onPress={() => setValue(Math.max(min, value - 1))}><Text style={s.numBtn}>−</Text></Pressable>
+        <Pressable onPress={() => setValue(Math.max(min, value - 1))} accessibilityRole="button"><Text style={s.numBtn}>−</Text></Pressable>
         <Text style={s.numVal}>{value}</Text>
-        <Pressable onPress={() => setValue(Math.min(max, value + 1))}><Text style={s.numBtn}>＋</Text></Pressable>
+        <Pressable onPress={() => setValue(Math.min(max, value + 1))} accessibilityRole="button"><Text style={s.numBtn}>＋</Text></Pressable>
       </View>
     </View>
   );

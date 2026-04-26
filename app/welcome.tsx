@@ -62,15 +62,15 @@ export default function Welcome() {
             </Pressable>
 
             <View style={s.legalRow}>
-              <Pressable onPress={() => router.push("/legal/terms")}>
+              <Pressable onPress={() => router.push("/legal/terms")} accessibilityRole="button">
                 <Text style={s.legalLink}>利用規約</Text>
               </Pressable>
               <Text style={s.legalSep}>・</Text>
-              <Pressable onPress={() => router.push("/legal/privacy")}>
+              <Pressable onPress={() => router.push("/legal/privacy")} accessibilityRole="button">
                 <Text style={s.legalLink}>プライバシーポリシー</Text>
               </Pressable>
               <Text style={s.legalSep}>・</Text>
-              <Pressable onPress={() => router.push("/help")}>
+              <Pressable onPress={() => router.push("/help")} accessibilityRole="button">
                 <Text style={s.legalLink}>ヘルプ</Text>
               </Pressable>
             </View>

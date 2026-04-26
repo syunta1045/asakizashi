@@ -1,0 +1,40 @@
+# オンボーディング全7ステップを通る基本フロー
+appId: jp.asakizashi.app
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+- assertVisible: "旭兆"
+- tapOn: "はじめる"
+# Step 1: name
+- tapOn: "ニックネーム"
+- inputText: "テスト太郎"
+- tapOn: "次へ"
+# Step 2: birth
+- assertVisible: "生まれた日"
+- tapOn: "次へ"
+# Step 3: mbti（タップで自動遷移）
+- assertVisible: "MBTI"
+- tapOn: "INTJ"
+# Step 4: blood（タップで自動遷移）
+- assertVisible: "血液型"
+- tapOn: "A型"
+# Step 5: gender（タップで自動遷移）
+- assertVisible: "性別"
+- tapOn: "選択しない"
+# Step 6: wake-up
+- assertVisible: "起きる時間"
+- tapOn: "次へ"
+# Step 7: themes
+- assertVisible: "気になっていること"
+- tapOn: "仕事・キャリア"
+- tapOn: "入力内容を確認"
+# confirm
+- assertVisible: "この内容で進む"
+- tapOn: "この内容で進む"
+# reveal → today
+- waitForAnimationToEnd
+- assertVisible: "今日のお告げを見る"
+- tapOn: "今日のお告げを見る"
+# today タブ到着
+- assertVisible: "テスト太郎"

@@ -159,19 +159,19 @@ export default function Today() {
           </Pressable>
           {shareOpen && (
             <View style={s.shareMenu}>
-              <Pressable style={s.shareMenuRow} onPress={() => { shareToLine(); setShareOpen(false); }}>
+              <Pressable style={s.shareMenuRow} onPress={() => { shareToLine(); setShareOpen(false); }} accessibilityRole="button">
                 <View style={[s.shareDot, { backgroundColor: "#06C755" }]} />
                 <Text style={s.shareMenuText}>LINEで送る</Text>
                 <Text style={s.shareMenuArrow}>›</Text>
               </Pressable>
               <View style={s.shareMenuDivider} />
-              <Pressable style={s.shareMenuRow} onPress={() => { shareToX(); setShareOpen(false); }}>
+              <Pressable style={s.shareMenuRow} onPress={() => { shareToX(); setShareOpen(false); }} accessibilityRole="button">
                 <View style={[s.shareDot, { backgroundColor: C.ink }]} />
                 <Text style={s.shareMenuText}>Xにポストする</Text>
                 <Text style={s.shareMenuArrow}>›</Text>
               </Pressable>
               <View style={s.shareMenuDivider} />
-              <Pressable style={s.shareMenuRow} onPress={() => { onShare(); setShareOpen(false); }}>
+              <Pressable style={s.shareMenuRow} onPress={() => { onShare(); setShareOpen(false); }} accessibilityRole="button">
                 <View style={[s.shareDot, { backgroundColor: C.gold }]} />
                 <Text style={s.shareMenuText}>その他のアプリ…</Text>
                 <Text style={s.shareMenuArrow}>›</Text>
@@ -209,7 +209,7 @@ export default function Today() {
             ))}
           </View>
 
-          <Pressable style={s.linkCard} onPress={() => router.push("/calendar")}>
+          <Pressable style={s.linkCard} onPress={() => router.push("/calendar")} accessibilityRole="button">
             <View style={s.linkIcon} />
             <View style={{ flex: 1 }}>
               <Text style={s.linkTitle}>月の流れを読み解く</Text>
@@ -218,7 +218,7 @@ export default function Today() {
             <Text style={s.linkArrow}>›</Text>
           </Pressable>
 
-          <Pressable style={s.linkCard} onPress={() => router.push("/journal")}>
+          <Pressable style={s.linkCard} onPress={() => router.push("/journal")} accessibilityRole="button">
             <View style={[s.linkIcon, { backgroundColor: C.gold }]} />
             <View style={{ flex: 1 }}>
               <Text style={s.linkTitle}>今晩の振り返りを書く</Text>
@@ -228,7 +228,7 @@ export default function Today() {
           </Pressable>
 
           {!isPremium && (
-            <Pressable style={s.premiumBanner} onPress={() => router.push("/premium")}>
+            <Pressable style={s.premiumBanner} onPress={() => router.push("/premium")} accessibilityRole="button">
               <Text style={s.premiumBannerLabel}>◆ プレミアムで さらに深く</Text>
               <Text style={s.premiumBannerTitle}>命式の詳細・五行・月の流れ</Text>
               <Text style={s.premiumBannerCta}>7日間無料で試す ›</Text>

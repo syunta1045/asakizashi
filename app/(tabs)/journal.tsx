@@ -75,7 +75,7 @@ export default function Journal() {
               placeholderTextColor={C.inkMuted}
               multiline
             />
-            <Pressable style={s.saveBtn} onPress={onSave} disabled={mood === null}>
+            <Pressable style={s.saveBtn} onPress={onSave} disabled={mood === null} accessibilityRole="button">
               <Text style={s.saveText}>記録する</Text>
             </Pressable>
           </View>

@@ -42,19 +42,19 @@ export default function Profile() {
           </View>
 
           <View style={s.linkGroup}>
-            <Pressable style={s.linkRow} onPress={() => router.push("/chart")}>
+            <Pressable style={s.linkRow} onPress={() => router.push("/chart")} accessibilityRole="button">
               <Text style={s.linkText}>命式の詳細を見る</Text>
               <Text style={s.linkArrow}>›</Text>
             </Pressable>
-            <Pressable style={s.linkRow} onPress={() => router.push("/calendar")}>
+            <Pressable style={s.linkRow} onPress={() => router.push("/calendar")} accessibilityRole="button">
               <Text style={s.linkText}>月の流れ</Text>
               <Text style={s.linkArrow}>›</Text>
             </Pressable>
-            <Pressable style={s.linkRow} onPress={() => router.push("/premium")}>
+            <Pressable style={s.linkRow} onPress={() => router.push("/premium")} accessibilityRole="button">
               <Text style={s.linkText}>プレミアムにアップグレード</Text>
               <Text style={s.linkArrow}>›</Text>
             </Pressable>
-            <Pressable style={s.linkRow} onPress={() => router.push("/settings")}>
+            <Pressable style={s.linkRow} onPress={() => router.push("/settings")} accessibilityRole="button">
               <Text style={s.linkText}>設定</Text>
               <Text style={s.linkArrow}>›</Text>
             </Pressable>

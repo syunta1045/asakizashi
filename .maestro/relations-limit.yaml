@@ -1,0 +1,22 @@
+# 無料プランで5件登録 → 6件目で上限ダイアログが出ることを確認
+appId: jp.asakizashi.app
+---
+- launchApp
+- tapOn: "つながり"
+# まず1件登録
+- repeat:
+    times: 6
+    commands:
+      - tapOn:
+          text: "新しいつながり"
+          optional: true
+      - tapOn:
+          text: "ジャンルを選んで登録"
+          optional: true
+      - tapOn: "推し"
+      - tapOn: "次へ"
+      - tapOn: "アイドル"
+      - inputText: "テスト"
+      - tapOn: "登録する"
+- assertVisible: "登録上限に達しました"
+- assertVisible: "プレミアムを見る"

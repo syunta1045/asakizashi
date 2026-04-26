@@ -87,15 +87,15 @@ export default function Calendar() {
             <Text style={s.title}>{month}月の流れ</Text>
           </View>
           {!isCurrentMonth && (
-            <Pressable onPress={goToday}>
+            <Pressable onPress={goToday} accessibilityRole="button">
               <Text style={s.todayBtn}>今月</Text>
             </Pressable>
           )}
         </View>
 
         <View style={s.navRow}>
-          <Pressable onPress={goPrev} style={s.navBtn}><Text style={s.navText}>‹ 前月</Text></Pressable>
-          <Pressable onPress={goNext} style={s.navBtn}><Text style={s.navText}>次月 ›</Text></Pressable>
+          <Pressable onPress={goPrev} style={s.navBtn} accessibilityRole="button"><Text style={s.navText}>‹ 前月</Text></Pressable>
+          <Pressable onPress={goNext} style={s.navBtn} accessibilityRole="button"><Text style={s.navText}>次月 ›</Text></Pressable>
         </View>
 
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
@@ -110,7 +110,7 @@ export default function Calendar() {
               {cells.map((d, i) => {
                 if (!d) return <View key={`b-${i}`} style={s.cell} />;
                 return (
-                  <Pressable key={d.date} style={s.cell} onPress={() => onTapDay(d)}>
+                  <Pressable key={d.date} style={s.cell} onPress={() => onTapDay(d)} accessibilityRole="button">
                     <View style={[
                       s.dayCircle,
                       d.isToday && s.dayToday,
@@ -163,7 +163,7 @@ export default function Calendar() {
 
         {/* 日付プレビューモーダル */}
         <Modal visible={!!selected} transparent animationType="fade" onRequestClose={() => setSelected(null)}>
-          <Pressable style={s.modalBg} onPress={() => setSelected(null)}>
+          <Pressable style={s.modalBg} onPress={() => setSelected(null)} accessibilityRole="button">
             {selected && (
               <View style={s.modalCard}>
                 <Text style={s.modalDate}>

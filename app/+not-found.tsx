@@ -11,7 +11,7 @@ export default function NotFound() {
       <SafeAreaView style={s.safe}>
         <Text style={s.title}>道に迷いました</Text>
         <Text style={s.body}>このページは見つかりませんでした。</Text>
-        <Pressable style={s.btn} onPress={() => router.replace("/today")}>
+        <Pressable style={s.btn} onPress={() => router.replace("/today")} accessibilityRole="button">
           <Text style={s.btnText}>今日の画面に戻る</Text>
         </Pressable>
       </SafeAreaView>
