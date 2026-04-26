@@ -1,0 +1,42 @@
+{
+  "$comment": "App Store Connect / Google Play Console に手動入力 or fastlane deliver 用",
+  "ios": {
+    "name": "旭兆",
+    "subtitle": "毎朝届く、あなただけの一行運勢",
+    "primaryCategory": "LIFESTYLE",
+    "secondaryCategory": "ENTERTAINMENT",
+    "ageRating": "4+",
+    "languages": ["ja"],
+    "keywords": [
+      "四柱推命","占い","運勢","朝","毎日","命式","干支","鑑定",
+      "日柱","五行","十二支","おみくじ","お告げ","通知","生年月日","MBTI","血液型","相性"
+    ],
+    "supportUrl": "https://asakizashi.app/support",
+    "marketingUrl": "https://asakizashi.app",
+    "privacyPolicyUrl": "https://asakizashi.app/privacy",
+    "promotionalText": "四柱推命を朝のルーティンへ。命式 × MBTI × 血液型から、毎日あなただけの一行が届きます。御神籤カード、十二支ランキング、推しや大切な日の相性まで。",
+    "description": "詳細は asakizashi-store-listing.md 参照",
+    "whatsNew": "v0.1.2\n- 朝命から旭兆へ正式リリース\n- 四柱推命の命式計算エンジン搭載\n- 朝の通知（起床+10分）\n- 御神籤カード・十二支ランキング・つながり機能"
+  },
+  "android": {
+    "title": "旭兆 - 朝の四柱推命お告げ",
+    "shortDescription": "毎朝届く、あなただけの一行運勢",
+    "fullDescription": "詳細は asakizashi-store-listing.md 参照",
+    "category": "LIFESTYLE",
+    "contentRating": "everyone"
+  },
+  "iap": [
+    { "id": "premium_monthly", "type": "auto-renewable-subscription", "price": 480, "currency": "JPY", "title": "プレミアム 月額" },
+    { "id": "premium_yearly",  "type": "auto-renewable-subscription", "price": 3800, "currency": "JPY", "title": "プレミアム 年額", "introOffer": { "type": "free_trial", "duration": "P7D" } }
+  ],
+  "appPrivacy": {
+    "linkedToUser": [
+      { "type": "Name", "purposes": ["AppFunctionality"], "tracking": false },
+      { "type": "EmailAddress", "purposes": ["AppFunctionality"], "tracking": false },
+      { "type": "UserId", "purposes": ["AppFunctionality"], "tracking": false },
+      { "type": "OtherUserContent", "purposes": ["AppFunctionality"], "tracking": false }
+    ],
+    "linkedToTracking": false
+  },
+  "reviewNotes": "占い・娯楽アプリ。すべての機能はサインインなしで体験可能（オフラインモード）。プレミアムは7日無料体験可。\n\n占いの結果は娯楽目的であり、医療・法律・金融助言ではないことを利用規約に明記しています。"
+}
