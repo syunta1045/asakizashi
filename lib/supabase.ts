@@ -202,8 +202,8 @@ export async function deleteAccount(): Promise<{ ok: boolean; error?: string }> 
       return { ok: false, error: `アカウント削除に失敗しました (${detail})` };
     }
 
-    // サーバー側削除成功 → ローカルセッションをクリア（呼び出し側が fullLocalWipe を続けて実行）
-    await supabase.auth.signOut();
+    // サーバー側削除成功。ローカルセッションのクリアは呼び出し側が
+    // performSignOutCleanup() で必ず実行する想定（重複 signOut を避ける）。
     return { ok: true };
   } catch (e: unknown) {
     return { ok: false, error: errorMessage(e) };

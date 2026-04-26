@@ -22,7 +22,9 @@ export type EventName =
   | "share_clicked"
   | "sign_in_attempted"
   | "sign_in_succeeded"
-  | "sign_out";
+  | "sign_out"
+  | "revenuecat_init_failed"
+  | "account_deleted";
 
 type Props = Record<string, string | number | boolean | null>;
 

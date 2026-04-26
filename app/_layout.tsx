@@ -32,8 +32,19 @@ function RootLayout() {
       // トライアル期限切れを起動時に判定
       useSubscription.getState().checkTrialExpiry();
       try { await restoreSession(); } catch {}
-      // セッション復元後に RevenueCat 初期化（未設定/未ログインなら no-op、エラーは握りつぶす）
-      ensureRevenueCatConfigured().catch(() => {});
+      // セッション復元後に RevenueCat 初期化（未設定/未ログインなら no-op）
+      // 失敗しても起動は止めないが、無音で握りつぶさず可観測化する
+      ensureRevenueCatConfigured()
+        .then((r) => {
+          if (!r.ok && r.error && r.error !== "未設定" && r.error !== "未ログイン") {
+            console.warn("[RevenueCat] 起動時初期化失敗:", r.error);
+            track("revenuecat_init_failed", { reason: r.error, phase: "boot" });
+          }
+        })
+        .catch((e) => {
+          console.warn("[RevenueCat] 起動時初期化例外:", e);
+          track("revenuecat_init_failed", { reason: String(e), phase: "boot" });
+        });
       // プッシュトークン登録（fire-and-forget、未許可でも続行）
       registerPushToken().catch(() => {});
       setReady(true);

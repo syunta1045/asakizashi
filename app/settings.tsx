@@ -8,8 +8,8 @@ import { useRelations } from "../lib/relations";
 import { useJournal } from "../lib/journal";
 import { useSubscription, isTrialActive, trialDaysRemaining } from "../lib/subscription";
 import { useCoachmark } from "../lib/coachmark";
-import { resetRevenueCat } from "../lib/revenuecat";
-import { signOut, isSupabaseConfigured, getSession, deleteAccount } from "../lib/supabase";
+import { performSignOutCleanup } from "../lib/postSignIn";
+import { isSupabaseConfigured, getSession, deleteAccount } from "../lib/supabase";
 import { requestNotificationPermission, scheduleMorningNotification, cancelAllNotifications } from "../lib/notifications";
 import { exportUserData } from "../lib/export";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -32,15 +32,17 @@ export default function Settings() {
     return "無料プラン";
   })();
 
+  /**
+   * ローカル側の全クリア。サインアウト/退会/手動リセット いずれの動線でも必ず通る。
+   * RevenueCat の logout / Supabase signOut は performSignOutCleanup() で別途実行する。
+   */
   const fullLocalWipe = async () => {
     u.reset();
     relReset();
     journalReset();
     subReset();
     coachReset();
-    await resetRevenueCat();
     await cancelAllNotifications();
-    // 解釈文キャッシュ等の asakizashi-* / interp:* も全削除
     try {
       const keys = await AsyncStorage.getAllKeys();
       const targets = keys.filter((k) => k.startsWith("asakizashi-") || k.startsWith("interp:"));
@@ -68,8 +70,8 @@ export default function Settings() {
       [
         { text: "キャンセル", style: "cancel" },
         { text: "サインアウト", style: "destructive", onPress: async () => {
-            await signOut();
-            await fullLocalWipe();
+            await performSignOutCleanup();   // Supabase signOut + RevenueCat reset + analytics
+            await fullLocalWipe();             // ローカル Zustand + AsyncStorage の全削除
             setSignedIn(false);
             router.replace("/welcome");
           } },
@@ -124,6 +126,7 @@ export default function Settings() {
               Alert.alert("削除に失敗しました", `${r.error || "通信エラー"}\nもう一度お試しください。\nローカルデータは保持されています。`);
               return;
             }
+            await performSignOutCleanup();   // ← サインアウト動線と同じ後始末を必ず通す
             await fullLocalWipe();
             router.replace("/welcome");
           } },

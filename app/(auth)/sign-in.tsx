@@ -4,8 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { signInWithApple, signInWithGoogle, isSupabaseConfigured } from "../../lib/supabase";
-import { syncOnSignIn } from "../../lib/sync";
-import { ensureRevenueCatConfigured } from "../../lib/revenuecat";
+import { finishSignIn } from "../../lib/postSignIn";
 import { useUser } from "../../lib/store";
 import { track } from "../../lib/analytics";
 import { haptics } from "../../lib/haptics";
@@ -46,14 +45,29 @@ export default function SignIn() {
     }
   }, []);
 
+  /**
+   * Apple/Google 共通の後処理。プロバイダ間で挙動がズレないように統一。
+   */
+  const handleSignedIn = async (provider: "apple" | "google", seedNickname?: string | null) => {
+    track("sign_in_succeeded", { provider });
+    if (seedNickname && !useUser.getState().nickname) {
+      useUser.getState().setField("nickname", seedNickname);
+    }
+    const r = await finishSignIn();
+    setLoading(false);
+    if (!r.ok) {
+      Alert.alert("同期に失敗しました", `${r.error || "通信エラー"}\nもう一度お試しください。`);
+      return;
+    }
+    haptics.success();
+    router.replace(r.route);
+  };
+
   const onAppleSignIn = async () => {
     haptics.light();
     track("sign_in_attempted", { provider: "apple" });
     if (!isSupabaseConfigured) {
-      Alert.alert(
-        "オフラインモード",
-        "サーバー連携が未設定のため、ローカル保存のみで進めます。"
-      );
+      Alert.alert("オフラインモード", "サーバー連携が未設定のため、ローカル保存のみで進めます。");
       router.replace("/(onboarding)/name");
       return;
     }
@@ -64,22 +78,7 @@ export default function SignIn() {
       Alert.alert("サインインできませんでした", result.error);
       return;
     }
-    track("sign_in_succeeded", { provider: "apple" });
-    // 初回のみ Apple から名前が取れた場合は nickname のシード値に
-    if (result.fullName && !useUser.getState().nickname) {
-      useUser.getState().setField("nickname", result.fullName);
-    }
-    // サーバーから pull / push
-    const sync = await syncOnSignIn();
-    setLoading(false);
-    if (!sync.ok) {
-      // 通信エラー等で同期に失敗 → オンボへ進める前にユーザーに知らせて中断
-      Alert.alert("同期に失敗しました", `${sync.error || "通信エラー"}\nもう一度お試しください。`);
-      return;
-    }
-    haptics.success();
-    const onboarded = useUser.getState().isOnboarded;
-    router.replace(onboarded ? "/today" : "/(onboarding)/name");
+    await handleSignedIn("apple", result.fullName);
   };
 
   const onGoogleSignIn = async () => {
@@ -97,18 +96,7 @@ export default function SignIn() {
       Alert.alert("サインインできませんでした", result.error);
       return;
     }
-    track("sign_in_succeeded", { provider: "google" });
-    const sync = await syncOnSignIn();
-    setLoading(false);
-    if (!sync.ok) {
-      Alert.alert("同期に失敗しました", `${sync.error || "通信エラー"}\nもう一度お試しください。`);
-      return;
-    }
-    // RevenueCat を新しい userId で初期化（未設定なら no-op）
-    ensureRevenueCatConfigured().catch(() => {});
-    haptics.success();
-    const onboarded = useUser.getState().isOnboarded;
-    router.replace(onboarded ? "/today" : "/(onboarding)/name");
+    await handleSignedIn("google");
   };
 
   return (
