@@ -35,12 +35,11 @@ export default function MbtiStep() {
         onPress={() => select(null)}
         style={[s.skip, mbti === null && s.cellActive]}
       accessibilityRole="button">
-        <Text style={[s.skipText, mbti === null && s.textActive]}>設定しない</Text>
+        <Text style={[s.skipText, mbti === null && s.textActive]}>わからない</Text>
       </Pressable>
 
       <Text style={s.hint}>
-        わからない方は診断テストへ ↗{"\n"}
-        設定しない場合、性格に依存しないメッセージになります
+        わからない場合、性格に依存しないメッセージになります
       </Text>
     </OnboardShell>
   );

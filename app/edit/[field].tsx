@@ -23,8 +23,12 @@ const GENDERS: { v: GenderVal; label: string }[] = [
 ];
 const TIMES = ["5:00","5:30","6:00","6:30","7:00","7:30","8:00"];
 const THEMES = [
-  "恋愛・パートナーシップ","仕事・キャリア","お金・金運","健康・体調",
-  "人間関係","学び・成長","美容・ライフスタイル","結婚・家庭",
+  "恋愛・パートナーシップ","結婚・家庭","子育て・家族",
+  "仕事・キャリア","副業・独立","お金・金運","勝負・運気",
+  "人間関係","学び・成長","創作・表現",
+  "趣味・楽しみ","旅・冒険",
+  "健康・体調","メンタル・心","美容・ライフスタイル","食・暮らし",
+  "推し・ファン活動","スピリチュアル",
 ];
 
 export default function EditField() {
@@ -125,7 +129,7 @@ function MbtiEditor() {
         ))}
       </View>
       <Pressable onPress={() => setField("mbti", null)} style={[s.fullRow, mbti === null && s.fullRowOn]} accessibilityRole="button">
-        <Text style={[s.fullRowText, mbti === null && s.fullRowTextOn]}>設定しない</Text>
+        <Text style={[s.fullRowText, mbti === null && s.fullRowTextOn]}>わからない</Text>
       </Pressable>
     </View>
   );

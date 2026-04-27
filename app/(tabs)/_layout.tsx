@@ -1,8 +1,14 @@
 import { Tabs } from "expo-router";
-import { Text } from "react-native";
+import { Text, Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { C, F } from "../../lib/theme";
 
 export default function TabsLayout() {
+  // Android 11+ のジェスチャーナビゲーションだと bottom inset がそれなりに大きいので
+  // tabBar の paddingBottom と height を端末ごとに動的に決める。
+  const insets = useSafeAreaInsets();
+  const bottomPad = Math.max(insets.bottom, Platform.OS === "ios" ? 18 : 12);
+
   return (
     <Tabs
       screenOptions={{
@@ -14,8 +20,8 @@ export default function TabsLayout() {
           borderTopColor: C.paperBorder,
           borderTopWidth: 1,
           paddingTop: 8,
-          paddingBottom: 18,
-          height: 70,
+          paddingBottom: bottomPad,
+          height: 56 + bottomPad,
         },
         tabBarLabelStyle: { fontSize: 10, fontFamily: F.serif },
       }}
