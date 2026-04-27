@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, TextInput, ScrollView, Pressable, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useUser, notifyTimeFrom } from "../../lib/store";
 import { scheduleMorningNotification } from "../../lib/notifications";
+import { PlaceSelectButton, PlacePickerModal } from "../../components/PlacePicker";
 import { C, dawnGradient, F } from "../../lib/theme";
 
 const MBTI_LIST = ["INTJ","INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP","ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP"];
@@ -20,7 +21,6 @@ const GENDERS: { v: GenderVal; label: string }[] = [
   { v: "female", label: "女性" }, { v: "male", label: "男性" },
   { v: "other", label: "その他" }, { v: "none", label: "選択しない" },
 ];
-const PLACES = ["北海道","東京都","神奈川県","大阪府","京都府","愛知県","福岡県","海外"];
 const TIMES = ["5:00","5:30","6:00","6:30","7:00","7:30","8:00"];
 const THEMES = [
   "恋愛・パートナーシップ","仕事・キャリア","お金・金運","健康・体調",
@@ -99,13 +99,16 @@ function BirthEditor() {
 
 function PlaceEditor() {
   const { birthPlace, setField } = useUser();
+  const [open, setOpen] = useState(false);
   return (
-    <View style={s.chips}>
-      {PLACES.map((p) => (
-        <Pressable key={p} onPress={() => setField("birthPlace", p)} style={[s.chip, birthPlace === p && s.chipOn]} accessibilityRole="button">
-          <Text style={[s.chipText, birthPlace === p && s.chipTextOn]}>{p}</Text>
-        </Pressable>
-      ))}
+    <View>
+      <PlaceSelectButton value={birthPlace} onPress={() => setOpen(true)} />
+      <PlacePickerModal
+        visible={open}
+        value={birthPlace}
+        onPick={(v) => setField("birthPlace", v)}
+        onClose={() => setOpen(false)}
+      />
     </View>
   );
 }

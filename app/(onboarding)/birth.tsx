@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { View, Text, Pressable, ScrollView, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { OnboardShell } from "../../components/OnboardShell";
+import { PlaceSelectButton, PlacePickerModal } from "../../components/PlacePicker";
 import { useUser } from "../../lib/store";
 import { C, F } from "../../lib/theme";
 
@@ -32,22 +33,12 @@ function NumWheel({ values, value, onChange, unit }: {
   );
 }
 
-const PLACES = [
-  "北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県",
-  "茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県",
-  "新潟県","富山県","石川県","福井県","山梨県","長野県",
-  "岐阜県","静岡県","愛知県","三重県",
-  "滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県",
-  "鳥取県","島根県","岡山県","広島県","山口県",
-  "徳島県","香川県","愛媛県","高知県",
-  "福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県",
-  "海外",
-];
 
 
 export default function BirthStep() {
   const router = useRouter();
   const { birthYear, birthMonth, birthDay, birthPlace, setField } = useUser();
+  const [placeOpen, setPlaceOpen] = useState(false);
 
   const today = new Date();
   const isFuture = new Date(birthYear, birthMonth - 1, birthDay) > today;
@@ -77,18 +68,14 @@ export default function BirthStep() {
       <NumWheel values={days} value={Math.min(birthDay, dayMax)} unit="日" onChange={(v) => setField("birthDay", v)} />
 
       <Text style={[s.section, { marginTop: 18 }]}>生まれた場所</Text>
-      <View style={s.placeRow}>
-        {PLACES.map((p) => (
-          <Pressable
-            key={p}
-            onPress={() => setField("birthPlace", p)}
-            style={[s.chip, birthPlace === p && s.chipActive]}
-          accessibilityRole="button">
-            <Text style={[s.chipText, birthPlace === p && s.chipTextActive]}>{p}</Text>
-          </Pressable>
-        ))}
-      </View>
+      <PlaceSelectButton value={birthPlace} onPress={() => setPlaceOpen(true)} />
       <Text style={s.hint}>日柱の境界判定に使います・海外もOK</Text>
+      <PlacePickerModal
+        visible={placeOpen}
+        value={birthPlace}
+        onPick={(v) => setField("birthPlace", v)}
+        onClose={() => setPlaceOpen(false)}
+      />
     </OnboardShell>
   );
 }
@@ -101,10 +88,5 @@ const s = StyleSheet.create({
   wheelCellOn: { backgroundColor: C.white95 },
   wheelText: { color: C.white, fontSize: 16, fontFamily: F.serif },
   wheelTextOn: { color: C.red, fontWeight: "600" },
-  placeRow: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
-  chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18, backgroundColor: C.white12, borderWidth: 1, borderColor: C.whiteBorder },
-  chipActive: { backgroundColor: C.white95, borderColor: "rgba(255,255,255,0.5)" },
-  chipText: { color: C.white, fontSize: 12, fontFamily: F.serif },
-  chipTextActive: { color: C.red, fontWeight: "600" },
   hint: { color: C.white, fontSize: 10, opacity: 0.75, marginTop: 8 },
 });

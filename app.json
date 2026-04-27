@@ -36,10 +36,19 @@
     "plugins": [
       "expo-router",
       "expo-apple-authentication",
-      "@sentry/react-native"
+      "@sentry/react-native",
+      "@react-native-community/datetimepicker",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7c15f87d-287c-4c44-a18a-3eea1cfc8049"
+      }
+    },
+    "owner": "syut"
   }
 }
