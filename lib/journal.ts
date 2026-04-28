@@ -102,6 +102,10 @@ export function isTodayMissing(entries: Record<string, JournalEntry>): boolean {
   return !entries[todayKey()];
 }
 
+function localKey(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 /**
  * 過去N日間の気分集計
  */
@@ -112,15 +116,99 @@ export function moodStats(entries: Record<string, JournalEntry>, days: number = 
   for (let i = 0; i < days; i++) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
-    // ローカル時刻ベースの YYYY-MM-DD（保存側のキー形式と揃える）
-    const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-    const e = entries[k];
+    const e = entries[localKey(d)];
     if (e) {
       counts[e.mood]++;
       total++;
     }
   }
   return { counts, total };
+}
+
+/** 過去N日の平均気分。Mood は 0=最良 ... 3=最悪 なので 0〜3 の小数を返す */
+export function moodAverage(entries: Record<string, JournalEntry>, days: number = 30): { avg: number; total: number } {
+  const today = new Date();
+  let sum = 0;
+  let total = 0;
+  for (let i = 0; i < days; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const e = entries[localKey(d)];
+    if (e) {
+      sum += e.mood;
+      total++;
+    }
+  }
+  return { avg: total > 0 ? sum / total : 0, total };
+}
+
+/** 直近7日 vs その前7日 の気分平均の差（マイナス = 改善、プラス = 悪化）*/
+export function moodTrend(entries: Record<string, JournalEntry>): { current: number; previous: number; diff: number; currentN: number; previousN: number } {
+  const today = new Date();
+  let curSum = 0, curN = 0, prevSum = 0, prevN = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const e = entries[localKey(d)];
+    if (e) { curSum += e.mood; curN++; }
+  }
+  for (let i = 7; i < 14; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const e = entries[localKey(d)];
+    if (e) { prevSum += e.mood; prevN++; }
+  }
+  const current = curN > 0 ? curSum / curN : 0;
+  const previous = prevN > 0 ? prevSum / prevN : 0;
+  return { current, previous, diff: current - previous, currentN: curN, previousN: prevN };
+}
+
+/** 曜日別の平均気分（日=0 〜 土=6）*/
+export function moodByWeekday(entries: Record<string, JournalEntry>, days: number = 30): { sums: number[]; counts: number[] } {
+  const sums = [0, 0, 0, 0, 0, 0, 0];
+  const counts = [0, 0, 0, 0, 0, 0, 0];
+  const today = new Date();
+  for (let i = 0; i < days; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const e = entries[localKey(d)];
+    if (e) {
+      const w = d.getDay();
+      sums[w] += e.mood;
+      counts[w]++;
+    }
+  }
+  return { sums, counts };
+}
+
+/** 直近 N 日の気分配列（古→新）。記録なしは null */
+export function moodSparkline(entries: Record<string, JournalEntry>, days: number = 14): (Mood | null)[] {
+  const today = new Date();
+  const out: (Mood | null)[] = [];
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const e = entries[localKey(d)];
+    out.push(e ? e.mood : null);
+  }
+  return out;
+}
+
+/** 過去 N 日内の最長連続記録 */
+export function longestStreakInRange(entries: Record<string, JournalEntry>, days: number = 30): number {
+  const today = new Date();
+  let max = 0, cur = 0;
+  for (let i = 0; i < days; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    if (entries[localKey(d)]) {
+      cur++;
+      max = Math.max(max, cur);
+    } else {
+      cur = 0;
+    }
+  }
+  return max;
 }
 
 function milestoneTitle(days: number): string {

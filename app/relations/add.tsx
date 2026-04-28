@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { View, Text, ScrollView, Pressable, TextInput, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -130,11 +130,24 @@ export default function AddRelation() {
             </View>
 
             <Text style={s.fieldLabel}>生年月日</Text>
-            <View style={s.dateRow}>
-              <NumPicker label="年" value={year} setValue={setYear} min={1900} max={new Date().getFullYear() + 1} />
-              <NumPicker label="月" value={month} setValue={setMonth} min={1} max={12} />
-              <NumPicker label="日" value={day} setValue={setDay} min={1} max={dayMax} />
-            </View>
+            <NumWheel
+              label="年"
+              values={Array.from({ length: new Date().getFullYear() + 1 - 1900 + 1 }, (_, i) => 1900 + i)}
+              value={year}
+              onChange={setYear}
+            />
+            <NumWheel
+              label="月"
+              values={Array.from({ length: 12 }, (_, i) => i + 1)}
+              value={month}
+              onChange={setMonth}
+            />
+            <NumWheel
+              label="日"
+              values={Array.from({ length: dayMax }, (_, i) => i + 1)}
+              value={day}
+              onChange={setDay}
+            />
           </ScrollView>
         )}
 
@@ -155,29 +168,37 @@ export default function AddRelation() {
   );
 }
 
-function NumPicker({ label, value, setValue, min, max }: { label: string; value: number; setValue: (v: number) => void; min: number; max: number }) {
+/**
+ * 横スクロール型の数値ホイール。
+ * +/- ボタンと違って大きな数値（例: 1995年 → 2010年）も少ないタップで届く。
+ */
+function NumWheel({ label, values, value, onChange }: {
+  label: string; values: number[]; value: number; onChange: (v: number) => void;
+}) {
+  const ref = useRef<ScrollView>(null);
+  const CELL_W = 60;
+  useEffect(() => {
+    const idx = values.indexOf(value);
+    if (idx >= 0 && ref.current) {
+      ref.current.scrollTo({ x: Math.max(0, idx * CELL_W - 100), animated: false });
+    }
+  }, [value, values]);
   return (
-    <View style={s.numWrap}>
-      <Text style={s.numLabel}>{label}</Text>
-      <View style={s.numCtrl}>
-        <Pressable
-          onPress={() => setValue(Math.max(min, value - 1))}
-          accessibilityRole="button"
-          accessibilityLabel={`${label}を1減らす`}
-          hitSlop={12}
-        >
-          <Text style={s.numBtn}>−</Text>
-        </Pressable>
-        <Text style={s.numVal} accessibilityLabel={`${label} ${value}`}>{value}</Text>
-        <Pressable
-          onPress={() => setValue(Math.min(max, value + 1))}
-          accessibilityRole="button"
-          accessibilityLabel={`${label}を1増やす`}
-          hitSlop={12}
-        >
-          <Text style={s.numBtn}>＋</Text>
-        </Pressable>
-      </View>
+    <View style={s.wheel}>
+      <Text style={s.wheelLabel}>{label}</Text>
+      <ScrollView ref={ref} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, gap: 4 }}>
+        {values.map((v) => (
+          <Pressable
+            key={v}
+            onPress={() => onChange(v)}
+            style={[s.wheelCell, v === value && s.wheelCellOn]}
+            accessibilityRole="button"
+            accessibilityState={{ selected: v === value }}
+          >
+            <Text style={[s.wheelText, v === value && s.wheelTextOn]}>{v}</Text>
+          </Pressable>
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -213,12 +234,12 @@ const s = StyleSheet.create({
   chipText: { color: C.white, fontSize: 12, fontFamily: F.serif },
   chipTextOn: { color: C.red, fontWeight: "600" },
 
-  dateRow: { flexDirection: "row", gap: 8 },
-  numWrap: { flex: 1, backgroundColor: C.white15, borderRadius: 12, padding: 12, borderWidth: 1, borderColor: C.whiteBorder },
-  numLabel: { color: C.white, fontSize: 10, opacity: 0.8 },
-  numCtrl: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 6 },
-  numBtn: { color: C.white, fontSize: 22, paddingHorizontal: 6 },
-  numVal: { color: C.white, fontSize: 18, fontWeight: "600", fontFamily: F.serif },
+  wheel: { flexDirection: "row", alignItems: "center", backgroundColor: C.white15, borderRadius: 10, borderWidth: 1, borderColor: C.whiteBorder, marginBottom: 8, paddingVertical: 6 },
+  wheelLabel: { color: C.white, fontSize: 11, opacity: 0.7, paddingHorizontal: 12, width: 36 },
+  wheelCell: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, minWidth: 56, alignItems: "center" },
+  wheelCellOn: { backgroundColor: C.white95 },
+  wheelText: { color: C.white, fontSize: 16, fontFamily: F.serif },
+  wheelTextOn: { color: C.red, fontWeight: "600" },
 
   cta: { backgroundColor: C.paper, borderRadius: 30, paddingVertical: 16, alignItems: "center", borderWidth: 1, borderColor: C.gold, marginBottom: 8 },
   ctaText: { color: C.ink, fontSize: 14, fontWeight: "600", letterSpacing: 6, fontFamily: F.serif },

@@ -31,15 +31,25 @@ export default function MbtiStep() {
         })}
       </View>
 
+      <View style={s.divider}>
+        <View style={s.dividerLine} />
+        <Text style={s.dividerText}>または</Text>
+        <View style={s.dividerLine} />
+      </View>
+
       <Pressable
         onPress={() => select(null)}
-        style={[s.skip, mbti === null && s.cellActive]}
-      accessibilityRole="button">
-        <Text style={[s.skipText, mbti === null && s.textActive]}>わからない</Text>
+        style={[s.skip, mbti === null && s.skipActive]}
+        accessibilityRole="button"
+        accessibilityState={{ selected: mbti === null }}
+      >
+        <Text style={[s.skipText, mbti === null && s.skipTextActive]}>
+          わからないので設定しない
+        </Text>
       </Pressable>
 
       <Text style={s.hint}>
-        わからない場合、性格に依存しないメッセージになります
+        この場合、性格に依存しないメッセージをお届けします
       </Text>
     </OnboardShell>
   );
@@ -51,7 +61,12 @@ const s = StyleSheet.create({
   cellActive: { backgroundColor: C.white95, borderColor: "rgba(255,255,255,0.5)" },
   text: { color: C.white, fontSize: 11, fontWeight: "600" },
   textActive: { color: C.red },
-  skip: { marginTop: 12, paddingVertical: 12, alignItems: "center", borderRadius: 10, backgroundColor: C.white12, borderWidth: 1, borderColor: "rgba(255,255,255,0.18)" },
-  skipText: { color: C.white, fontSize: 12, fontFamily: F.serif },
-  hint: { color: C.white, fontSize: 11, opacity: 0.85, marginTop: 14, lineHeight: 20, textAlign: "center" },
+  divider: { flexDirection: "row", alignItems: "center", marginTop: 22, marginBottom: 10, gap: 10 },
+  dividerLine: { flex: 1, height: 1, backgroundColor: "rgba(255,255,255,0.25)" },
+  dividerText: { color: C.white, fontSize: 10, opacity: 0.7, letterSpacing: 2, fontFamily: F.serif },
+  skip: { paddingVertical: 12, alignItems: "center", borderRadius: 24, borderWidth: 1, borderColor: "rgba(255,255,255,0.35)", borderStyle: "dashed" },
+  skipActive: { backgroundColor: C.white95, borderColor: C.gold, borderStyle: "solid" },
+  skipText: { color: C.white, fontSize: 13, opacity: 0.85, fontFamily: F.serif },
+  skipTextActive: { color: C.red, fontWeight: "600", opacity: 1 },
+  hint: { color: C.white, fontSize: 11, opacity: 0.75, marginTop: 14, lineHeight: 20, textAlign: "center" },
 });
