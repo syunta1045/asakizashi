@@ -45,7 +45,7 @@ export default function WakeUpStep() {
   };
 
   const hours = Array.from({ length: 24 }, (_, i) => i);
-  const minutes = Array.from({ length: 12 }, (_, i) => i * 5); // 5分刻み
+  const minutes = Array.from({ length: 60 }, (_, i) => i); // 1分刻みで自由選択
 
   const notify = notifyTimeFrom(wakeUpTime);
 

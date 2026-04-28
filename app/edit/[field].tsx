@@ -21,7 +21,6 @@ const GENDERS: { v: GenderVal; label: string }[] = [
   { v: "female", label: "女性" }, { v: "male", label: "男性" },
   { v: "other", label: "その他" }, { v: "none", label: "選択しない" },
 ];
-const TIMES = ["5:00","5:30","6:00","6:30","7:00","7:30","8:00"];
 const THEMES = [
   "恋愛・パートナーシップ","結婚・家庭","子育て・家族",
   "仕事・キャリア","副業・独立","お金・金運","勝負・運気",
@@ -163,22 +162,89 @@ function GenderEditor() {
   );
 }
 
+function pad2(n: number) { return String(n).padStart(2, "0"); }
+
 function WakeUpEditor() {
   const { wakeUpTime, nickname, setField } = useUser();
-  const onChange = async (t: string) => {
+  const [hStr, mStr] = wakeUpTime.split(":");
+  const hour = parseInt(hStr, 10);
+  const minute = parseInt(mStr, 10);
+
+  const update = async (h: number, m: number) => {
+    const t = `${pad2(h)}:${pad2(m)}`;
     setField("wakeUpTime", t);
     try { await scheduleMorningNotification(t, nickname); } catch {}
   };
+
+  // 1分単位で自由入力可能（時 0-23、分 0-59）
   return (
     <View>
       <Text style={s.bigTime}>{wakeUpTime}</Text>
       <Text style={s.note}>通知は {notifyTimeFrom(wakeUpTime)} に届きます</Text>
-      <View style={s.chips}>
-        {TIMES.map((t) => (
-          <Pressable key={t} onPress={() => onChange(t)} style={[s.chip, wakeUpTime === t && s.chipOn]} accessibilityRole="button">
-            <Text style={[s.chipText, wakeUpTime === t && s.chipTextOn]}>{t}</Text>
-          </Pressable>
-        ))}
+      <View style={s.timePickerRow}>
+        <View style={s.timePickerCol}>
+          <Pressable
+            onPress={() => update((hour + 1) % 24, minute)}
+            style={s.timeStepBtn}
+            accessibilityRole="button"
+            accessibilityLabel="時を1進める"
+          ><Text style={s.timeStepText}>＋</Text></Pressable>
+          <Text style={s.timeValue}>{pad2(hour)}</Text>
+          <Pressable
+            onPress={() => update((hour + 23) % 24, minute)}
+            style={s.timeStepBtn}
+            accessibilityRole="button"
+            accessibilityLabel="時を1戻す"
+          ><Text style={s.timeStepText}>−</Text></Pressable>
+          <Text style={s.timeUnit}>時</Text>
+        </View>
+        <Text style={s.timeSep}>:</Text>
+        <View style={s.timePickerCol}>
+          <Pressable
+            onPress={() => update(hour, (minute + 1) % 60)}
+            style={s.timeStepBtn}
+            accessibilityRole="button"
+            accessibilityLabel="分を1進める"
+          ><Text style={s.timeStepText}>＋</Text></Pressable>
+          <Text style={s.timeValue}>{pad2(minute)}</Text>
+          <Pressable
+            onPress={() => update(hour, (minute + 59) % 60)}
+            style={s.timeStepBtn}
+            accessibilityRole="button"
+            accessibilityLabel="分を1戻す"
+          ><Text style={s.timeStepText}>−</Text></Pressable>
+          <Text style={s.timeUnit}>分</Text>
+        </View>
+      </View>
+      <Text style={[s.note, { marginTop: 8 }]}>長押しで早送り、または下のボタンで5分単位の調整も可能です</Text>
+      <View style={s.quickStepRow}>
+        <Pressable
+          onPress={() => {
+            const total = hour * 60 + minute - 5;
+            const adjusted = ((total % 1440) + 1440) % 1440;
+            update(Math.floor(adjusted / 60), adjusted % 60);
+          }}
+          style={s.quickStepBtn}
+          accessibilityRole="button"
+        ><Text style={s.quickStepText}>− 5分</Text></Pressable>
+        <Pressable
+          onPress={() => {
+            const total = hour * 60 + minute + 5;
+            const adjusted = total % 1440;
+            update(Math.floor(adjusted / 60), adjusted % 60);
+          }}
+          style={s.quickStepBtn}
+          accessibilityRole="button"
+        ><Text style={s.quickStepText}>+ 5分</Text></Pressable>
+        <Pressable
+          onPress={() => {
+            const total = hour * 60 + minute + 30;
+            const adjusted = total % 1440;
+            update(Math.floor(adjusted / 60), adjusted % 60);
+          }}
+          style={s.quickStepBtn}
+          accessibilityRole="button"
+        ><Text style={s.quickStepText}>+ 30分</Text></Pressable>
       </View>
     </View>
   );
@@ -258,6 +324,16 @@ const s = StyleSheet.create({
   numVal: { color: C.white, fontSize: 22, fontWeight: "600", fontFamily: F.serif },
 
   bigTime: { color: C.white, fontSize: 64, letterSpacing: 4, textAlign: "center", fontFamily: F.serif, fontWeight: "200", marginVertical: 12 },
+  timePickerRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 18, marginTop: 16 },
+  timePickerCol: { alignItems: "center", gap: 8 },
+  timeStepBtn: { width: 44, height: 36, alignItems: "center", justifyContent: "center", backgroundColor: C.white15, borderRadius: 10, borderWidth: 1, borderColor: C.whiteBorder },
+  timeStepText: { color: C.white, fontSize: 22, fontWeight: "300" },
+  timeValue: { color: C.white, fontSize: 36, fontFamily: F.serif, fontWeight: "300", minWidth: 60, textAlign: "center" },
+  timeUnit: { color: C.white, fontSize: 11, opacity: 0.75, letterSpacing: 2, marginTop: 2 },
+  timeSep: { color: C.white, fontSize: 32, fontFamily: F.serif, opacity: 0.7 },
+  quickStepRow: { flexDirection: "row", justifyContent: "center", gap: 8, marginTop: 16 },
+  quickStepBtn: { paddingHorizontal: 16, paddingVertical: 10, backgroundColor: C.white12, borderRadius: 18, borderWidth: 1, borderColor: C.whiteBorder },
+  quickStepText: { color: C.white, fontSize: 12, fontFamily: F.serif },
 
   cta: { backgroundColor: C.paper, borderRadius: 30, paddingVertical: 16, alignItems: "center", borderWidth: 1, borderColor: C.gold, marginBottom: 16 },
   ctaText: { color: C.ink, fontSize: 14, fontWeight: "600", letterSpacing: 6, fontFamily: F.serif },
