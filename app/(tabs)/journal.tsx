@@ -52,7 +52,7 @@ export default function Journal() {
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
           <View style={s.todayCard}>
             <Text style={s.todayLabel}>◆ 今日はどんな一日でしたか</Text>
-            <Text style={s.todaySub}>気分を4段階で記録すると、連続記録が育ちます</Text>
+            <Text style={s.todaySub}>毎日の気分を4段階で記録すると、連続記録が育ちます</Text>
             <View style={s.moodRow}>
               {MOOD_MARKS.map((m, i) => {
                 const on = mood === i;

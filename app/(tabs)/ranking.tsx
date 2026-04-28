@@ -63,7 +63,7 @@ export default function Ranking() {
       <Coachmark
         k="ranking_intro"
         title="十二支ランキング"
-        body="今日の干支との五行の関係から、十二支それぞれの今日の運気を順位で表示します。あなたの位置はハイライトされます。"
+        body="今日の干支との相性から、十二支それぞれの今日の運気を順位で表示します。あなたの位置がハイライトされます。"
       />
     </LinearGradient>
   );

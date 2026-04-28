@@ -138,7 +138,7 @@ function Empty({ onAdd }: { onAdd: () => void }) {
         </View>
         <ScrollView contentContainerStyle={s.list}>
           <Text style={s.emptyLede}>
-            家族・恋人・推し・ペット・記念日まで{"\n"}生年月日があれば登録できます
+            大切な人・推し・ペット・記念日など{"\n"}生年月日があれば、みんな登録できます
           </Text>
           <View style={s.genreGrid}>
             {(Object.entries(GENRE_INFO) as [keyof typeof GENRE_INFO, typeof GENRE_INFO[keyof typeof GENRE_INFO]][]).map(([key, g]) => (

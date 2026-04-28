@@ -55,7 +55,7 @@ export default function Chart() {
           <Section
             num="01"
             title="あなたの三柱"
-            desc="生まれた年・月・日それぞれの干支。年柱は祖先・幼少期、月柱は社会性、日柱はあなた自身を表します。"
+            desc="生まれた年・月・日それぞれの干支。年柱は祖先や幼少期、月柱は社会での立場、日柱があなた自身を表します。"
           />
           <View style={s.pillarsCard}>
             <View style={s.pillarsRow}>

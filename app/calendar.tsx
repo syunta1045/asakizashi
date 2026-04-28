@@ -142,7 +142,7 @@ export default function Calendar() {
           {keyDays.length === 0 && (
             <View style={s.emptyBox}>
               <Text style={s.empty}>今月、この先の節目はありません</Text>
-              <Text style={s.emptySub}>節目の日は月によって数が変わります。翌月以降にまたお知らせします。</Text>
+              <Text style={s.emptySub}>節目の日は月によって変わります。翌月もチェックしてみてください。</Text>
             </View>
           )}
           {keyDays.map((d) => (

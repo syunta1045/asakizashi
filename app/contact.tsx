@@ -62,7 +62,7 @@ export default function Contact() {
 
           <Text style={s.note}>
             メールアプリが起動します。{"\n"}
-            返信には2〜3営業日いただく場合があります。
+            返信までに2〜3営業日をいただく場合があります。
           </Text>
         </ScrollView>
       </SafeAreaView>

@@ -46,7 +46,7 @@ export default function Premium() {
       }
       Alert.alert(
         plan === "yearly" ? "年額プランを購入" : "月額プランを購入",
-        "7日間の無料トライアル後、選択したプランで自動課金が開始されます。設定からいつでも解約できます。",
+        "7日間のトライアル後、選択したプランで自動課金が始まります。いつでも解約できます。",
         [
           { text: "キャンセル", style: "cancel" },
           { text: "購入", onPress: async () => {

@@ -97,7 +97,7 @@ export default function Today() {
           <View style={s.header}>
             <Text style={s.dateLabel}>{reiwaLabel(new Date())}</Text>
             <View style={{ flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" }}>
-              <Text style={s.greet}>{nickname || "あなた"}さん、おはよう</Text>
+              <Text style={s.greet}>おはよう、{nickname || "あなた"}さん</Text>
               {streak > 0 && (
                 <Text style={s.streak}>連続 {streak}日</Text>
               )}

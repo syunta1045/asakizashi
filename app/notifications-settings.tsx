@@ -73,7 +73,7 @@ export default function NotificationsSettings() {
             <View style={s.row}>
               <View style={{ flex: 1 }}>
                 <Text style={s.rowTitle}>朝のお告げ</Text>
-                <Text style={s.rowSub}>起床時刻の10分後（{notifyTimeFrom(u.wakeUpTime)}）に届きます</Text>
+                <Text style={s.rowSub}>起床の10分後（{notifyTimeFrom(u.wakeUpTime)}）に届きます</Text>
               </View>
               <Switch value={u.morningEnabled} onValueChange={onToggleMorning} trackColor={{ true: C.red, false: "#ccc" }} />
             </View>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { View, Text, TextInput, ScrollView, Pressable, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -82,6 +82,7 @@ function NicknameEditor() {
 
 function BirthEditor() {
   const u = useUser();
+  const currentYear = new Date().getFullYear();
   const dayMax = new Date(u.birthYear, u.birthMonth, 0).getDate();
   // 月・年変更で birthDay が dayMax を超えていたらクランプ
   useEffect(() => {
@@ -90,12 +91,49 @@ function BirthEditor() {
       u.computePillars();
     }
   }, [u.birthYear, u.birthMonth, dayMax]);
+  const onYear = (v: number) => { u.setField("birthYear", v); u.computePillars(); };
+  const onMonth = (v: number) => { u.setField("birthMonth", v); u.computePillars(); };
+  const onDay = (v: number) => { u.setField("birthDay", v); u.computePillars(); };
   return (
     <View>
-      <NumRow label="年" value={u.birthYear} setValue={(v) => { u.setField("birthYear", v); u.computePillars(); }} min={1900} max={new Date().getFullYear()} />
-      <NumRow label="月" value={u.birthMonth} setValue={(v) => { u.setField("birthMonth", v); u.computePillars(); }} min={1} max={12} />
-      <NumRow label="日" value={u.birthDay} setValue={(v) => { u.setField("birthDay", v); u.computePillars(); }} min={1} max={dayMax} />
+      <NumWheel label="年" values={Array.from({ length: currentYear - 1900 + 1 }, (_, i) => 1900 + i)} value={u.birthYear} onChange={onYear} />
+      <NumWheel label="月" values={Array.from({ length: 12 }, (_, i) => i + 1)} value={u.birthMonth} onChange={onMonth} />
+      <NumWheel label="日" values={Array.from({ length: dayMax }, (_, i) => i + 1)} value={u.birthDay} onChange={onDay} />
       <Text style={s.note}>変更すると命式が再計算されます</Text>
+    </View>
+  );
+}
+
+/**
+ * 横スクロール式の数値ホイール。オンボ・繋がり・設定 で共通の UX。
+ */
+function NumWheel({ label, values, value, onChange }: {
+  label: string; values: number[]; value: number; onChange: (v: number) => void;
+}) {
+  const ref = useRef<ScrollView>(null);
+  const CELL_W = 60;
+  useEffect(() => {
+    const idx = values.indexOf(value);
+    if (idx >= 0 && ref.current) {
+      ref.current.scrollTo({ x: Math.max(0, idx * CELL_W - 100), animated: false });
+    }
+  }, [value, values]);
+  return (
+    <View style={s.wheel}>
+      <Text style={s.wheelLabel}>{label}</Text>
+      <ScrollView ref={ref} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, gap: 4 }}>
+        {values.map((v) => (
+          <Pressable
+            key={v}
+            onPress={() => onChange(v)}
+            style={[s.wheelCell, v === value && s.wheelCellOn]}
+            accessibilityRole="button"
+            accessibilityState={{ selected: v === value }}
+          >
+            <Text style={[s.wheelText, v === value && s.wheelTextOn]}>{v}</Text>
+          </Pressable>
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -274,19 +312,6 @@ function ThemesEditor() {
   );
 }
 
-function NumRow({ label, value, setValue, min, max }: { label: string; value: number; setValue: (v: number) => void; min: number; max: number }) {
-  return (
-    <View style={s.numRow}>
-      <Text style={s.numLabel}>{label}</Text>
-      <View style={s.numCtrl}>
-        <Pressable onPress={() => setValue(Math.max(min, value - 1))} accessibilityRole="button"><Text style={s.numBtn}>−</Text></Pressable>
-        <Text style={s.numVal}>{value}</Text>
-        <Pressable onPress={() => setValue(Math.min(max, value + 1))} accessibilityRole="button"><Text style={s.numBtn}>＋</Text></Pressable>
-      </View>
-    </View>
-  );
-}
-
 const s = StyleSheet.create({
   bg: { flex: 1 },
   safe: { flex: 1, paddingHorizontal: 28 },
@@ -317,11 +342,12 @@ const s = StyleSheet.create({
 
   note: { color: C.white, fontSize: 11, opacity: 0.85, marginTop: 12, textAlign: "center" },
 
-  numRow: { flexDirection: "row", alignItems: "center", padding: 14, backgroundColor: C.white15, borderRadius: 12, marginBottom: 8, borderWidth: 1, borderColor: C.whiteBorder },
-  numLabel: { color: C.white, fontSize: 13, opacity: 0.85, width: 40 },
-  numCtrl: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginLeft: 14 },
-  numBtn: { color: C.white, fontSize: 26, paddingHorizontal: 16 },
-  numVal: { color: C.white, fontSize: 22, fontWeight: "600", fontFamily: F.serif },
+  wheel: { flexDirection: "row", alignItems: "center", backgroundColor: C.white15, borderRadius: 10, borderWidth: 1, borderColor: C.whiteBorder, marginBottom: 8, paddingVertical: 6 },
+  wheelLabel: { color: C.white, fontSize: 11, opacity: 0.7, paddingHorizontal: 12, width: 36 },
+  wheelCell: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, minWidth: 56, alignItems: "center" },
+  wheelCellOn: { backgroundColor: C.white95 },
+  wheelText: { color: C.white, fontSize: 16, fontFamily: F.serif },
+  wheelTextOn: { color: C.red, fontWeight: "600" },
 
   bigTime: { color: C.white, fontSize: 64, letterSpacing: 4, textAlign: "center", fontFamily: F.serif, fontWeight: "200", marginVertical: 12 },
   timePickerRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 18, marginTop: 16 },
