@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { View, Text, TextInput, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, TextInput, ScrollView, Pressable, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -43,12 +43,20 @@ export default function EditField() {
   return (
     <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
       <SafeAreaView style={s.safe}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
         <View style={s.header}>
           <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="戻る" hitSlop={12}><Text style={s.back}>‹</Text></Pressable>
           <Text style={s.title}>{title}を編集</Text>
         </View>
 
-        <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={s.content}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
           {field === "nickname" && <NicknameEditor />}
           {field === "birth" && <BirthEditor />}
           {field === "place" && <PlaceEditor />}
@@ -62,6 +70,7 @@ export default function EditField() {
         <Pressable style={s.cta} onPress={() => router.back()} accessibilityRole="button">
           <Text style={s.ctaText}>完了</Text>
         </Pressable>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -322,9 +331,9 @@ const s = StyleSheet.create({
 
   input: { backgroundColor: C.white15, borderRadius: 12, padding: 14, color: C.white, fontSize: 18, borderWidth: 1, borderColor: C.whiteBorder, fontFamily: F.serif },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
-  chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18, backgroundColor: C.white12, borderWidth: 1, borderColor: C.whiteBorder, flexDirection: "row", alignItems: "center", gap: 6 },
+  chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18, backgroundColor: C.white12, borderWidth: 1, borderColor: C.whiteBorder, flexDirection: "row", alignItems: "center", gap: 6, maxWidth: "100%" },
   chipOn: { backgroundColor: C.white95, borderColor: "rgba(255,255,255,0.5)" },
-  chipText: { color: C.white, fontSize: 12, fontFamily: F.serif },
+  chipText: { color: C.white, fontSize: 12, fontFamily: F.serif, flexShrink: 1 },
   chipTextOn: { color: C.red, fontWeight: "600" },
   checkSm: { color: C.red, fontSize: 11 },
   checkRed: { color: C.red, fontSize: 14 },

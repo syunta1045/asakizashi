@@ -42,8 +42,13 @@ export function PlacePickerModal({ visible, value, onPick, onClose }: {
 }) {
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
-      <View style={s.modalBg}>
-        <View style={s.modalCard}>
+      <Pressable
+        style={s.modalBg}
+        onPress={onClose}
+        accessibilityRole="button"
+        accessibilityLabel="閉じる"
+      >
+        <Pressable style={s.modalCard} onPress={() => { /* card 内タップでは閉じない */ }}>
           <View style={s.modalHeader}>
             <Text style={s.modalTitle}>生まれた場所を選ぶ</Text>
             <Pressable
@@ -78,8 +83,8 @@ export function PlacePickerModal({ visible, value, onPick, onClose }: {
               </View>
             ))}
           </ScrollView>
-        </View>
-      </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 }

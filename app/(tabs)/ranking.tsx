@@ -28,7 +28,11 @@ export default function Ranking() {
             const isMy = r.branch === my;
             const isTop = r.rank <= 3;
             return (
-              <View key={r.branch} style={[s.row, isMy && s.rowMy]}>
+              <View
+                key={r.branch}
+                style={[s.row, isMy && s.rowMy]}
+                accessibilityLabel={`${r.rank}位 ${branchName[r.branch]}年 相性スコア${r.score}${isMy ? "（あなた）" : ""}`}
+              >
                 <Text style={[
                   s.rank,
                   isMy && s.rankMy,

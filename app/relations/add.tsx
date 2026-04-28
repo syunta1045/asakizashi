@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, KeyboardAvoidingView, Platform, Alert, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Alert } from "react-native";
 import { useRouter } from "expo-router";
 import { useUser } from "../../lib/store";
 import { useRelations, GENRE_INFO, compatibility, RelationLimitError, FREE_RELATION_LIMIT, type Genre } from "../../lib/relations";
@@ -68,6 +67,10 @@ export default function AddRelation() {
   return (
     <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
       <SafeAreaView style={s.safe}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
         <View style={s.headerRow}>
           <Pressable onPress={() => step === 1 ? router.back() : setStep((step - 1) as 1 | 2 | 3)} accessibilityRole="button">
             <Text style={s.back}>‹</Text>
@@ -81,7 +84,7 @@ export default function AddRelation() {
         </View>
 
         {step === 1 && (
-          <ScrollView contentContainerStyle={s.body}>
+          <ScrollView contentContainerStyle={s.body} keyboardShouldPersistTaps="handled">
             <Text style={s.title}>何を占いますか</Text>
             <Text style={s.sub}>ジャンルを選んでください</Text>
             <View style={s.grid}>
@@ -104,7 +107,7 @@ export default function AddRelation() {
         )}
 
         {step === 2 && genre && (
-          <ScrollView contentContainerStyle={s.body}>
+          <ScrollView contentContainerStyle={s.body} keyboardShouldPersistTaps="handled">
             <Text style={s.title}>名前と詳細</Text>
             <Text style={s.sub}>{GENRE_INFO[genre].label}を登録します</Text>
 
@@ -163,6 +166,7 @@ export default function AddRelation() {
             <Text style={s.ctaText}>{step === 2 ? "登録する" : "次へ"}</Text>
           </Pressable>
         )}
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </LinearGradient>
   );

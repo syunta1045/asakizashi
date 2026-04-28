@@ -68,9 +68,9 @@ export default function ThemesStep() {
 
 const s = StyleSheet.create({
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  chip: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: 20, backgroundColor: C.white12, borderWidth: 1, borderColor: C.whiteBorder, flexDirection: "row", alignItems: "center", gap: 6 },
+  chip: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: 20, backgroundColor: C.white12, borderWidth: 1, borderColor: C.whiteBorder, flexDirection: "row", alignItems: "center", gap: 6, maxWidth: "100%" },
   chipOn: { backgroundColor: C.white95, borderColor: "rgba(255,255,255,0.5)" },
-  chipText: { color: C.white, fontSize: 12, fontFamily: F.serif },
+  chipText: { color: C.white, fontSize: 12, fontFamily: F.serif, flexShrink: 1 },
   chipTextOn: { color: C.ink, fontWeight: "600" },
   check: { color: C.red, fontSize: 12 },
   counter: { color: C.white, fontSize: 11, opacity: 0.85, textAlign: "center", marginTop: 18 },

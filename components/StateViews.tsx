@@ -25,8 +25,44 @@ export function ErrorView({ title = "うまく読めませんでした", message
         <Text style={s.title}>{title}</Text>
         {message && <Text style={s.subtle}>{message}</Text>}
         {onRetry && (
-          <Pressable style={s.retry} onPress={onRetry}>
+          <Pressable style={s.retry} onPress={onRetry} accessibilityRole="button">
             <Text style={s.retryText}>もう一度試す</Text>
+          </Pressable>
+        )}
+      </SafeAreaView>
+    </LinearGradient>
+  );
+}
+
+/**
+ * オフライン用フォールバック。「電波の届かない場所でも、命式は手元で読める」とトーンを保つ。
+ */
+export function OfflineView({ onRetry }: { onRetry?: () => void }) {
+  return (
+    <ErrorView
+      title="ネットにつながりません"
+      message={"通信が不安定です。\n命式と今日の干支は手元で読み解いていますので、しばらくしてからもう一度お試しください。"}
+      onRetry={onRetry}
+    />
+  );
+}
+
+/**
+ * 任意のリストや状態が空のときに表示。世界観を壊さない柔らかい言葉。
+ */
+export function EmptyView({ title, message, action }: {
+  title: string;
+  message?: string;
+  action?: { label: string; onPress: () => void };
+}) {
+  return (
+    <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
+      <SafeAreaView style={s.center}>
+        <Text style={s.title}>{title}</Text>
+        {message && <Text style={s.subtle}>{message}</Text>}
+        {action && (
+          <Pressable style={s.retry} onPress={action.onPress} accessibilityRole="button">
+            <Text style={s.retryText}>{action.label}</Text>
           </Pressable>
         )}
       </SafeAreaView>

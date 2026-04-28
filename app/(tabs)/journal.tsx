@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useJournal, MOOD_LABELS, MOOD_MARKS, todayKey, nextMilestone, reachedMilestone, moodStats, moodAverage, moodTrend, moodByWeekday, moodSparkline, longestStreakInRange, type Mood } from "../../lib/journal";
@@ -42,6 +42,10 @@ export default function Journal() {
   return (
     <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
       <SafeAreaView style={s.safe} edges={["top"]}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
         <View style={s.header}>
           <View style={{ flex: 1 }}>
             <Text style={s.dateLabel}>EVENING REFLECTION</Text>
@@ -49,7 +53,7 @@ export default function Journal() {
           </View>
         </View>
 
-        <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
+        <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
           <View style={s.todayCard}>
             <Text style={s.todayLabel}>◆ 今日はどんな一日でしたか</Text>
             <Text style={s.todaySub}>毎日の気分を4段階で記録すると、連続記録が育ちます</Text>
@@ -218,6 +222,7 @@ export default function Journal() {
             </View>
           ))}
         </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </LinearGradient>
   );

@@ -95,7 +95,10 @@ export default function Relations() {
                 <View style={{ flex: 1 }}>
                   <View style={s.nameRow}>
                     <Text style={s.name}>{r.name}</Text>
-                    <View style={[s.tag, tagStyle(compat.kind)]}>
+                    <View
+                      style={[s.tag, tagStyle(compat.kind)]}
+                      accessibilityLabel={`相性: ${tagLabel(compat.kind)}`}
+                    >
                       <Text style={s.tagText}>{tagLabel(compat.kind)}</Text>
                     </View>
                   </View>
