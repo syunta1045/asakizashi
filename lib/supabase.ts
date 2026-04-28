@@ -153,18 +153,31 @@ export async function signInWithGoogle(): Promise<{ error?: string; userId?: str
 
 export async function signOut(): Promise<void> {
   if (!supabase) return;
-  await supabase.auth.signOut();
-  // dynamic import で循環依存回避
-  const { setUserId } = await import("./analytics");
-  const { setUser } = await import("./sentry");
-  setUserId(null);
-  setUser(null);
+  try {
+    await supabase.auth.signOut();
+  } catch (e) {
+    console.warn("signOut:", errorMessage(e));
+  }
+  try {
+    // dynamic import で循環依存回避
+    const { setUserId } = await import("./analytics");
+    const { setUser } = await import("./sentry");
+    setUserId(null);
+    setUser(null);
+  } catch (e) {
+    console.warn("signOut cleanup:", errorMessage(e));
+  }
 }
 
 export async function getSession() {
   if (!supabase) return null;
-  const { data } = await supabase.auth.getSession();
-  return data.session;
+  try {
+    const { data } = await supabase.auth.getSession();
+    return data.session;
+  } catch (e) {
+    console.warn("getSession:", errorMessage(e));
+    return null;
+  }
 }
 
 /**
@@ -219,22 +232,31 @@ export async function fetchInterpretation(
   version: number = 1
 ): Promise<DbInterpretation | null> {
   if (!supabase) return null;
-  const { data, error } = await supabase
-    .from("interpretations")
-    .select("*")
-    .eq("user_day_pillar", userDayPillar)
-    .eq("target_day_pillar", targetDayPillar)
-    .eq("version", version)
-    .single();
-  if (error) {
-    console.warn("fetchInterpretation:", error.message);
+  try {
+    const { data, error } = await supabase
+      .from("interpretations")
+      .select("*")
+      .eq("user_day_pillar", userDayPillar)
+      .eq("target_day_pillar", targetDayPillar)
+      .eq("version", version)
+      .single();
+    if (error) {
+      console.warn("fetchInterpretation:", error.message);
+      return null;
+    }
+    return data as DbInterpretation;
+  } catch (e) {
+    console.warn("fetchInterpretation:", errorMessage(e));
     return null;
   }
-  return data as DbInterpretation;
 }
 
 export async function syncUserProfile(profile: Partial<DbUser>): Promise<void> {
   if (!supabase) return;
-  const { error } = await supabase.from("users").upsert(profile, { onConflict: "auth_id" });
-  if (error) console.warn("syncUserProfile:", error.message);
+  try {
+    const { error } = await supabase.from("users").upsert(profile, { onConflict: "auth_id" });
+    if (error) console.warn("syncUserProfile:", error.message);
+  } catch (e) {
+    console.warn("syncUserProfile:", errorMessage(e));
+  }
 }

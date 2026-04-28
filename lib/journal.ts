@@ -17,6 +17,28 @@ export type JournalEntry = {
   note: string;
 };
 
+/**
+ * 保持する最大日数。これより古い記録は upsert 時に自動的に削除される。
+ * 統計（最大30日）+ 余裕を持たせて2年。AsyncStorage 肥大化防止。
+ */
+export const JOURNAL_RETENTION_DAYS = 730;
+
+/** 保持期間外のエントリを削った新しい辞書を返す */
+export function pruneOldEntries(
+  entries: Record<string, JournalEntry>,
+  retentionDays: number = JOURNAL_RETENTION_DAYS,
+  now: Date = new Date()
+): Record<string, JournalEntry> {
+  const cutoff = new Date(now);
+  cutoff.setDate(cutoff.getDate() - retentionDays);
+  const cutoffKey = `${cutoff.getFullYear()}-${String(cutoff.getMonth() + 1).padStart(2, "0")}-${String(cutoff.getDate()).padStart(2, "0")}`;
+  const next: Record<string, JournalEntry> = {};
+  for (const [k, v] of Object.entries(entries)) {
+    if (k >= cutoffKey) next[k] = v;
+  }
+  return next;
+}
+
 type JournalState = {
   entries: Record<string, JournalEntry>;
   upsert: (date: string, mood: Mood, note: string) => void;
@@ -31,7 +53,9 @@ export const useJournal = create<JournalState>()(
       entries: {},
       upsert: (date, mood, note) => {
         track("journal_entry_saved", { date, mood, hasNote: note.length > 0 });
-        set((s) => ({ entries: { ...s.entries, [date]: { date, mood, note } } }));
+        set((s) => ({
+          entries: pruneOldEntries({ ...s.entries, [date]: { date, mood, note } }),
+        }));
       },
       remove: (date) =>
         set((s) => {

@@ -60,7 +60,12 @@ export function OnboardShell({ step, total = 7, title, sub, children, onNext, on
         </Pressable>
 
         {onSkip && (
-          <Pressable onPress={() => { haptics.select(); onSkip(); }} style={s.skipBtn}>
+          <Pressable
+            onPress={() => { haptics.select(); onSkip(); }}
+            style={s.skipBtn}
+            accessibilityRole="button"
+            accessibilityLabel="この項目をスキップ"
+          >
             <Text style={s.skipText}>スキップ</Text>
           </Pressable>
         )}
