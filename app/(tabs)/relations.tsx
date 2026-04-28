@@ -183,7 +183,7 @@ const s = StyleSheet.create({
   filterTextOn: { color: C.red, fontWeight: "600" },
   filterEmpty: { color: C.white, fontSize: 12, opacity: 0.7, textAlign: "center", padding: 24 },
 
-  card: { flexDirection: "row", alignItems: "center", gap: 14, backgroundColor: C.white95, borderRadius: 14, padding: 14, borderWidth: 1, borderColor: C.paperBorder },
+  card: { flexDirection: "row", alignItems: "center", gap: 14, backgroundColor: C.paper, borderRadius: 14, padding: 14, borderWidth: 1, borderColor: C.paperBorder },
   icon: { width: 48, height: 48, borderRadius: 24, alignItems: "center", justifyContent: "center" },
   iconText: { color: C.white, fontSize: 20, fontWeight: "500", fontFamily: F.serif },
   nameRow: { flexDirection: "row", alignItems: "center", gap: 8 },

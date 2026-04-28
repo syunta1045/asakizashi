@@ -221,7 +221,7 @@ const s = StyleSheet.create({
   legend: { flexDirection: "row", justifyContent: "center", gap: 12, marginTop: 8 },
   legendItem: { fontSize: 9, color: C.inkSub },
 
-  sectionTitle: { color: C.white, fontSize: 13, fontWeight: "500", letterSpacing: 3, marginTop: 24, marginBottom: 10, fontFamily: F.serif },
+  sectionTitle: { color: C.white, fontSize: 13, fontWeight: "500", letterSpacing: 3, marginTop: 24, marginBottom: 12, fontFamily: F.serif },
   empty: { color: C.white, fontSize: 13, fontFamily: F.serif, textAlign: "center" },
   emptyBox: { padding: 20, backgroundColor: "rgba(255,255,255,0.08)", borderRadius: 12, borderWidth: 1, borderColor: "rgba(255,255,255,0.18)", marginTop: 8, gap: 6 },
   emptySub: { color: C.white, opacity: 0.75, fontSize: 11, lineHeight: 18, textAlign: "center", fontFamily: F.serif },

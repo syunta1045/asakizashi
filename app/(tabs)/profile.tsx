@@ -54,7 +54,7 @@ export default function Profile() {
               <Text style={s.linkText}>プレミアムにアップグレード</Text>
               <Text style={s.linkArrow}>›</Text>
             </Pressable>
-            <Pressable style={s.linkRow} onPress={() => router.push("/settings")} accessibilityRole="button">
+            <Pressable style={s.linkRowLast} onPress={() => router.push("/settings")} accessibilityRole="button">
               <Text style={s.linkText}>設定</Text>
               <Text style={s.linkArrow}>›</Text>
             </Pressable>
@@ -98,6 +98,7 @@ const s = StyleSheet.create({
   themeEmpty: { color: C.white, fontSize: 12, opacity: 0.7, paddingHorizontal: 8 },
   linkGroup: { marginTop: 24, backgroundColor: C.white95, borderRadius: 14, borderWidth: 1, borderColor: C.paperBorder, overflow: "hidden" },
   linkRow: { flexDirection: "row", alignItems: "center", padding: 14, borderBottomWidth: 1, borderBottomColor: C.paperBorder },
+  linkRowLast: { flexDirection: "row", alignItems: "center", padding: 14 },
   linkText: { flex: 1, color: C.ink, fontSize: 13, fontWeight: "500" },
   linkArrow: { color: C.inkMuted, fontSize: 14 },
 });

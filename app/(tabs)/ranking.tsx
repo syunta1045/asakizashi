@@ -98,7 +98,7 @@ const s = StyleSheet.create({
   nameMy: { color: C.ink },
   youTag: { color: C.red, fontSize: 9, letterSpacing: 2 },
   comment: { color: C.inkSub, fontSize: 11, marginTop: 4, lineHeight: 16, fontFamily: F.serif },
-  scoreBar: { marginTop: 6, height: 3, backgroundColor: "rgba(255,255,255,0.2)", borderRadius: 2, overflow: "hidden" },
+  scoreBar: { marginTop: 6, height: 4, backgroundColor: "rgba(255,255,255,0.2)", borderRadius: 2, overflow: "hidden" },
   scoreBarMy: { backgroundColor: "rgba(168,131,64,0.2)" },
   scoreFill: { height: "100%", backgroundColor: "rgba(255,255,255,0.7)" },
   scoreFillMy: { backgroundColor: C.red },

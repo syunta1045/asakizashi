@@ -314,8 +314,8 @@ const s = StyleSheet.create({
 
   sparkBlock: { paddingVertical: 10, paddingHorizontal: 4, borderTopWidth: 1, borderTopColor: "rgba(255,255,255,0.15)" },
   sparkLabel: { color: C.white, fontSize: 10, opacity: 0.85, letterSpacing: 2, marginBottom: 8 },
-  sparkRow: { flexDirection: "row", alignItems: "flex-end", gap: 3, height: 32 },
-  sparkCol: { flex: 1, alignItems: "center", justifyContent: "flex-end", height: 32 },
+  sparkRow: { flexDirection: "row", alignItems: "flex-end", gap: 3, height: 40, paddingTop: 4 },
+  sparkCol: { flex: 1, alignItems: "center", justifyContent: "flex-end", height: 36 },
   sparkDot: { width: 12, borderRadius: 2, height: 8 },
   sparkDotEmpty: { backgroundColor: "rgba(255,255,255,0.15)" },
   sparkAxis: { flexDirection: "row", justifyContent: "space-between", marginTop: 4 },
