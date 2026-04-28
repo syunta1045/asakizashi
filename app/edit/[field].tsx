@@ -121,16 +121,31 @@ function NumWheel({ label, values, value, onChange }: {
 }) {
   const ref = useRef<ScrollView>(null);
   const CELL_W = 60;
+  // ScrollView レイアウト確定後に scrollTo を発行する（contentSize が決まるまで待つ）
+  // 親が values=Array.from(...) で毎レンダー新規参照を作っても、
+  // value 変化のみを依存にして無駄な再スクロールを抑える。
+  const onContentSizeChange = () => {
+    const idx = values.indexOf(value);
+    if (idx >= 0 && ref.current) {
+      ref.current.scrollTo({ x: Math.max(0, idx * CELL_W - 100), animated: false });
+    }
+  };
   useEffect(() => {
     const idx = values.indexOf(value);
     if (idx >= 0 && ref.current) {
       ref.current.scrollTo({ x: Math.max(0, idx * CELL_W - 100), animated: false });
     }
-  }, [value, values]);
+  }, [value]);
   return (
     <View style={s.wheel}>
       <Text style={s.wheelLabel}>{label}</Text>
-      <ScrollView ref={ref} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, gap: 4 }}>
+      <ScrollView
+        ref={ref}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 12, gap: 4 }}
+        onContentSizeChange={onContentSizeChange}
+      >
         {values.map((v) => (
           <Pressable
             key={v}
@@ -263,7 +278,7 @@ function WakeUpEditor() {
           <Text style={s.timeUnit}>分</Text>
         </View>
       </View>
-      <Text style={[s.note, { marginTop: 8 }]}>長押しで早送り、または下のボタンで5分単位の調整も可能です</Text>
+      <Text style={[s.note, { marginTop: 8 }]}>下のボタンで5分単位、30分単位の調整もできます</Text>
       <View style={s.quickStepRow}>
         <Pressable
           onPress={() => {

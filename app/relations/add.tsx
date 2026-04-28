@@ -181,16 +181,25 @@ function NumWheel({ label, values, value, onChange }: {
 }) {
   const ref = useRef<ScrollView>(null);
   const CELL_W = 60;
-  useEffect(() => {
+  const scrollToValue = () => {
     const idx = values.indexOf(value);
     if (idx >= 0 && ref.current) {
       ref.current.scrollTo({ x: Math.max(0, idx * CELL_W - 100), animated: false });
     }
-  }, [value, values]);
+  };
+  useEffect(() => {
+    scrollToValue();
+  }, [value]);
   return (
     <View style={s.wheel}>
       <Text style={s.wheelLabel}>{label}</Text>
-      <ScrollView ref={ref} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, gap: 4 }}>
+      <ScrollView
+        ref={ref}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 12, gap: 4 }}
+        onContentSizeChange={scrollToValue}
+      >
         {values.map((v) => (
           <Pressable
             key={v}

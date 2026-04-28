@@ -13,16 +13,25 @@ function NumWheel({ values, value, onChange, unit, format = (v: number) => Strin
   format?: (v: number) => string;
 }) {
   const ref = useRef<ScrollView>(null);
-  useEffect(() => {
+  const scrollToValue = () => {
     const idx = values.indexOf(value);
     if (idx >= 0 && ref.current) {
       ref.current.scrollTo({ x: Math.max(0, idx * CELL_WIDTH - 100), animated: false });
     }
-  }, [value, values]);
+  };
+  useEffect(() => {
+    scrollToValue();
+  }, [value]);
   return (
     <View style={s.wheel}>
       <Text style={s.wheelLabel}>{unit}</Text>
-      <ScrollView ref={ref} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, gap: 4 }}>
+      <ScrollView
+        ref={ref}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 12, gap: 4 }}
+        onContentSizeChange={scrollToValue}
+      >
         {values.map((v) => (
           <Pressable key={v} onPress={() => onChange(v)} style={[s.wheelCell, v === value && s.wheelCellOn]} accessibilityRole="button">
             <Text style={[s.wheelText, v === value && s.wheelTextOn]}>{format(v)}</Text>

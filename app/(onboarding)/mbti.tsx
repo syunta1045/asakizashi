@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { OnboardShell } from "../../components/OnboardShell";
@@ -9,7 +10,13 @@ const TYPES = ["INTJ","INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP","ISTJ","I
 export default function MbtiStep() {
   const router = useRouter();
   const { mbti, setField } = useUser();
+  // 「ユーザーがこの画面で実際にタップした」かどうかを追跡。
+  // mbti===null は「未選択（DEFAULT）」と「わからないを明示選択」の両方になりうるため、
+  // タップフラグが立つまで わからないボタンの選択状態を見せない。
+  const [touched, setTouched] = useState(false);
+  const dontKnowSelected = touched && mbti === null;
   const select = (v: string | null) => {
+    setTouched(true);
     setField("mbti", v);
     router.push("/(onboarding)/blood");
   };
@@ -39,11 +46,11 @@ export default function MbtiStep() {
 
       <Pressable
         onPress={() => select(null)}
-        style={[s.skip, mbti === null && s.skipActive]}
+        style={[s.skip, dontKnowSelected && s.skipActive]}
         accessibilityRole="button"
-        accessibilityState={{ selected: mbti === null }}
+        accessibilityState={{ selected: dontKnowSelected }}
       >
-        <Text style={[s.skipText, mbti === null && s.skipTextActive]}>
+        <Text style={[s.skipText, dontKnowSelected && s.skipTextActive]}>
           わからないので設定しない
         </Text>
       </Pressable>
