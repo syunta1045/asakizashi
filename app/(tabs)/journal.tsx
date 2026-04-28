@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, KeyboardAvoidingView, Platform, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, KeyboardAvoidingView, Platform, Modal, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useJournal, MOOD_LABELS, MOOD_MARKS, todayKey, nextMilestone, reachedMilestone, moodStats, moodAverage, moodTrend, moodByWeekday, moodSparkline, longestStreakInRange, type Mood } from "../../lib/journal";
@@ -13,17 +13,22 @@ export default function Journal() {
 
   const [mood, setMood] = useState<Mood | null>(todayEntry ? todayEntry.mood : null);
   const [note, setNote] = useState(todayEntry?.note || "");
+  // マイルストーン達成時のお祝いダイアログ
+  const [celebrate, setCelebrate] = useState<{ title: string; description: string } | null>(null);
 
   const onSave = () => {
     if (mood === null) return;
     const prevStreak = useJournal.getState().getStreak();
     haptics.success();
     upsert(today, mood, note);
-    // upsert は同期 set なので即座に最新 streak を取得できる
     const newStreak = useJournal.getState().getStreak();
     const reached = reachedMilestone(newStreak);
     if (reached && newStreak !== prevStreak) {
       haptics.success();
+      setCelebrate({
+        title: reached.title,
+        description: `${newStreak}日 続いています`,
+      });
     }
   };
 
@@ -224,6 +229,29 @@ export default function Journal() {
         </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
+
+      {/* マイルストーン達成のお祝い */}
+      <Modal
+        visible={!!celebrate}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setCelebrate(null)}
+      >
+        <Pressable style={s.celebBg} onPress={() => setCelebrate(null)} accessibilityLabel="閉じる">
+          <View style={s.celebCard}>
+            <Text style={s.celebSparkle}>✦   ☀   ✦</Text>
+            <Text style={s.celebTitle}>{celebrate?.title}</Text>
+            <Text style={s.celebDesc}>{celebrate?.description}</Text>
+            <View style={s.celebDivider} />
+            <Text style={s.celebMessage}>
+              続けることで、あなたの日々の流れが{"\n"}より深く読み解けるようになります。
+            </Text>
+            <Pressable style={s.celebClose} onPress={() => setCelebrate(null)} accessibilityRole="button">
+              <Text style={s.celebCloseText}>ありがとう</Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
     </LinearGradient>
   );
 }
@@ -270,7 +298,20 @@ function weekdayBgFromAvg(avg: number) {
   return { backgroundColor: "rgba(180,80,80,0.5)" };
 }
 
+const celebStyles = {
+  celebBg: { flex: 1, backgroundColor: "rgba(0,0,0,0.55)", alignItems: "center" as const, justifyContent: "center" as const, padding: 24 },
+  celebCard: { backgroundColor: C.paper, borderRadius: 18, paddingVertical: 28, paddingHorizontal: 24, borderWidth: 1, borderColor: C.gold, alignItems: "center" as const, maxWidth: 360 },
+  celebSparkle: { color: C.gold, fontSize: 14, letterSpacing: 8, marginBottom: 12 },
+  celebTitle: { color: C.red, fontSize: 22, fontWeight: "600" as const, fontFamily: F.serif, letterSpacing: 4, textAlign: "center" as const },
+  celebDesc: { color: C.ink, fontSize: 13, marginTop: 8, fontFamily: F.serif },
+  celebDivider: { width: 60, height: 1, backgroundColor: C.gold, marginVertical: 18, opacity: 0.5 },
+  celebMessage: { color: C.inkSub, fontSize: 12, lineHeight: 22, textAlign: "center" as const, fontFamily: F.serif },
+  celebClose: { marginTop: 22, paddingHorizontal: 32, paddingVertical: 12, backgroundColor: C.red, borderRadius: 24 },
+  celebCloseText: { color: C.white, fontSize: 13, fontWeight: "600" as const, letterSpacing: 4, fontFamily: F.serif },
+};
+
 const s = StyleSheet.create({
+  ...celebStyles,
   bg: { flex: 1 },
   safe: { flex: 1 },
   header: { flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 24, paddingTop: 14, paddingBottom: 14 },

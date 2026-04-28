@@ -118,32 +118,37 @@ export default function Today() {
             <View style={s.stamp}><Text style={s.stampText}>旭{"\n"}兆</Text></View>
             <Text style={s.omikujiHead}>◆ {targetDayStr}（{dayReading}）の日</Text>
 
-            <View style={s.kichiRow}>
-              <View style={s.kichiCol}>
-                <Text style={s.kichiLabel}>運勢</Text>
-                <Text style={s.kichiText}>{m.kichi}</Text>
+            {/* 主役: 運勢 (大吉等) */}
+            <Text style={s.kichiHero}>{m.kichi}</Text>
+            <Text style={s.kichiHeroSub}>今日の運勢</Text>
+
+            {/* 補助情報: 順位・スコアを 1段落としで */}
+            <View style={s.subStatsRow}>
+              <View style={s.subStat}>
+                <Text style={s.subStatValue}>第{m.rank}位</Text>
+                <Text style={s.subStatLabel}>十二支中</Text>
               </View>
-              <View style={s.divider} />
-              <View style={s.kichiCol}>
-                <Text style={s.kichiLabel}>十二支中</Text>
-                <Text style={s.rankText}>
-                  <Text style={s.rankSmall}>第</Text>{m.rank}<Text style={s.rankSmall}>位</Text>
-                </Text>
+              <View style={s.subStatDiv} />
+              <View style={s.subStat}>
+                <Text style={s.subStatValue}>{m.score}<Text style={s.subStatUnit}>点</Text></Text>
+                <Text style={s.subStatLabel}>運気スコア</Text>
               </View>
             </View>
 
             <Text style={s.headline}>{m.headline}</Text>
+
+            {/* パーソナライズ・マーカー (MBTI / 血液型 を入力していたら明示) */}
+            {(mbti || (bloodType && bloodType !== "unknown")) && (
+              <Text style={s.personalLine}>
+                ── {mbti}{mbti && bloodType && bloodType !== "unknown" ? "・" : ""}{bloodType && bloodType !== "unknown" ? `${bloodType}型` : ""}のあなたへ ──
+              </Text>
+            )}
+
             <View style={s.hr} />
             <Text style={s.body}>{m.body}</Text>
 
-            <View style={{ marginTop: 16 }}>
-              <View style={s.scoreLabel}>
-                <Text style={s.scoreLabelText}>運気</Text>
-                <Text style={s.scoreValue}>{m.score} / 100</Text>
-              </View>
-              <View style={s.scoreBar}>
-                <View style={[s.scoreBarFill, { width: `${m.score}%` }]} />
-              </View>
+            <View style={s.scoreBarOuter}>
+              <View style={[s.scoreBarFill, { width: `${m.score}%` }]} />
             </View>
           </View>
 
@@ -184,15 +189,15 @@ export default function Today() {
           <View style={s.guideCard}>
             <View style={[s.guideBlock, { borderBottomWidth: 1, borderBottomColor: "rgba(255,255,255,0.15)" }]}>
               <View style={s.guideHead}>
-                <View style={s.kichiBadge}><Text style={s.kichiBadgeText}>吉</Text></View>
-                <Text style={s.guideHeadText}>やるとよいこと</Text>
+                <View style={s.kichiBadge}><Text style={s.kichiBadgeText}>✓</Text></View>
+                <Text style={s.guideHeadText}>おすすめ</Text>
               </View>
               {m.doActions.map((a, i) => <Text key={i} style={s.guideItem}>・{a}</Text>)}
             </View>
             <View style={s.guideBlock}>
               <View style={s.guideHead}>
-                <View style={[s.kichiBadge, { backgroundColor: "rgba(184,150,86,0.25)" }]}><Text style={[s.kichiBadgeText, { color: C.gold }]}>忌</Text></View>
-                <Text style={s.guideHeadText}>控えるべきこと</Text>
+                <View style={[s.kichiBadge, { backgroundColor: "rgba(184,150,86,0.25)" }]}><Text style={[s.kichiBadgeText, { color: C.gold }]}>!</Text></View>
+                <Text style={s.guideHeadText}>ひかえめに</Text>
               </View>
               {m.avoidActions.map((a, i) => <Text key={i} style={s.guideItem}>・{a}</Text>)}
             </View>
@@ -276,20 +281,21 @@ const s = StyleSheet.create({
   stamp: { position: "absolute", top: 14, right: 14, width: 38, height: 38, borderWidth: 1.5, borderColor: C.red, borderRadius: 4, alignItems: "center", justifyContent: "center", transform: [{ rotate: "-6deg" }] },
   stampText: { color: C.red, fontSize: 11, lineHeight: 13, textAlign: "center", fontWeight: "600", fontFamily: F.serif },
   omikujiHead: { color: C.gold, fontSize: 9, letterSpacing: 4, fontFamily: F.serif },
-  kichiRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 14, gap: 16 },
-  kichiCol: { alignItems: "center" },
-  kichiLabel: { color: C.gold, fontSize: 9, letterSpacing: 3, fontFamily: F.serif },
-  kichiText: { color: C.red, fontSize: 50, fontWeight: "600", letterSpacing: 4, lineHeight: 56, fontFamily: F.serif },
-  divider: { width: 1, height: 56, backgroundColor: C.paperBorder },
-  rankText: { color: C.ink, fontSize: 44, fontWeight: "300", lineHeight: 48, fontFamily: F.serif },
-  rankSmall: { color: C.gold, fontSize: 18 },
+  // 主役の運勢
+  kichiHero: { color: C.red, fontSize: 60, fontWeight: "600", letterSpacing: 6, lineHeight: 70, fontFamily: F.serif, textAlign: "center", marginTop: 16 },
+  kichiHeroSub: { color: C.gold, fontSize: 9, letterSpacing: 4, textAlign: "center", marginTop: 2, fontFamily: F.serif },
+  // 補助情報
+  subStatsRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 14, gap: 18 },
+  subStat: { alignItems: "center" },
+  subStatDiv: { width: 1, height: 28, backgroundColor: C.paperBorder },
+  subStatValue: { color: C.ink, fontSize: 20, fontWeight: "500", fontFamily: F.serif, letterSpacing: 1 },
+  subStatUnit: { color: C.gold, fontSize: 13 },
+  subStatLabel: { color: C.gold, fontSize: 9, letterSpacing: 2, marginTop: 2, fontFamily: F.serif },
+  personalLine: { color: C.gold, fontSize: 10, letterSpacing: 3, textAlign: "center", marginTop: 10, fontFamily: F.serif, opacity: 0.85 },
   headline: { color: C.ink, fontSize: 18, lineHeight: 30, fontWeight: "500", textAlign: "center", marginTop: 18, fontFamily: F.serif },
   hr: { height: 1, backgroundColor: C.paperBorder, marginVertical: 14 },
   body: { color: C.inkSub, fontSize: 12, lineHeight: 22, fontFamily: F.serif },
-  scoreLabel: { flexDirection: "row", justifyContent: "space-between", marginBottom: 4 },
-  scoreLabelText: { color: C.gold, fontSize: 9, letterSpacing: 2 },
-  scoreValue: { color: C.red, fontSize: 11, fontWeight: "600" },
-  scoreBar: { height: 4, backgroundColor: "rgba(184,150,86,0.2)", borderRadius: 2, overflow: "hidden" },
+  scoreBarOuter: { marginTop: 16, height: 4, backgroundColor: "rgba(184,150,86,0.2)", borderRadius: 2, overflow: "hidden" },
   scoreBarFill: { height: "100%", backgroundColor: C.red },
   shareBtn: { marginTop: 12, padding: 12, alignItems: "center", borderRadius: 24, borderWidth: 1, borderColor: "rgba(255,255,255,0.4)", backgroundColor: "rgba(255,255,255,0.08)" },
   shareText: { color: C.white, fontSize: 12, letterSpacing: 2, fontFamily: F.serif },

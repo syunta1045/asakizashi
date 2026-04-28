@@ -170,6 +170,15 @@ export default function Chart() {
                 )}
               </View>
             ))}
+            {currentDaiunIdx >= 0 && daiun[currentDaiunIdx] && (
+              <View style={s.daiunNowBox}>
+                <Text style={s.daiunNowLabel}>今期のテーマ</Text>
+                <Text style={s.daiunNowText}>
+                  {stemMeaning[daiun[currentDaiunIdx].pillar.stem]}{"\n"}
+                  {branchMeaning[daiun[currentDaiunIdx].pillar.branch]}
+                </Text>
+              </View>
+            )}
             <Text style={s.daiunNote}>
               ※ 起算年齢は概算 8歳。本来は出生時刻から精密に算出します。
             </Text>
@@ -260,6 +269,9 @@ const s = StyleSheet.create({
   daiunPillarCurrent: { color: C.red, fontWeight: "600" },
   daiunCurrent: { color: C.red, fontSize: 11, fontWeight: "600", marginLeft: "auto" },
   daiunNote: { color: C.inkSub, fontSize: 9, padding: 12, lineHeight: 14, fontFamily: F.serif },
+  daiunNowBox: { padding: 14, marginHorizontal: 8, marginTop: 12, marginBottom: 4, borderRadius: 10, backgroundColor: "rgba(168,30,30,0.08)", borderWidth: 1, borderColor: "rgba(168,30,30,0.18)" },
+  daiunNowLabel: { color: C.red, fontSize: 10, letterSpacing: 3, fontWeight: "600", fontFamily: F.serif },
+  daiunNowText: { color: C.ink, fontSize: 12, lineHeight: 20, marginTop: 6, fontFamily: F.serif },
   bars: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", height: 110, gap: 8 },
   barCol: { flex: 1, alignItems: "center" },
   barCount: { color: C.inkSub, fontSize: 9, marginBottom: 4 },
