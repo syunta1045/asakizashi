@@ -99,6 +99,40 @@ export async function cancelAllNotifications() {
 }
 
 /**
+ * 起動時の safety net: ユーザー設定で通知ON かつ OS 権限 granted なのに
+ * スケジュール済みが0件の場合だけ、再スケジュールする。
+ *
+ * 想定ケース:
+ *   - APK の上書きインストール後にスケジュールが消失した
+ *   - OS のメンテで一時的にクリアされた
+ *   - 何らかの理由で過去に schedule 失敗した
+ *
+ * オンボ未完了 / 権限未許可 / ユーザー設定で OFF のときは何もしない（黙って no-op）。
+ */
+export async function ensureNotificationsScheduled(): Promise<{ ok: boolean; rescheduled: boolean; reason?: string }> {
+  if (!Device.isDevice) return { ok: true, rescheduled: false, reason: "not-device" };
+  try {
+    const { useUser } = await import("./store");
+    const u = useUser.getState();
+    // オンボ未完了
+    if (!u.isOnboarded) return { ok: true, rescheduled: false, reason: "onboarding-incomplete" };
+    // ユーザー設定が両方OFF
+    if (!u.morningEnabled && !u.eveningEnabled) return { ok: true, rescheduled: false, reason: "user-disabled" };
+    // 権限なし（黙って no-op、許可ダイアログは出さない）
+    const { status } = await Notifications.getPermissionsAsync();
+    if (status !== "granted") return { ok: true, rescheduled: false, reason: "permission-denied" };
+    // 既にスケジュール済みなら何もしない
+    const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+    if (scheduled.length > 0) return { ok: true, rescheduled: false, reason: "already-scheduled" };
+    // 再スケジュール
+    await scheduleMorningNotification(u.wakeUpTime, u.nickname);
+    return { ok: true, rescheduled: true };
+  } catch (e: unknown) {
+    return { ok: false, rescheduled: false, reason: errorMessage(e) };
+  }
+}
+
+/**
  * Expo Push Token を取得して Supabase の push_tokens テーブルに登録。
  * サーバー側からプッシュ送信するために必要。
  */

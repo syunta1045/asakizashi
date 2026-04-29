@@ -24,6 +24,7 @@ export type EventName =
   | "sign_in_succeeded"
   | "sign_out"
   | "revenuecat_init_failed"
+  | "notifications_rescheduled"
   | "account_deleted";
 
 type Props = Record<string, string | number | boolean | null>;

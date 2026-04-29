@@ -7,7 +7,7 @@ import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { restoreSession } from "../lib/sync";
-import { registerPushToken } from "../lib/notifications";
+import { registerPushToken, ensureNotificationsScheduled } from "../lib/notifications";
 import { track } from "../lib/analytics";
 import { initSentry, wrap } from "../lib/sentry";
 import { useSubscription } from "../lib/subscription";
@@ -47,6 +47,13 @@ function RootLayout() {
         });
       // プッシュトークン登録（fire-and-forget、未許可でも続行）
       registerPushToken().catch(() => {});
+      // ローカル通知の safety net: 設定ON & 権限grantedなのに schedule が0件なら復旧
+      ensureNotificationsScheduled()
+        .then((r) => {
+          if (r.rescheduled) track("notifications_rescheduled");
+          else if (!r.ok) console.warn("[notifications] ensure 失敗:", r.reason);
+        })
+        .catch((e) => console.warn("[notifications] ensure 例外:", e));
       setReady(true);
       SplashScreen.hideAsync().catch(() => {});
     })();
