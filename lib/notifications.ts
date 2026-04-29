@@ -63,34 +63,48 @@ export async function scheduleMorningNotification(
   if (morningEnabled) {
     const notify = notifyTimeFrom(wakeUpTime);
     const [h, m] = notify.split(":").map(Number);
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "旭兆",
-        body: `${nickname || "あなた"}さんへの今朝のお告げが届いています`,
-        sound: "default",
-        data: { deeplink: "asakizashi://today" },
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
-        hour: h, minute: m, repeats: true,
-      },
-    });
+    try {
+      const id = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "旭兆",
+          body: `${nickname || "あなた"}さんへの今朝のお告げが届いています`,
+          sound: "default",
+          data: { deeplink: "asakizashi://today" },
+        },
+        trigger: {
+          channelId: "morning",
+          type: Notifications.SchedulableTriggerInputTypes.DAILY,
+          hour: h,
+          minute: m,
+        },
+      });
+      console.log("[notifications] morning scheduled:", id, h, m);
+    } catch (e) {
+      console.warn("[notifications] morning schedule failed:", errorMessage(e));
+    }
   }
 
   if (eveningEnabled) {
     const [eh, em] = eveningTime.split(":").map(Number);
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "旭兆",
-        body: "今日はどんな一日でしたか？少しだけ振り返ってみませんか",
-        sound: "default",
-        data: { deeplink: "asakizashi://journal" },
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
-        hour: eh, minute: em, repeats: true,
-      },
-    });
+    try {
+      const id = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "旭兆",
+          body: "今日はどんな一日でしたか？少しだけ振り返ってみませんか",
+          sound: "default",
+          data: { deeplink: "asakizashi://journal" },
+        },
+        trigger: {
+          channelId: "morning",
+          type: Notifications.SchedulableTriggerInputTypes.DAILY,
+          hour: eh,
+          minute: em,
+        },
+      });
+      console.log("[notifications] evening scheduled:", id, eh, em);
+    } catch (e) {
+      console.warn("[notifications] evening schedule failed:", errorMessage(e));
+    }
   }
 }
 
