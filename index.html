@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>朝しるべ — 今日を整える一行</title>
+<meta name="description" content="朝のひとときに、今日を整える一行を届ける四柱推命アプリ。" />
+<link rel="icon" type="image/png" href="/favicon.png" />
+
+<!-- OGP -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="朝しるべ — 今日を整える一行" />
+<meta property="og:description" content="朝のひとときに、今日を整える一行を届ける四柱推命アプリ。" />
+<meta property="og:url" content="https://asakizashi.app" />
+<meta property="og:site_name" content="朝しるべ" />
+<meta property="og:locale" content="ja_JP" />
+<meta property="og:image" content="https://asakizashi.app/og-image.png" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="朝しるべ — 今日を整える一行" />
+<meta name="twitter:description" content="朝のひとときに、今日を整える一行を届ける四柱推命アプリ。" />
+<meta name="twitter:image" content="https://asakizashi.app/og-image.png" />
+
+<style>
+  :root {
+    --top: #1F2E4A; --m1: #5B4274; --m2: #C26E70; --m3: #EBA47E; --bottom: #F5DDB5;
+    --paper: #FAF4E0; --gold: #A88340; --red: #9E2F2F; --ink: #231A1F; --inkSub: #6B5C4E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: linear-gradient(180deg, var(--top) 0%, var(--m1) 30%, var(--m2) 60%, var(--m3) 80%, var(--bottom) 100%);
+    color: #FFF;
+    font-family: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif;
+    min-height: 100vh;
+  }
+  main { width: 100%; }
+  .hero {
+    min-height: 82vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 56px 24px 36px; text-align: center;
+  }
+  .brand { font-size: clamp(44px, 10vw, 64px); letter-spacing: 8px; margin-bottom: 14px; }
+  .appIcon { width: 116px; height: 116px; border-radius: 26px; margin-bottom: 24px; box-shadow: 0 18px 56px rgba(15, 10, 20, 0.28); }
+  .tagline { font-size: 13px; letter-spacing: 6px; margin: 24px 0; opacity: 0.85; }
+  .lede { font-size: 16px; line-height: 2; margin: 28px 0; text-align: center; max-width: 480px; }
+  .featureBand {
+    width: 100%; padding: 34px 24px 52px; background: rgba(250,244,224,0.18);
+    border-top: 1px solid rgba(255,255,255,0.2);
+  }
+  .features {
+    max-width: 820px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  }
+  .feature { border-top: 1px solid rgba(255,255,255,0.32); padding-top: 16px; }
+  .feature h2 { font-size: 17px; letter-spacing: 3px; margin-bottom: 10px; font-weight: 600; }
+  .feature p { color: rgba(255,255,255,0.82); font-size: 13px; line-height: 1.9; }
+  .note { max-width: 720px; margin: 28px auto 0; color: rgba(255,255,255,0.72); font-size: 12px; line-height: 1.9; text-align: center; }
+  .footer { padding: 28px 24px 42px; display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .footer a { color: #FFF; opacity: 0.8; text-decoration: underline; font-size: 12px; }
+  .stores { display: flex; gap: 14px; margin-top: 24px; }
+  .stores span {
+    background: var(--paper); color: var(--ink); padding: 10px 18px; border-radius: 24px;
+    font-size: 13px; font-weight: 600; letter-spacing: 2px;
+    border: 1px solid var(--gold);
+  }
+  @media (max-width: 700px) {
+    .features { grid-template-columns: 1fr; gap: 22px; }
+    .stores { flex-direction: column; width: min(280px, 100%); }
+    .stores a { text-align: center; }
+  }
+</style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <img class="appIcon" src="/app-icon.png" alt="" aria-hidden="true" />
+      <div class="brand">朝しるべ</div>
+      <div class="tagline">── 今日を整える一行 ──</div>
+      <div class="lede">
+        朝のひとときに<br />
+        今日を整える一行を
+      </div>
+      <div class="stores">
+        <span>App Store 準備中</span>
+        <span>Google Play 準備中</span>
+      </div>
+    </section>
+
+    <section class="featureBand" aria-label="朝しるべの特徴">
+      <div class="features">
+        <div class="feature">
+          <h2>今朝の一行</h2>
+          <p>命式とその日の干支から、今日の歩き方を短い言葉で届けます。</p>
+        </div>
+        <div class="feature">
+          <h2>月の流れ</h2>
+          <p>今月の節目の日、やわらかな日、控えめにしたい日を見渡せます。</p>
+        </div>
+        <div class="feature">
+          <h2>つながり</h2>
+          <p>大切な人や記念日を登録して、毎朝の相性と流れを確認できます。</p>
+        </div>
+      </div>
+      <p class="note">占い・娯楽を目的としたアプリです。医療・法律・金融などの専門的助言ではありません。</p>
+    </section>
+  </main>
+  <footer class="footer">
+    <a href="/privacy">プライバシーポリシー</a>
+    <a href="/terms">利用規約</a>
+    <a href="/support">サポート</a>
+  </footer>
+</body>
+</html>
