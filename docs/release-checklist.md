@@ -1,4 +1,4 @@
-# 旭兆 リリースチェックリスト
+# 朝しるべ リリースチェックリスト
 
 ## Phase 1: 開発者アカウント取得（β配信前）
 
@@ -33,7 +33,7 @@
 
 ### app.json / 環境変数
 - [ ] `expo.ios.bundleIdentifier`: `jp.asakizashi.app` ✓ 設定済
-- [ ] `expo.android.package`: `jp.asakizashi.app` ✓ 設定済
+- [ ] `expo.android.package`: `jp.asashirube.app` ✓ 設定済
 - [ ] `expo.scheme`: `asakizashi` ✓ 設定済
 - [ ] `EXPO_PUBLIC_SUPABASE_URL`
 - [ ] `EXPO_PUBLIC_SUPABASE_ANON_KEY`
@@ -74,20 +74,29 @@ supabase secrets set GEMINI_API_KEY=...              # Google AI Studio
 - [ ] サンプル10件を目視レビュー
 
 ### Apple Developer Console
-- [ ] App ID 登録: `jp.asakizashi.app` + Sign in with Apple capability
-- [ ] Apple Push Notification 鍵（.p8）を生成
+- [ ] App ID 登録: `jp.asakizashi.app`
+- [ ] Capabilities を有効化: **Sign in with Apple**, **Push Notifications**, **In-App Purchase**
+- [ ] Provisioning Profile に上記 Capabilities が反映されていることを確認
+- [ ] Apple Push Notification 鍵（.p8）を生成し、Expo / EAS 側に登録
 - [ ] App Store Connect で新規アプリ作成
 - [ ] TestFlight Internal Testing を有効化
 
 ### Google Play Console
-- [ ] アプリ作成: `jp.asakizashi.app`
+- [ ] アプリ作成: `jp.asashirube.app`
 - [ ] Internal Testing トラックに最初のビルドをアップロード
 - [ ] アプリ署名鍵を作成
 
 ### RevenueCat
 - [ ] App Store Connect / Play Console を RevenueCat に連携
-- [ ] Product 作成: `premium_monthly` (¥480), `premium_yearly` (¥3,800)
-- [ ] Entitlement 作成: `premium`
+- [x] RevenueCat iOS App Store App 作成: `jp.asakizashi.app`
+- [x] RevenueCat In-App Purchase Key 連携
+- [x] App Store Connect で Subscription Group 作成: `朝しるべプレミアム`
+- [x] Product 作成: `premium_monthly` (¥480), `premium_yearly` (¥3,800)
+- [x] `premium_yearly` に 7日間の無料トライアルを設定
+- [x] Entitlement 作成: `premium`
+- [x] App Store側 `premium_monthly` / `premium_yearly` を Entitlement `premium` に紐付け
+- [x] Offering `default` の `$rc_monthly` / `$rc_annual` に App Store商品を紐付け
+- [x] RevenueCat iOS SDK Key を `EXPO_PUBLIC_REVENUECAT_IOS_KEY` に設定
 - [ ] Webhook URL を Supabase Edge Function に設定
 
 ---
@@ -98,6 +107,7 @@ supabase secrets set GEMINI_API_KEY=...              # Google AI Studio
 - [x] `assets/icon.png` 1024×1024
 - [x] `assets/adaptive-icon.png` 1024×1024 (Android)
 - [x] `assets/splash-icon.png` 1242×2688
+- [x] `assets/feature-graphic.png` 1024×500 (Google Play)
 
 ### スクリーンショット（実機 or シミュレータで撮影）
 iOS 必要サイズ:
@@ -111,12 +121,12 @@ Android 必要サイズ:
 
 ### 撮影内容（10枚案 — store-listing.md 参照）
 - [ ] 1. ロック画面通知（朝6:40）
-- [ ] 2. Today 御神籤カード
-- [ ] 3. 命式リビール
-- [ ] 4. 十二支ランキング
+- [ ] 2. 今日タブ（朝メモ）
+- [ ] 3. 初回朝メモ
+- [ ] 4. 今日のペース
 - [ ] 5. つながり一覧
-- [ ] 6. 月の流れカレンダー
-- [ ] 7. 命式の詳細
+- [ ] 6. 月間カレンダー
+- [ ] 7. 傾向メモ
 - [ ] 8. 振り返り日記
 - [ ] 9. プレミアム比較
 - [ ] 10. オンボーディング MBTI
@@ -132,12 +142,13 @@ Android 必要サイズ:
 - [x] プライバシーポリシー作成 ✓
 - [x] 利用規約作成 ✓
 - [ ] 弁護士レビュー（推奨）
-- [ ] HTTPSでホスティング: `https://asakizashi.app/privacy`, `https://asakizashi.app/terms`
-- [ ] App Store Connect の Privacy Manifest を入力
+- [ ] HTTPSでホスティング: `https://syunta1045.github.io/asakizashi/privacy/`, `https://syunta1045.github.io/asakizashi/terms/`
+- [ ] App Store Connect の App Privacy を入力（`docs/app-store-submission.md` を参照）
 - [ ] Google Play の データセーフティ セクション記入
 
 ### App Tracking Transparency (iOS 14.5+)
-- [x] `NSUserTrackingUsageDescription` 設定済 ✓
+- [x] トラッキングしない設計。ATT ダイアログ / `NSUserTrackingUsageDescription` は不要
+- [ ] App Store Connect の App Privacy で「他社のAppやWebサイトを横断したトラッキング」は **No** にする
 
 ---
 
@@ -161,7 +172,10 @@ Android 必要サイズ:
 - [ ] 段階的公開設定
 
 ### App Store 提出
-- [ ] App Review 用デモアカウント作成（占いアプリは特に重要）
+- [ ] App Review 用メモを入力（`docs/app-store-submission.md` を参照）
+- [ ] サインインなしで主要機能を確認できることをTestFlightで確認
+- [ ] Apple Sign in が成功することをTestFlightで確認
+- [ ] IAP購入・購入復元がSandboxで成功することをTestFlightで確認
 - [ ] ビルド選択 + 提出
 - [ ] 審査待ち（1〜3週間）
 - [ ] 審査でリジェクトされた場合、対応 → 再提出

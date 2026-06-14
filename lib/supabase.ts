@@ -8,12 +8,18 @@
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 import { errorMessage, userCancelled } from "./errors";
 
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+const googleClientId =
+  Platform.OS === "ios" ? process.env.EXPO_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_IOS
+  : Platform.OS === "android" ? process.env.EXPO_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_ANDROID
+  : process.env.EXPO_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_WEB;
 
 export const isSupabaseConfigured = Boolean(url && anonKey);
+export const isGoogleSignInConfigured = Boolean(googleClientId);
 
 export const supabase: SupabaseClient | null = isSupabaseConfigured
   ? createClient(url!, anonKey!, {
@@ -51,7 +57,7 @@ export type DbInterpretation = {
   id: string;
   user_day_pillar: string;
   target_day_pillar: string;
-  kichi: "大吉" | "中吉" | "小吉" | "末吉" | "凶";
+  kichi: string;
   score: number;
   headline: string;
   body: string;
@@ -118,17 +124,12 @@ export async function signInWithGoogle(): Promise<{ error?: string; userId?: str
 
   try {
     const AuthSession = await import("expo-auth-session");
-    const { Platform } = await import("react-native");
-    const GOOGLE_CLIENT_ID =
-      Platform.OS === "ios"     ? process.env.EXPO_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_IOS
-      : Platform.OS === "android" ? process.env.EXPO_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_ANDROID
-      : process.env.EXPO_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_WEB;
-    if (!GOOGLE_CLIENT_ID) return { error: "Google Client ID 未設定" };
+    if (!googleClientId) return { error: "Google Client ID 未設定" };
 
     const redirectUri = AuthSession.makeRedirectUri({ scheme: "asakizashi" });
     const discovery = await AuthSession.fetchDiscoveryAsync("https://accounts.google.com");
     const request = new AuthSession.AuthRequest({
-      clientId: GOOGLE_CLIENT_ID,
+      clientId: googleClientId,
       scopes: ["openid", "profile", "email"],
       redirectUri,
       responseType: AuthSession.ResponseType.IdToken,

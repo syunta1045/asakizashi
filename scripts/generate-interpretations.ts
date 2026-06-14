@@ -30,7 +30,7 @@ const genai = new GoogleGenAI({ apiKey });
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const ResponseShape = z.object({
-  kichi: z.enum(["大吉", "中吉", "小吉", "末吉", "凶"]),
+  kichi: z.enum(["bright", "steady", "soft", "gentle", "hold"]),
   score: z.number().int().min(0).max(100),
   headline: z.string().min(8).max(40),
   body: z.string().min(80).max(400),

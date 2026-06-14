@@ -61,8 +61,8 @@ export default function WakeUpStep() {
   return (
     <OnboardShell
       step={6}
-      title={"起きる時間を\n教えてください"}
-      sub="その10分後に、その日のお告げをお届けします"
+      title={"起きる時間を\n決めましょう"}
+      sub="目が覚めて少し落ち着いた頃に、朝メモをお届けします"
       onNext={() => router.push("/(onboarding)/themes")}
     >
       <View style={s.clockWrap}>
@@ -74,7 +74,11 @@ export default function WakeUpStep() {
       <NumWheel values={minutes} value={minute} unit="分" format={pad} onChange={(m) => updateTime(hour, m)} />
 
       <View style={s.notifyCard}>
-        <View style={s.brandIcon}><Text style={s.brandIconText}>旭</Text></View>
+        <View style={s.brandIcon}>
+          <View style={s.brandCard}>
+            <View style={s.brandSun} />
+          </View>
+        </View>
         <View style={{ flex: 1 }}>
           <Text style={s.notifyLabel}>通知が届く時刻</Text>
           <Text style={s.notifyTime}>{notify}</Text>
@@ -97,8 +101,9 @@ const s = StyleSheet.create({
   wheelTextOn: { color: C.red, fontWeight: "600" },
 
   notifyCard: { marginTop: 24, padding: 14, flexDirection: "row", alignItems: "center", gap: 12, backgroundColor: C.white12, borderRadius: 12, borderWidth: 1, borderColor: C.whiteBorder },
-  brandIcon: { width: 36, height: 36, borderRadius: 8, backgroundColor: C.red, alignItems: "center", justifyContent: "center" },
-  brandIconText: { color: C.white, fontSize: 16, fontFamily: F.serif, fontWeight: "600" },
+  brandIcon: { width: 36, height: 36, borderRadius: 9, backgroundColor: "rgba(250,244,224,0.18)", alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: C.whiteBorder },
+  brandCard: { width: 18, height: 23, borderRadius: 5, backgroundColor: C.paper, alignItems: "center", justifyContent: "center", transform: [{ rotate: "-3deg" }] },
+  brandSun: { width: 10, height: 10, borderRadius: 5, backgroundColor: "#F1B95F" },
   notifyLabel: { color: C.white, fontSize: 11, opacity: 0.85 },
   notifyTime: { color: C.white, fontSize: 18, fontWeight: "500", marginTop: 2 },
 });

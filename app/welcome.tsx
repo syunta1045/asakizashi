@@ -4,7 +4,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { haptics } from "../lib/haptics";
-import { C, dawnGradient, F } from "../lib/theme";
+import { C, morningGradient, F } from "../lib/theme";
 
 export default function Welcome() {
   const router = useRouter();
@@ -14,18 +14,22 @@ export default function Welcome() {
   const ctaFade = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.sequence([
-      Animated.parallel([
-        Animated.timing(sunFade, { toValue: 1, duration: 1200, useNativeDriver: true }),
-        Animated.timing(sunRise, { toValue: 0, duration: 1200, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    Animated.parallel([
+      Animated.timing(sunFade, { toValue: 1, duration: 700, useNativeDriver: true }),
+      Animated.timing(sunRise, { toValue: 0, duration: 700, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+      Animated.sequence([
+        Animated.delay(220),
+        Animated.timing(brandFade, { toValue: 1, duration: 520, useNativeDriver: true }),
       ]),
-      Animated.timing(brandFade, { toValue: 1, duration: 800, useNativeDriver: true }),
-      Animated.timing(ctaFade, { toValue: 1, duration: 600, useNativeDriver: true }),
+      Animated.sequence([
+        Animated.delay(460),
+        Animated.timing(ctaFade, { toValue: 1, duration: 420, useNativeDriver: true }),
+      ]),
     ]).start();
   }, []);
 
   return (
-    <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
+    <LinearGradient colors={morningGradient as unknown as [string, string, ...string[]]} style={s.bg}>
       <SafeAreaView style={s.safe}>
         {/* 中央の朝陽 */}
         <Animated.View style={[s.sunWrap, { opacity: sunFade, transform: [{ translateY: sunRise }] }]}>
@@ -35,12 +39,11 @@ export default function Welcome() {
 
         <View style={s.bottom}>
           <Animated.View style={{ opacity: brandFade }}>
-            <Text style={s.tagline}>── A morning oracle ──</Text>
-            <Text style={s.brand}>旭兆</Text>
-            <Text style={s.brandRoman}>Asakizashi</Text>
+            <Text style={s.tagline}>── 今日を整える朝メモ ──</Text>
+            <Text style={s.brand}>朝しるべ</Text>
 
             <Text style={s.lede}>
-              毎朝、あなたへの{"\n"}一行のお告げをお届けします
+              朝のひとときに、{"\n"}今日のわたしを整える。
             </Text>
           </Animated.View>
 
@@ -95,14 +98,13 @@ const s = StyleSheet.create({
     shadowColor: "#FFD89E", shadowOpacity: 0.8, shadowRadius: 30, shadowOffset: { width: 0, height: 0 },
   },
   bottom: { flex: 1, justifyContent: "flex-end", paddingBottom: 30 },
-  tagline: { color: C.white, fontSize: 12, opacity: 0.85, letterSpacing: 6, textAlign: "center", marginBottom: 14, fontFamily: F.serif },
-  brand: { color: C.white, fontSize: 56, letterSpacing: 16, textAlign: "center", lineHeight: 60, fontFamily: F.serif, fontWeight: "500" },
-  brandRoman: { color: C.white, fontSize: 11, letterSpacing: 3, textAlign: "center", marginTop: 14, opacity: 0.75 },
-  lede: { color: C.white, fontSize: 14, lineHeight: 28, textAlign: "center", opacity: 0.95, marginVertical: 32, fontFamily: F.serif },
-  cta: { backgroundColor: C.paper, borderRadius: 30, paddingVertical: 16, alignItems: "center", borderWidth: 1, borderColor: C.gold },
-  ctaText: { color: C.ink, fontSize: 14, fontWeight: "600", letterSpacing: 6, fontFamily: F.serif },
-  subLink: { color: C.white, fontSize: 11, textAlign: "center", marginTop: 14, opacity: 0.85 },
+  tagline: { color: "#FFF8EA", fontSize: 12, opacity: 0.96, letterSpacing: 6, textAlign: "center", marginBottom: 14, fontFamily: F.serif, fontWeight: "800" },
+  brand: { color: C.white, fontSize: 52, letterSpacing: 8, textAlign: "center", lineHeight: 62, fontFamily: F.serif, fontWeight: "800" },
+  lede: { color: C.white, fontSize: 15, lineHeight: 29, textAlign: "center", opacity: 0.98, marginVertical: 32, fontFamily: F.serif, fontWeight: "600" },
+  cta: { backgroundColor: "#FFF8EA", borderRadius: 30, paddingVertical: 16, alignItems: "center", borderWidth: 1, borderColor: "rgba(126,88,48,0.18)" },
+  ctaText: { color: C.ink, fontSize: 14, fontWeight: "800", letterSpacing: 6, fontFamily: F.serif },
+  subLink: { color: "#FFF8EA", fontSize: 11, textAlign: "center", marginTop: 14, opacity: 0.95, fontWeight: "800" },
   legalRow: { flexDirection: "row", justifyContent: "center", marginTop: 18, gap: 6 },
-  legalLink: { color: C.white, fontSize: 10, opacity: 0.7, textDecorationLine: "underline" },
-  legalSep: { color: C.white, fontSize: 10, opacity: 0.5 },
+  legalLink: { color: C.inkSub, fontSize: 10, opacity: 0.85, textDecorationLine: "underline" },
+  legalSep: { color: C.inkMuted, fontSize: 10, opacity: 0.8 },
 });

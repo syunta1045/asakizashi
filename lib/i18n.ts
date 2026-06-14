@@ -1,7 +1,7 @@
 /**
  * 国際化（i18n）スキャフォールド
  *
- * Phase 2 で BaZi 名で英語圏展開する際の準備。
+ * Phase 2 で多言語展開する際の準備。
  * MVPでは ja のみ使用。
  */
 
@@ -9,10 +9,10 @@ export type Locale = "ja" | "en";
 
 export const STRINGS = {
   ja: {
-    appName: "旭兆",
-    appNameRoman: "Asakizashi",
-    tagline: "A morning oracle",
-    welcome: "毎朝、あなたへの一行のお告げをお届けします",
+    appName: "朝しるべ",
+    appNameRoman: "",
+    tagline: "今日を整える朝メモ",
+    welcome: "毎朝、今日を整える朝メモをお届けします",
     // 共通アクション
     start: "はじめる",
     next: "次へ",
@@ -26,23 +26,23 @@ export const STRINGS = {
     retry: "もう一度",
     // タブ
     today: "今日",
-    ranking: "順位",
+    pace: "ペース",
     relations: "つながり",
     journal: "振り返り",
     profile: "あなた",
     settings: "設定",
     premium: "プレミアム",
-    chartDetail: "命式の詳細",
-    monthFlow: "月の流れ",
+    tendencyMemo: "傾向メモ",
+    monthlyCalendar: "月間カレンダー",
     // 今日の構成
     youSan: (name: string) => `${name || "あなた"}さん、おはよう`,
-    fortuneLabel: "運勢",
-    rankAmong12: "十二支中",
+    morningMemo: "朝メモ",
+    todayPace: "今日のペース",
     todayIntention: "今日の心がけ",
-    luckyTitle: "今日を運ぶもの",
-    todoLabel: "やるとよいこと",
-    avoidLabel: "控えるべきこと",
-    intentTitle: "今日の指針",
+    careHints: "整えるヒント",
+    todoLabel: "やってみること",
+    avoidLabel: "今日は控えたいこと",
+    intentTitle: "今日の行動メモ",
     // a11y
     a11y: {
       back: "戻る",
@@ -59,9 +59,9 @@ export const STRINGS = {
     },
   },
   en: {
-    appName: "旭兆",
-    appNameRoman: "Asakizashi",
-    tagline: "A morning oracle",
+    appName: "朝しるべ",
+    appNameRoman: "",
+    tagline: "A line to steady your morning",
     welcome: "A daily verse for your morning",
     start: "Begin",
     next: "Next",
@@ -74,19 +74,19 @@ export const STRINGS = {
     confirm: "Confirm",
     retry: "Try again",
     today: "Today",
-    ranking: "Ranks",
+    pace: "Pace",
     relations: "Bonds",
     journal: "Reflect",
     profile: "You",
     settings: "Settings",
     premium: "Premium",
-    chartDetail: "Your chart",
-    monthFlow: "This month's flow",
+    tendencyMemo: "Tendency memo",
+    monthlyCalendar: "Monthly calendar",
     youSan: (name: string) => `Good morning, ${name || "friend"}`,
-    fortuneLabel: "Reading",
-    rankAmong12: "of the twelve",
+    morningMemo: "Morning memo",
+    todayPace: "Today's pace",
     todayIntention: "Today's intention",
-    luckyTitle: "What carries you today",
+    careHints: "Small care hints",
     todoLabel: "Lean into",
     avoidLabel: "Hold back from",
     intentTitle: "Today's guidance",

@@ -4,7 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useUser } from "../lib/store";
 import { useSubscription, isLocked } from "../lib/subscription";
-import { stemReading, branchReading, stemMeaning, branchMeaning, stemElement, branchElement, fiveElementBalance, tenGodsAcross, tenGodDescription, daiunPillars, calcAge, yongShinOf, type Element } from "../lib/bazi";
+import { fiveElementBalance, yongShinOf, type Element, type ThreePillars } from "../lib/bazi";
 import { PremiumLock } from "../components/PremiumLock";
 import { C, dawnGradient, F } from "../lib/theme";
 
@@ -15,19 +15,52 @@ const ELEMENT_COLOR: Record<Element, string> = {
 export default function Chart() {
   const router = useRouter();
   const u = useUser();
-  const { pillars, gender, birthYear, birthMonth, birthDay } = u;
+  const { pillars } = u;
   const { isPremium } = useSubscription();
-  if (!pillars) return null;
+  if (!pillars) {
+    return (
+      <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
+        <SafeAreaView style={s.safe} edges={["top"]}>
+          <View style={s.header}>
+            <Pressable
+              onPress={() => router.canGoBack() ? router.back() : router.replace("/(tabs)/today")}
+              hitSlop={16}
+              accessibilityRole="button"
+              accessibilityLabel="戻る"
+            >
+              <Text style={s.back}>‹</Text>
+            </Pressable>
+            <View style={{ flex: 1 }}>
+              <Text style={s.dateLabel}>あなたについて</Text>
+              <Text style={s.title}>傾向メモ</Text>
+            </View>
+          </View>
+          <View style={{ padding: 24, alignItems: "center", marginTop: 40 }}>
+            <Text style={{ color: C.white, fontSize: 16, lineHeight: 26, textAlign: "center", fontWeight: "600", marginBottom: 12 }}>
+              生年月日を入力すると{"\n"}傾向メモが見られます
+            </Text>
+            <Text style={{ color: C.white, opacity: 0.85, fontSize: 12, lineHeight: 20, textAlign: "center", marginBottom: 24 }}>
+              生年月日は任意です。{"\n"}未入力でも朝メモ・振り返り・つながりは使えます。
+            </Text>
+            <Pressable
+              onPress={() => router.push("/edit/birth")}
+              style={{ backgroundColor: C.paper, paddingHorizontal: 24, paddingVertical: 14, borderRadius: 24, borderWidth: 1, borderColor: C.gold }}
+              accessibilityRole="button"
+            >
+              <Text style={{ color: C.ink, fontSize: 13, fontWeight: "700", letterSpacing: 2 }}>生年月日を入力する</Text>
+            </Pressable>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
 
   const balance = fiveElementBalance(pillars);
   const max = Math.max(...Object.values(balance));
   const elements: Element[] = ["木", "火", "土", "金", "水"];
   const fiveLocked = isLocked("fiveElements", isPremium);
   const yongShin = yongShinOf(pillars);
-
-  const age = calcAge(birthYear, birthMonth, birthDay);
-  const daiun = daiunPillars(pillars, gender || "none", 8);
-  const currentDaiunIdx = daiun.findIndex((d) => age >= d.startAge && age <= d.endAge);
+  const summary = buildTendencySummary(pillars, balance);
 
   return (
     <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
@@ -45,80 +78,59 @@ export default function Chart() {
             <Text style={s.back}>‹</Text>
           </Pressable>
           <View style={{ flex: 1 }}>
-            <Text style={s.dateLabel}>YOUR CHART</Text>
-            <Text style={s.title}>命式の詳細</Text>
+            <Text style={s.dateLabel}>あなたについて</Text>
+            <Text style={s.title}>傾向メモ</Text>
           </View>
         </View>
 
         <ScrollView contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
-          {/* 三柱表 */}
+          <View style={s.summaryCard}>
+            <Text style={s.summaryLabel}>まずはここだけ</Text>
+            <Text style={s.summaryTitle}>あなたの傾向まとめ</Text>
+            <Text style={s.summaryText}>{summary.body}</Text>
+            <View style={s.summaryGrid}>
+              <View style={s.summaryCell}>
+                <Text style={s.summaryCellLabel}>強み</Text>
+                <Text style={s.summaryCellValue}>{summary.strongWord}</Text>
+              </View>
+              <View style={s.summaryCell}>
+                <Text style={s.summaryCellLabel}>足すとよいこと</Text>
+                <Text style={s.summaryCellValue}>{summary.softWord}</Text>
+              </View>
+            </View>
+            <Text style={s.summaryNote}>下の詳しい情報は、気になるときだけ見れば大丈夫です。</Text>
+          </View>
+
           <Section
             num="01"
-            title="あなたの三柱"
-            desc="生まれた年・月・日それぞれの干支。年柱は祖先や幼少期、月柱は社会での立場、日柱があなた自身を表します。"
+            title="朝の整え方"
+            desc="プロフィールから、朝に意識しやすい強みと、少し足すとよいことをメモにしています。"
           />
           <View style={s.pillarsCard}>
-            <View style={s.pillarsRow}>
-              {[
-                { l: "年柱", p: pillars.year },
-                { l: "月柱", p: pillars.month },
-                { l: "日柱", p: pillars.day, hi: true },
-              ].map((x) => (
-                <View key={x.l} style={[s.pillar, x.hi && s.pillarHi]}>
-                  <Text style={[s.pillarLabel, x.hi && s.pillarLabelHi]}>{x.l}</Text>
-                  <Text style={s.pillarStem}>{x.p.stem}</Text>
-                  <Text style={s.pillarStem}>{x.p.branch}</Text>
-                  <Text style={s.pillarReading}>{stemReading[x.p.stem]}・{branchReading[x.p.branch]}</Text>
-                </View>
-              ))}
+            <View style={s.tendencyRow}>
+              <Text style={s.tendencyKey}>強み</Text>
+              <Text style={s.tendencyValue}>{summary.strongWord}</Text>
             </View>
-          </View>
-          <View style={s.dayMeaningCard}>
-            <Text style={s.dayMeaningLabel}>日柱 ＝ あなた自身</Text>
-            <View style={s.dayMeaningHeader}>
-              <Text style={s.dayMeaningKanji}>{pillars.day.stem}{pillars.day.branch}</Text>
-              <Text style={s.dayMeaningReading}>
-                {stemReading[pillars.day.stem]}（{stemElement[pillars.day.stem]}）{"\n"}
-                {branchReading[pillars.day.branch]}（{branchElement[pillars.day.branch]}）
-              </Text>
+            <View style={s.tendencyRow}>
+              <Text style={s.tendencyKey}>足すとよいこと</Text>
+              <Text style={s.tendencyValue}>{summary.softWord}</Text>
             </View>
-            <View style={s.dayMeaningRow}>
-              <Text style={s.dayMeaningKanjiSmall}>{pillars.day.stem}</Text>
-              <Text style={s.dayMeaningText}>{stemMeaning[pillars.day.stem]}</Text>
-            </View>
-            <View style={s.dayMeaningRow}>
-              <Text style={s.dayMeaningKanjiSmall}>{pillars.day.branch}</Text>
-              <Text style={s.dayMeaningText}>{branchMeaning[pillars.day.branch]}</Text>
+            <View style={[s.tendencyRow, s.tendencyRowLast]}>
+              <Text style={s.tendencyKey}>今日の使い方</Text>
+              <Text style={s.tendencyText}>朝は予定を広げすぎず、一つだけ選ぶと続けやすくなります。</Text>
             </View>
           </View>
 
-          {/* 十神 */}
+          {/* 5つの傾向 */}
           <Section
             num="02"
-            title="十神（じっしん）"
-            desc="日柱の干（あなた自身）から見た、他の干との関係。性格・才能・人との縁の出方を読み解きます。"
-          />
-          <View style={s.tenGodsCard}>
-            {tenGodsAcross(pillars).map((g) => (
-              <View key={g.pillar} style={s.tenGodRow}>
-                <Text style={s.tenGodPillar}>{g.pillar}</Text>
-                <Text style={s.tenGodStem}>{g.stem}</Text>
-                <Text style={s.tenGodName}>{g.god}</Text>
-                <Text style={s.tenGodDesc}>{g.god !== "—" ? tenGodDescription[g.god] : "あなた自身"}</Text>
-              </View>
-            ))}
-          </View>
-
-          {/* 五行バランス */}
-          <Section
-            num="03"
-            title="五行のバランス"
-            desc="木・火・土・金・水の五つの気の配分。多い気は強み、少ない気は補うべき要素として日々の指針になります。"
+            title="5つの傾向"
+            desc="成長・表現・安定・決断・思考の5つを、暮らしの傾向として見たバランスです。多いテーマは強み、少ないテーマは少し足すと整いやすいポイントです。"
           />
           {fiveLocked ? (
             <PremiumLock
-              title="五行バランスはプレミアム限定"
-              description="木火土金水のバランスから、あなたの命式の傾向を読み解きます"
+              title="5つの傾向はプレミアム限定"
+              description="強みと、少し足したいことを見られます"
             />
           ) : (
             <View style={s.fiveCard}>
@@ -130,7 +142,7 @@ export default function Chart() {
                     <View key={e} style={s.barCol}>
                       <Text style={s.barCount}>{v}</Text>
                       <View style={[s.bar, { height: h, backgroundColor: ELEMENT_COLOR[e] }]} />
-                      <Text style={s.barLabel}>{e}</Text>
+                      <Text style={s.barLabel}>{ELEMENT_WORD[e]}</Text>
                     </View>
                   );
                 })}
@@ -140,47 +152,28 @@ export default function Chart() {
                 <Text style={s.fiveNoteText}>{fiveDetail(balance)}</Text>
               </View>
               <View style={s.yongShinBox}>
-                <Text style={s.yongShinLabel}>用神（補うべき気）</Text>
+                <Text style={s.yongShinLabel}>少し足すと整いやすいこと</Text>
                 <View style={{ flexDirection: "row", alignItems: "baseline", gap: 12 }}>
-                  <Text style={s.yongShinValue}>{yongShin.yongShin}</Text>
-                  <Text style={s.kiShinText}>忌神（控えめに）: {yongShin.kiShin}</Text>
+                  <Text style={s.yongShinValue}>{ELEMENT_WORD[yongShin.yongShin]}</Text>
+                  <Text style={s.kiShinText}>控えめにしたいこと: {ELEMENT_WORD[yongShin.kiShin]}</Text>
                 </View>
-                <Text style={s.yongShinDesc}>{yongShin.description}</Text>
+                <Text style={s.yongShinDesc}>{balanceAction(yongShin.yongShin)}</Text>
               </View>
             </View>
           )}
 
-          {/* 大運 */}
           <Section
-            num="04"
-            title="大運（10年運）"
-            desc="人生を10年ごとに区切った大きな運の流れ。今いる柱の干支があなたの今期のテーマです。"
+            num="03"
+            title="長い目で見るテーマ"
+            desc="今の時期に大切にしたいことを、暮らしのメモとして表示します。"
           />
           <View style={s.daiunCard}>
-            {daiun.map((d, i) => (
-              <View key={i} style={[s.daiunRow, i === currentDaiunIdx && s.daiunRowCurrent]}>
-                <Text style={[s.daiunAge, i === currentDaiunIdx && s.daiunAgeCurrent]}>
-                  {d.startAge}-{d.endAge}歳
-                </Text>
-                <Text style={[s.daiunPillar, i === currentDaiunIdx && s.daiunPillarCurrent]}>
-                  {d.pillar.stem}{d.pillar.branch}
-                </Text>
-                {i === currentDaiunIdx && (
-                  <Text style={s.daiunCurrent}>← 今</Text>
-                )}
-              </View>
-            ))}
-            {currentDaiunIdx >= 0 && daiun[currentDaiunIdx] && (
-              <View style={s.daiunNowBox}>
-                <Text style={s.daiunNowLabel}>今期のテーマ</Text>
-                <Text style={s.daiunNowText}>
-                  {stemMeaning[daiun[currentDaiunIdx].pillar.stem]}{"\n"}
-                  {branchMeaning[daiun[currentDaiunIdx].pillar.branch]}
-                </Text>
-              </View>
-            )}
+            <View style={s.daiunNowBox}>
+              <Text style={s.daiunNowLabel}>今期のテーマ</Text>
+              <Text style={s.daiunNowText}>{longRangeTheme(summary.strongWord, summary.softWord)}</Text>
+            </View>
             <Text style={s.daiunNote}>
-              ※ 起算年齢は概算 8歳。本来は出生時刻から精密に算出します。
+              ※ 朝の気づきを残すためのメモです。大事な判断は、自分のいまの気持ちに合わせて選んでください。
             </Text>
           </View>
         </ScrollView>
@@ -191,7 +184,7 @@ export default function Chart() {
 
 function fiveSummary(b: Record<Element, number>): string {
   const sorted = (Object.entries(b) as [Element, number][]).sort((a, c) => c[1] - a[1]);
-  return `${sorted[0][0]}の気が強く、${sorted[sorted.length - 1][0]}が少なめ。`;
+  return `${ELEMENT_WORD[sorted[0][0]]}が強く、${ELEMENT_WORD[sorted[sorted.length - 1][0]]}が少なめ。`;
 }
 function fiveDetail(b: Record<Element, number>): string {
   const sorted = (Object.entries(b) as [Element, number][]).sort((a, c) => c[1] - a[1]);
@@ -205,6 +198,39 @@ const HINT: Record<Element, string> = {
   金: "けじめと潔さが魅力。やわらかさを忘れずに。",
   水: "知性と柔軟さに長ける。芯を持つことを意識して。",
 };
+
+const ELEMENT_WORD: Record<Element, string> = {
+  木: "伸びやかさ",
+  火: "表現する力",
+  土: "落ち着き",
+  金: "整理と決断",
+  水: "考える力",
+};
+
+function balanceAction(element: Element) {
+  return ({
+    木: "新しい予定を増やすより、気になっていたことを一つだけ始めてみて。",
+    火: "気持ちを言葉にする時間を少し作ると、自分の考えがまとまりやすくなります。",
+    土: "予定の間に余白を置き、落ち着いて確認する時間を作ってみて。",
+    金: "持ちものやタスクを一つ整理すると、次に選ぶことが見えやすくなります。",
+    水: "調べる、読む、聞く時間を少し置くと、焦りがやわらぎます。",
+  } as Record<Element, string>)[element];
+}
+
+function buildTendencySummary(pillars: ThreePillars, balance: Record<Element, number>) {
+  const sorted = (Object.entries(balance) as [Element, number][]).sort((a, b) => b[1] - a[1]);
+  const strong = sorted[0][0];
+  const soft = sorted[sorted.length - 1][0];
+  return {
+    strongWord: ELEMENT_WORD[strong],
+    softWord: ELEMENT_WORD[soft],
+    body: `朝しるべでは、プロフィールから日々の整え方をメモにします。${ELEMENT_WORD[strong]}が強みに出やすく、${ELEMENT_WORD[soft]}を少し足すと、毎日の選び方が整いやすくなります。`,
+  };
+}
+
+function longRangeTheme(strongWord: string, softWord: string) {
+  return `${strongWord}を活かしながら、${softWord}を少しずつ足していく時期です。大きく変えようとするより、朝のひとつ・夜のひとことを続けるほど、自分の調子が見えやすくなります。`;
+}
 
 function Section({ num, title, desc }: { num: string; title: string; desc?: string }) {
   return (
@@ -235,27 +261,40 @@ const s = StyleSheet.create({
   sectionTitle: { color: C.white, fontSize: 13, fontWeight: "500", letterSpacing: 3, fontFamily: F.serif },
   sectionDesc: { color: C.white, opacity: 0.78, fontSize: 11, lineHeight: 18, marginTop: -4, marginBottom: 12, paddingHorizontal: 4, fontFamily: F.serif },
 
+  summaryCard: { backgroundColor: C.paper, borderRadius: 14, padding: 18, borderWidth: 1, borderColor: C.paperBorder, shadowColor: "#42231A", shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } },
+  summaryLabel: { color: C.gold, fontSize: 10, letterSpacing: 2, fontWeight: "800" },
+  summaryTitle: { color: C.ink, fontSize: 20, fontWeight: "800", marginTop: 6, fontFamily: F.serif },
+  summaryText: { color: C.inkSub, fontSize: 12, lineHeight: 22, marginTop: 10, fontWeight: "600" },
+  summaryGrid: { flexDirection: "row", gap: 8, marginTop: 14 },
+  summaryCell: { flex: 1, padding: 12, borderRadius: 10, backgroundColor: "rgba(168,131,64,0.1)", borderWidth: 1, borderColor: "rgba(168,131,64,0.18)" },
+  summaryCellLabel: { color: C.gold, fontSize: 9, fontWeight: "800", letterSpacing: 1 },
+  summaryCellValue: { color: C.red, fontSize: 13, fontWeight: "800", marginTop: 5 },
+  summaryNote: { color: C.inkMuted, fontSize: 10, lineHeight: 17, marginTop: 12, fontWeight: "600" },
+
   pillarsCard: { backgroundColor: C.paper, borderRadius: 14, padding: 14, borderWidth: 1, borderColor: C.paperBorder },
+  tendencyRow: { paddingVertical: 13, borderBottomWidth: 1, borderBottomColor: C.paperBorder },
+  tendencyRowLast: { borderBottomWidth: 0 },
+  tendencyKey: { color: C.gold, fontSize: 10, letterSpacing: 2, fontWeight: "800", fontFamily: F.serif },
+  tendencyValue: { color: C.red, fontSize: 18, lineHeight: 26, marginTop: 5, fontWeight: "800", fontFamily: F.serif },
+  tendencyText: { color: C.ink, fontSize: 13, lineHeight: 22, marginTop: 5, fontWeight: "700", fontFamily: F.serif },
   pillarsRow: { flexDirection: "row", gap: 8 },
   pillar: { flex: 1, alignItems: "center", padding: 12, borderRadius: 10, backgroundColor: "rgba(255,255,255,0.5)", borderWidth: 1, borderColor: C.paperBorder },
   pillarHi: { borderWidth: 2, borderColor: C.red, backgroundColor: C.white },
   pillarLabel: { color: C.gold, fontSize: 9, letterSpacing: 2, fontWeight: "600" },
   pillarLabelHi: { color: C.red },
   pillarStem: { color: C.ink, fontSize: 22, fontWeight: "500", marginTop: 4, fontFamily: F.serif },
-  pillarReading: { color: C.inkSub, fontSize: 8, marginTop: 6, textAlign: "center", lineHeight: 12, fontFamily: F.serif },
 
   dayMeaningCard: { marginTop: 12, padding: 18, backgroundColor: C.white95, borderRadius: 14, borderWidth: 1, borderColor: C.paperBorder },
   dayMeaningLabel: { color: C.gold, fontSize: 10, letterSpacing: 3, fontWeight: "600" },
   dayMeaningHeader: { flexDirection: "row", alignItems: "center", gap: 16, marginTop: 8 },
   dayMeaningKanji: { color: C.red, fontSize: 32, fontFamily: F.serif, fontWeight: "600", letterSpacing: 4, lineHeight: 38 },
-  dayMeaningReading: { color: C.inkSub, fontSize: 11, lineHeight: 18, fontFamily: F.serif },
   dayMeaningRow: { flexDirection: "row", alignItems: "flex-start", gap: 12, marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: C.paperBorder },
   dayMeaningKanjiSmall: { color: C.red, fontSize: 20, fontFamily: F.serif, fontWeight: "500", width: 24, textAlign: "center", lineHeight: 24 },
   dayMeaningText: { flex: 1, color: C.ink, fontSize: 12, lineHeight: 20, fontFamily: F.serif },
 
   tenGodsCard: { backgroundColor: C.white95, borderRadius: 14, padding: 4, borderWidth: 1, borderColor: C.paperBorder },
   tenGodRow: { flexDirection: "row", alignItems: "center", padding: 12, borderBottomWidth: 1, borderBottomColor: C.paperBorder, gap: 12 },
-  tenGodPillar: { color: C.gold, fontSize: 10, letterSpacing: 2, width: 36, fontWeight: "600" },
+  tenGodPillar: { color: C.gold, fontSize: 10, letterSpacing: 1, width: 56, fontWeight: "600" },
   tenGodStem: { color: C.ink, fontSize: 18, fontFamily: F.serif, width: 24, textAlign: "center", fontWeight: "500" },
   tenGodName: { color: C.red, fontSize: 13, fontWeight: "600", width: 48, fontFamily: F.serif },
   tenGodDesc: { color: C.inkSub, fontSize: 11, flex: 1, fontFamily: F.serif },

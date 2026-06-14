@@ -27,18 +27,30 @@ export async function requestNotificationPermission(): Promise<boolean> {
   const { status: existing } = await Notifications.getPermissionsAsync();
   let status = existing;
   if (status !== "granted") {
-    const { status: req } = await Notifications.requestPermissionsAsync();
+    const { status: req } = await Notifications.requestPermissionsAsync({
+      ios: {
+        allowAlert: true,
+        allowBadge: false,
+        allowSound: true,
+      },
+    });
     status = req;
   }
 
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync("morning", {
-      name: "朝のお告げ",
+      name: "朝メモ",
       importance: Notifications.AndroidImportance.HIGH,
       sound: "default",
     });
   }
 
+  return status === "granted";
+}
+
+export async function getNotificationPermissionGranted(): Promise<boolean> {
+  if (!Device.isDevice) return false;
+  const { status } = await Notifications.getPermissionsAsync();
   return status === "granted";
 }
 
@@ -66,8 +78,8 @@ export async function scheduleMorningNotification(
     try {
       const id = await Notifications.scheduleNotificationAsync({
         content: {
-          title: "旭兆",
-          body: `${nickname || "あなた"}さんへの今朝のお告げが届いています`,
+          title: "朝しるべ",
+          body: `おはよう、${nickname || "あなた"}さん。今朝の朝メモが届きました。`,
           sound: "default",
           data: { deeplink: "asakizashi://today" },
         },
@@ -89,7 +101,7 @@ export async function scheduleMorningNotification(
     try {
       const id = await Notifications.scheduleNotificationAsync({
         content: {
-          title: "旭兆",
+          title: "朝しるべ",
           body: "今日はどんな一日でしたか？少しだけ振り返ってみませんか",
           sound: "default",
           data: { deeplink: "asakizashi://journal" },
@@ -112,9 +124,53 @@ export async function cancelAllNotifications() {
   await Notifications.cancelAllScheduledNotificationsAsync();
 }
 
+function hasScheduledDeepLink(scheduled: Notifications.NotificationRequest[], deeplink: string) {
+  return scheduled.some((n) => n.content.data?.deeplink === deeplink);
+}
+
+export async function getNotificationScheduleState(): Promise<{
+  granted: boolean;
+  scheduledCount: number;
+  morningScheduled: boolean;
+  eveningScheduled: boolean;
+}> {
+  if (!Device.isDevice) {
+    return { granted: false, scheduledCount: 0, morningScheduled: false, eveningScheduled: false };
+  }
+
+  const { status } = await Notifications.getPermissionsAsync();
+  const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+  return {
+    granted: status === "granted",
+    scheduledCount: scheduled.length,
+    morningScheduled: hasScheduledDeepLink(scheduled, "asakizashi://today"),
+    eveningScheduled: hasScheduledDeepLink(scheduled, "asakizashi://journal"),
+  };
+}
+
+export async function scheduleTestNotification(seconds = 60) {
+  const granted = await requestNotificationPermission();
+  if (!granted) return false;
+
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "朝しるべ",
+      body: "ためし通知です。朝メモもこのように届きます。",
+      sound: "default",
+      data: { deeplink: "asakizashi://today", test: true },
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds,
+    },
+  });
+
+  return true;
+}
+
 /**
  * 起動時の safety net: ユーザー設定で通知ON かつ OS 権限 granted なのに
- * スケジュール済みが0件の場合だけ、再スケジュールする。
+ * 必要な通知予約が欠けている場合だけ、再スケジュールする。
  *
  * 想定ケース:
  *   - APK の上書きインストール後にスケジュールが消失した
@@ -135,9 +191,11 @@ export async function ensureNotificationsScheduled(): Promise<{ ok: boolean; res
     // 権限なし（黙って no-op、許可ダイアログは出さない）
     const { status } = await Notifications.getPermissionsAsync();
     if (status !== "granted") return { ok: true, rescheduled: false, reason: "permission-denied" };
-    // 既にスケジュール済みなら何もしない
+    // 必要な通知が揃っていれば何もしない
     const scheduled = await Notifications.getAllScheduledNotificationsAsync();
-    if (scheduled.length > 0) return { ok: true, rescheduled: false, reason: "already-scheduled" };
+    const hasMorning = !u.morningEnabled || hasScheduledDeepLink(scheduled, "asakizashi://today");
+    const hasEvening = !u.eveningEnabled || hasScheduledDeepLink(scheduled, "asakizashi://journal");
+    if (hasMorning && hasEvening) return { ok: true, rescheduled: false, reason: "already-scheduled" };
     // 再スケジュール
     await scheduleMorningNotification(u.wakeUpTime, u.nickname);
     return { ok: true, rescheduled: true };

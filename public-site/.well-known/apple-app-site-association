@@ -5,7 +5,7 @@
       {
         "appIDs": ["TEAMID.jp.asakizashi.app"],
         "components": [
-          { "/": "/today", "comment": "今日のお告げ" },
+          { "/": "/today", "comment": "朝のチェックイン" },
           { "/": "/journal", "comment": "振り返り" },
           { "/": "/relations", "comment": "つながり" },
           { "/": "/", "comment": "アプリトップ" }

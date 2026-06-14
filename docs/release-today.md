@@ -1,4 +1,4 @@
-# 旭兆 — 今日中に提出する手順
+# 朝しるべ — 今日中に提出する手順
 
 > **注意**: ストアでの一般公開は審査のため数日〜数週間かかります。
 > 今日中に達成可能なゴール: **「提出ボタンを押した状態」 + 「TestFlight で実機に届けられる状態」**
@@ -151,7 +151,7 @@ SUPABASE_SERVICE_ROLE_KEY=xxx \
 URL: https://app.revenuecat.com
 ```
 
-1. 新規プロジェクト: `Asakizashi`
+1. 新規プロジェクト: `Asa Shirube`
 2. iOS App 追加: Bundle ID `jp.asakizashi.app`
    - App Store Connect API Key を生成して連携
 3. Products 追加:
@@ -179,14 +179,14 @@ URL: https://appstoreconnect.apple.com
 
 ### 7-2. App Store Connect で新規アプリ (15分)
 1. My Apps → New App
-2. Name: 旭兆
+2. Name: 朝しるべ
 3. Bundle ID: jp.asakizashi.app
 4. SKU: asakizashi-001
 5. 保存
 
 ### 7-3. アプリ情報入力 (1時間)
 - **アプリ情報**:
-  - サブタイトル: `毎朝届く、あなただけの一行運勢`
+  - サブタイトル: `朝のセルフケア日記`
   - キーワード: `asakizashi-store-listing.md` から
   - サポート URL: `https://asakizashi.app/support`
   - マーケティング URL: `https://asakizashi.app`
@@ -199,7 +199,7 @@ URL: https://appstoreconnect.apple.com
   - Linked to identity: Yes
 - **App Review**:
   - Sign-in info: Apple Test User を作成 → ログイン不要のため「No sign-in required」可
-  - Notes: "占い・娯楽アプリ。すべての機能はサインインなしで体験可能。プレミアムは7日無料体験可。"
+  - Notes: "朝のセルフケア日記アプリ。すべての機能はサインインなしで体験可能。プレミアムは7日無料体験可。"
 - **アプリ内課金**: `premium_monthly` / `premium_yearly` を申請（個別審査）
 
 ---
@@ -210,7 +210,7 @@ URL: https://appstoreconnect.apple.com
 URL: https://play.google.com/console
 ```
 
-1. アプリ作成: 旭兆 / Free / Apps
+1. アプリ作成: 朝しるべ / Free / Apps
 2. **アプリのコンテンツ**:
    - プライバシーポリシー URL
    - 広告: なし
@@ -265,11 +265,11 @@ iPhone Simulator で各画面を撮影:
 撮影画面（10枚）:
 1. ◯ ウェルカム画面
 2. ① オンボーディング MBTI
-3. ✦ 命式リビール
-4. ② Today（御神籤）
-5. ③ 順位（十二支ランキング）
-6. ④ 月の流れカレンダー
-7. ⑤ 命式の詳細
+3. ✦ 初回朝メモ
+4. ② Today（朝メモ）
+5. ③ 今日のペース
+6. ④ 月間カレンダー
+7. ⑤ 傾向メモ
 8. ⑥ つながり
 9. ⑦ 振り返り日記
 10. ⑧ プレミアム

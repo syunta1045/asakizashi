@@ -23,9 +23,11 @@ export default function MbtiStep() {
   return (
     <OnboardShell
       step={3}
-      title={"MBTIを\n教えてください"}
-      sub="性格に合わせてメッセージのトーンを変えます"
+      title={"MBTIを\n選びましょう"}
+      sub="わからない場合は、設定しないを選んで進めます"
       onNext={() => router.push("/(onboarding)/blood")}
+      ctaLabel={touched || mbti ? "次へ" : "選択してください"}
+      disabled={!touched && mbti === null}
     >
       <View style={s.grid}>
         {TYPES.map((t) => {
@@ -51,12 +53,12 @@ export default function MbtiStep() {
         accessibilityState={{ selected: dontKnowSelected }}
       >
         <Text style={[s.skipText, dontKnowSelected && s.skipTextActive]}>
-          わからないので設定しない
+          設定しない
         </Text>
       </Pressable>
 
       <Text style={s.hint}>
-        この場合、性格に依存しないメッセージをお届けします
+        設定しない場合も、自然な表現で朝メモをお届けします
       </Text>
     </OnboardShell>
   );
@@ -75,5 +77,5 @@ const s = StyleSheet.create({
   skipActive: { backgroundColor: C.white95, borderColor: C.gold, borderStyle: "solid" },
   skipText: { color: C.white, fontSize: 13, opacity: 0.85, fontFamily: F.serif },
   skipTextActive: { color: C.red, fontWeight: "600", opacity: 1 },
-  hint: { color: C.white, fontSize: 11, opacity: 0.75, marginTop: 14, lineHeight: 20, textAlign: "center" },
+  hint: { color: C.white, fontSize: 11, opacity: 0.85, marginTop: 14, lineHeight: 20, textAlign: "center", fontFamily: F.serif },
 });

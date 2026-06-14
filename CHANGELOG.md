@@ -1,4 +1,4 @@
-# 旭兆 Changelog
+# 朝しるべ Changelog
 
 All notable changes to this project are documented here.
 

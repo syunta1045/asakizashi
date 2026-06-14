@@ -49,7 +49,7 @@ function format(y: number, m: number, d: number) {
 }
 
 function main() {
-  console.log("# 旭兆 命式エンジン検証（年柱・月柱・日柱）");
+  console.log("# 朝しるべ 命式エンジン検証（年柱・月柱・日柱）");
   console.log("# 形式: YYYY-MM-DD\\t年柱\\t月柱\\t日柱");
   console.log("");
   console.log("## 節気境界（25件）");

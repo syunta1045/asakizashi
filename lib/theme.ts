@@ -1,5 +1,5 @@
 /**
- * 旭兆 デザイントークン
+ * 朝しるべ デザイントークン
  * asamei-brand.md v1.0 準拠
  */
 
@@ -11,7 +11,7 @@ export const C = {
   bgMid3: "#EBA47E",
   bgBottom: "#F5DDB5",
 
-  // 御神籤
+  // 朝メモカード
   paper: "#FAF4E0",
   paperDark: "#F0E2BE",
   paperBorder: "rgba(184,150,86,0.35)",
@@ -34,6 +34,14 @@ export const C = {
 
 export const dawnGradient = [
   C.bgTop, C.bgMid1, C.bgMid2, C.bgMid3, C.bgBottom,
+] as const;
+
+export const morningGradient = [
+  "#F7E8CF",
+  "#F2C69B",
+  "#D98779",
+  "#8C5870",
+  "#2F3F60",
 ] as const;
 
 export const F = {

@@ -60,7 +60,7 @@ export async function pushUserToServer(): Promise<{ ok: boolean; error?: string 
   if (!session) return { ok: false, error: "未ログイン" };
 
   const u = useUser.getState();
-  if (!u.pillars) return { ok: false, error: "命式未算出" };
+  if (!u.pillars) return { ok: false, error: "生年月日の情報が未算出です" };
 
   const pillarsStr = {
     y: pillarToString(u.pillars.year),

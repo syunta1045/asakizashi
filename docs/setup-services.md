@@ -1,6 +1,6 @@
 # 外部サービス登録手順
 
-旭兆を本番配信するために必要な5サービスの登録 → キー発行 → アプリ/Edge Function への投入までの手順。
+朝しるべを本番配信するために必要な5サービスの登録 → キー発行 → アプリ/Edge Function への投入までの手順。
 
 所要時間目安：合計 **2〜3時間**（待ち時間を除く）
 
@@ -82,7 +82,7 @@ GEMINI_API_KEY=AIza... npx tsx scripts/generate-interpretations.ts
 ### OAuth 同意画面
 1. https://console.cloud.google.com/apis/credentials/consent
 2. **External** で作成
-3. **App name**: 旭兆
+3. **App name**: 朝しるべ
 4. **User support email**: `support@asakizashi.app`
 5. **Authorized domains**: `asakizashi.app`
 6. **Scopes**: `email`, `profile`, `openid`
@@ -93,7 +93,7 @@ https://console.cloud.google.com/apis/credentials → Create Credentials → OAu
 | Type | Application | Bundle ID / Origin | 環境変数 |
 |---|---|---|---|
 | iOS | iOS | `jp.asakizashi.app` | `EXPO_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_IOS` |
-| Android | Android | `jp.asakizashi.app` + SHA-1 | `EXPO_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_ANDROID` |
+| Android | Android | `jp.asashirube.app` + SHA-1 | `EXPO_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_ANDROID` |
 | Web | Web application | `https://<ref>.supabase.co/auth/v1/callback` | `EXPO_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_WEB` |
 
 Web Client ID は Supabase Dashboard → Authentication → Providers → Google でも設定。
@@ -104,16 +104,15 @@ Web Client ID は Supabase Dashboard → Authentication → Providers → Google
 
 ### 登録
 1. https://app.revenuecat.com/signup
-2. **Project name**: 旭兆
+2. **Project name**: 朝しるべ
 3. **Apps を追加**:
-   - iOS: `jp.asakizashi.app` + App Store Connect Shared Secret（後で投入）
-   - Android: `jp.asakizashi.app` + Google Play Service Account JSON
+   - iOS: `jp.asakizashi.app` + In-App Purchase Key
+   - Android: `jp.asashirube.app` + Google Play Service Account JSON
 
 ### Products / Entitlement 作成
 1. **Products**:
    - `premium_monthly`（月額 ¥480）
-   - `premium_yearly`（年額 ¥3,800）
-   - 両方とも 7日間無料トライアル付き
+   - `premium_yearly`（年額 ¥3,800 / 7日間無料トライアル付き）
 2. **Entitlement**: `premium`
 3. **Offerings → Current**: `default`
    - `monthly` パッケージ → `premium_monthly`

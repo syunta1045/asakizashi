@@ -1,5 +1,5 @@
 /**
- * Premium 限定機能のロックオーバーレイ
+ * プレミアム機能のロックオーバーレイ
  */
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -14,7 +14,7 @@ type Props = {
 
 export function PremiumLock({
   title = "プレミアム機能",
-  description = "もう一段、深く読み解くために",
+  description = "テーマ別ヒントと記録の見返しを広げます",
   cta = "プレミアムを見る",
 }: Props) {
   const router = useRouter();

@@ -3,27 +3,25 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>旭兆 — A morning oracle</title>
-<meta name="description" content="毎朝、あなたへの一行のお告げをお届けする四柱推命アプリ。" />
+<title>朝しるべ — 朝のセルフケア日記</title>
+<meta name="description" content="毎朝1分の朝メモと夜の振り返りで、自分のペースを整えるセルフケア日記アプリ。" />
 <link rel="icon" type="image/png" href="/favicon.png" />
 
 <!-- OGP -->
 <meta property="og:type" content="website" />
-<meta property="og:title" content="旭兆 — A morning oracle" />
-<meta property="og:description" content="毎朝、あなたへの一行のお告げをお届けする四柱推命アプリ。" />
+<meta property="og:title" content="朝しるべ — 朝のセルフケア日記" />
+<meta property="og:description" content="毎朝1分の朝メモと夜の振り返りで、自分のペースを整えるセルフケア日記アプリ。" />
 <meta property="og:url" content="https://asakizashi.app" />
-<meta property="og:site_name" content="旭兆 / Asakizashi" />
+<meta property="og:site_name" content="朝しるべ" />
 <meta property="og:locale" content="ja_JP" />
 <meta property="og:image" content="https://asakizashi.app/og-image.png" />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="旭兆 — A morning oracle" />
-<meta name="twitter:description" content="毎朝、あなたへの一行のお告げをお届けする四柱推命アプリ。" />
+<meta name="twitter:title" content="朝しるべ — 朝のセルフケア日記" />
+<meta name="twitter:description" content="毎朝1分の朝メモと夜の振り返りで、自分のペースを整えるセルフケア日記アプリ。" />
 <meta name="twitter:image" content="https://asakizashi.app/og-image.png" />
 
-<!-- App Store Smart Banner -->
-<meta name="apple-itunes-app" content="app-id=PLACEHOLDER_APP_ID" />
 <style>
   :root {
     --top: #1F2E4A; --m1: #5B4274; --m2: #C26E70; --m3: #EBA47E; --bottom: #F5DDB5;
@@ -35,40 +33,80 @@
     color: #FFF;
     font-family: "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif;
     min-height: 100vh;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 60px 24px;
   }
-  .brand { font-size: 64px; letter-spacing: 16px; margin-bottom: 14px; }
-  .roman { font-size: 14px; letter-spacing: 4px; opacity: 0.85; }
+  main { width: 100%; }
+  .hero {
+    min-height: 82vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 56px 24px 36px; text-align: center;
+  }
+  .brand { font-size: clamp(44px, 10vw, 64px); letter-spacing: 8px; margin-bottom: 14px; }
+  .appIcon { width: 116px; height: 116px; border-radius: 26px; margin-bottom: 24px; box-shadow: 0 18px 56px rgba(15, 10, 20, 0.28); }
   .tagline { font-size: 13px; letter-spacing: 6px; margin: 24px 0; opacity: 0.85; }
-  .lede { font-size: 16px; line-height: 2; margin: 32px 0; text-align: center; max-width: 480px; }
-  .footer { margin-top: 48px; display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .lede { font-size: 16px; line-height: 2; margin: 28px 0; text-align: center; max-width: 480px; }
+  .featureBand {
+    width: 100%; padding: 34px 24px 52px; background: rgba(250,244,224,0.18);
+    border-top: 1px solid rgba(255,255,255,0.2);
+  }
+  .features {
+    max-width: 820px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  }
+  .feature { border-top: 1px solid rgba(255,255,255,0.32); padding-top: 16px; }
+  .feature h2 { font-size: 17px; letter-spacing: 3px; margin-bottom: 10px; font-weight: 600; }
+  .feature p { color: rgba(255,255,255,0.82); font-size: 13px; line-height: 1.9; }
+  .note { max-width: 720px; margin: 28px auto 0; color: rgba(255,255,255,0.72); font-size: 12px; line-height: 1.9; text-align: center; }
+  .footer { padding: 28px 24px 42px; display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
   .footer a { color: #FFF; opacity: 0.8; text-decoration: underline; font-size: 12px; }
   .stores { display: flex; gap: 14px; margin-top: 24px; }
-  .stores a {
+  .stores span {
     background: var(--paper); color: var(--ink); padding: 10px 18px; border-radius: 24px;
-    text-decoration: none; font-size: 13px; font-weight: 600; letter-spacing: 2px;
+    font-size: 13px; font-weight: 600; letter-spacing: 2px;
     border: 1px solid var(--gold);
+  }
+  @media (max-width: 700px) {
+    .features { grid-template-columns: 1fr; gap: 22px; }
+    .stores { flex-direction: column; width: min(280px, 100%); }
+    .stores a { text-align: center; }
   }
 </style>
 </head>
 <body>
-  <div class="brand">旭兆</div>
-  <div class="roman">Asakizashi</div>
-  <div class="tagline">── A morning oracle ──</div>
-  <div class="lede">
-    毎朝、あなたへの<br />
-    一行のお告げをお届けします
-  </div>
-  <div class="stores">
-    <!-- TODO: ストア公開後に実IDへ差し替え。bundleIdentifier = jp.asakizashi.app -->
-    <a href="https://apps.apple.com/jp/app/id0000000000" rel="noopener">App Store</a>
-    <a href="https://play.google.com/store/apps/details?id=jp.asakizashi.app" rel="noopener">Google Play</a>
-  </div>
-  <div class="footer">
-    <a href="/privacy.html">プライバシーポリシー</a>
-    <a href="/terms.html">利用規約</a>
-    <a href="mailto:support@asakizashi.app">お問い合わせ</a>
-  </div>
+  <main>
+    <section class="hero">
+      <img class="appIcon" src="/app-icon.png" alt="" aria-hidden="true" />
+      <div class="brand">朝しるべ</div>
+      <div class="tagline">── 朝のセルフケア日記 ──</div>
+      <div class="lede">
+        毎朝1分の朝メモで<br />
+        今日のペースを整える
+      </div>
+      <div class="stores">
+        <span>App Store 準備中</span>
+        <span>Google Play 準備中</span>
+      </div>
+    </section>
+
+    <section class="featureBand" aria-label="朝しるべの特徴">
+      <div class="features">
+        <div class="feature">
+          <h2>朝メモ</h2>
+          <p>起床時間や関心テーマに合わせて、今日の歩き方を短いメモで届けます。</p>
+        </div>
+        <div class="feature">
+          <h2>月間カレンダー</h2>
+          <p>今月の意識したい日、整えやすい日、控えめにしたい日を見渡せます。</p>
+        </div>
+        <div class="feature">
+          <h2>つながりメモ</h2>
+          <p>大切な人や記念日を登録して、距離感と言葉選びを整えられます。</p>
+        </div>
+      </div>
+      <p class="note">自己理解と内省のきっかけとしてお楽しみください。医療・法律・金融などの専門的助言ではありません。</p>
+    </section>
+  </main>
+  <footer class="footer">
+    <a href="/privacy">プライバシーポリシー</a>
+    <a href="/terms">利用規約</a>
+    <a href="/support">サポート</a>
+  </footer>
 </body>
 </html>

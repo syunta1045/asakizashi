@@ -17,6 +17,8 @@ type SubscriptionState = {
   startTrial: () => void;
   cancelToFree: () => void;
   reset: () => void;
+  /** RevenueCat entitlement の現在値をローカル表示へ反映する */
+  applyEntitlement: (active: boolean, plan?: Extract<Plan, "premium_monthly" | "premium_yearly">) => void;
   /** トライアル期限切れなら自動で free に落とす。アプリ起動時 / 復帰時に呼ぶ */
   checkTrialExpiry: () => void;
 };
@@ -48,6 +50,24 @@ export const useSubscription = create<SubscriptionState>()(
       cancelToFree: () => set({ plan: "free", isPremium: false }),
 
       reset: () => set({ plan: "free", isPremium: false, trialStartedAt: null }),
+
+      applyEntitlement: (active, entitlementPlan) => {
+        const s = get();
+        if (active) {
+          const plan =
+            entitlementPlan ??
+            (s.plan === "premium_monthly" || s.plan === "premium_yearly" ? s.plan : "premium_monthly");
+          set({
+            plan,
+            isPremium: true,
+            trialStartedAt: null,
+          });
+          return;
+        }
+        if (s.plan === "premium_monthly" || s.plan === "premium_yearly") {
+          set({ plan: "free", isPremium: false });
+        }
+      },
 
       checkTrialExpiry: () => {
         const s = get();
@@ -96,7 +116,6 @@ export const FEATURE_LOCKS = {
   relations: { premium: false, freeLimit: 5 },
   customNotificationTime: { premium: true, freeLimit: 0 },
   sixLuckyItems: { premium: true, freeLimit: 3 },
-  detailedReport: { premium: true, freeLimit: 0 },
 } as const;
 
 export type FeatureKey = keyof typeof FEATURE_LOCKS;

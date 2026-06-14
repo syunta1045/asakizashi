@@ -3,6 +3,7 @@ import { View, Text, ScrollView, Pressable, Switch, Alert, StyleSheet } from "re
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
+import Constants from "expo-constants";
 import { useUser, notifyTimeFrom } from "../lib/store";
 import { useRelations } from "../lib/relations";
 import { useJournal } from "../lib/journal";
@@ -10,10 +11,10 @@ import { useSubscription, isTrialActive, trialDaysRemaining } from "../lib/subsc
 import { useCoachmark } from "../lib/coachmark";
 import { performSignOutCleanup } from "../lib/postSignIn";
 import { isSupabaseConfigured, getSession, deleteAccount } from "../lib/supabase";
-import { requestNotificationPermission, scheduleMorningNotification, cancelAllNotifications } from "../lib/notifications";
+import { getNotificationPermissionGranted, requestNotificationPermission, scheduleMorningNotification, cancelAllNotifications } from "../lib/notifications";
 import { exportUserData } from "../lib/export";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { C, dawnGradient, F } from "../lib/theme";
+import { C, morningGradient, F } from "../lib/theme";
 
 export default function Settings() {
   const router = useRouter();
@@ -23,13 +24,14 @@ export default function Settings() {
   const subReset = useSubscription((s) => s.reset);
   const coachReset = useCoachmark((s) => s.reset);
   const sub = useSubscription();
+  const appVersion = Constants.expoConfig?.version || "0.1.0";
   const planLabel = (() => {
     if (sub.plan === "premium_yearly") return "プレミアム（年額）";
     if (sub.plan === "premium_monthly") return "プレミアム（月額）";
     if (sub.plan === "trial" && isTrialActive(sub)) {
-      return `無料トライアル（残り${trialDaysRemaining(sub)}日）`;
+      return `プレミアムお試し（残り${trialDaysRemaining(sub)}日）`;
     }
-    return "無料プラン";
+    return "通常プラン";
   })();
 
   /**
@@ -55,8 +57,8 @@ export default function Settings() {
 
   useEffect(() => {
     (async () => {
-      const granted = await requestNotificationPermission();
-      setNotif(granted);
+      const granted = await getNotificationPermissionGranted();
+      setNotif(granted && useUser.getState().morningEnabled);
       const session = await getSession();
       setSignedIn(!!session);
       setEmail(session?.user?.email ?? null);
@@ -83,11 +85,21 @@ export default function Settings() {
     if (v) {
       const ok = await requestNotificationPermission();
       if (ok) {
-        await scheduleMorningNotification(u.wakeUpTime, u.nickname);
+        u.setField("morningEnabled", true);
+        await scheduleMorningNotification(u.wakeUpTime, u.nickname, {
+          morningEnabled: true,
+          eveningEnabled: u.eveningEnabled,
+          eveningTime: u.eveningTime,
+        });
         setNotif(true);
       }
     } else {
-      await cancelAllNotifications();
+      u.setField("morningEnabled", false);
+      await scheduleMorningNotification(u.wakeUpTime, u.nickname, {
+        morningEnabled: false,
+        eveningEnabled: u.eveningEnabled,
+        eveningTime: u.eveningTime,
+      });
       setNotif(false);
     }
   };
@@ -114,6 +126,15 @@ export default function Settings() {
     }
   };
 
+  const onExport = async () => {
+    const r = await exportUserData();
+    if (!r.ok) {
+      Alert.alert("エクスポートに失敗しました", r.error || "もう一度お試しください。");
+      return;
+    }
+    Alert.alert("エクスポートしました", "共有画面が開かない場合は、端末の共有先アプリをご確認ください。");
+  };
+
   const onDeleteAccount = () => {
     Alert.alert(
       "アカウントを削除",
@@ -135,12 +156,12 @@ export default function Settings() {
   };
 
   return (
-    <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
+    <LinearGradient colors={morningGradient as unknown as [string, string, ...string[]]} style={s.bg}>
       <SafeAreaView style={s.safe} edges={["top"]}>
         <View style={s.header}>
           <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="戻る" hitSlop={12}><Text style={s.back}>‹</Text></Pressable>
           <View style={{ flex: 1 }}>
-            <Text style={s.dateLabel}>SETTINGS</Text>
+            <Text style={s.dateLabel}>各種設定</Text>
             <Text style={s.title}>設定</Text>
           </View>
         </View>
@@ -161,7 +182,7 @@ export default function Settings() {
           <Group>
             <Pressable onPress={() => router.push("/edit/wakeup")} accessibilityRole="button"><Row label="起床時間" value={u.wakeUpTime} arrow /></Pressable>
             <Row label="通知が届く時刻" value={notifyTimeFrom(u.wakeUpTime)} hint="起床の10分後" />
-            <Pressable onPress={() => router.push("/notifications-settings")} accessibilityRole="button"><Row label="通知の詳細設定" value="" arrow /></Pressable>
+            <Pressable onPress={() => router.push("/notifications-settings")} accessibilityRole="button"><Row label="通知の設定" value="" arrow /></Pressable>
             <View style={s.row}>
               <View style={{ flex: 1 }}>
                 <Text style={s.rowKey}>朝の通知を受け取る</Text>
@@ -189,7 +210,7 @@ export default function Settings() {
                 <Group>
                   {!sub.isPremium && (
                     <Pressable onPress={() => router.push("/premium")} accessibilityRole="button">
-                      <Row label="プレミアムにアップグレード" value="" arrow />
+                      <Row label="プレミアムをはじめる" value="" arrow />
                     </Pressable>
                   )}
                   <Row label="現在のプラン" value={planLabel} />
@@ -197,8 +218,8 @@ export default function Settings() {
 
                 <Section num={next()} title="コンテンツ" />
                 <Group>
-                  <Pressable onPress={() => router.push("/calendar")} accessibilityRole="button"><Row label="月の流れ" value="" arrow /></Pressable>
-                  <Pressable onPress={() => router.push("/chart")} accessibilityRole="button"><Row label="命式の詳細" value="" arrow /></Pressable>
+                  <Pressable onPress={() => router.push("/calendar")} accessibilityRole="button"><Row label="月間カレンダー" value="" arrow /></Pressable>
+                  <Pressable onPress={() => router.push("/chart")} accessibilityRole="button"><Row label="傾向メモ" value="" arrow /></Pressable>
                 </Group>
 
                 <Section num={next()} title="その他" />
@@ -210,9 +231,9 @@ export default function Settings() {
             <Pressable onPress={() => router.push("/legal/terms")} accessibilityRole="button"><Row label="利用規約" value="" arrow /></Pressable>
             <Pressable onPress={() => router.push("/legal/privacy")} accessibilityRole="button"><Row label="プライバシーポリシー" value="" arrow /></Pressable>
             <Pressable onPress={() => router.push("/contact")} accessibilityRole="button"><Row label="お問い合わせ" value="" arrow /></Pressable>
-            <Pressable onPress={() => exportUserData()} accessibilityRole="button"><Row label="データをエクスポート" value="" arrow /></Pressable>
+            <Pressable onPress={onExport} accessibilityRole="button"><Row label="データをエクスポート" value="" arrow /></Pressable>
             <Pressable onPress={onClearCache} accessibilityRole="button"><Row label="キャッシュを整理" value="" arrow /></Pressable>
-            <Row label="バージョン" value="0.1.2" />
+            <Row label="バージョン" value={appVersion} />
           </Group>
 
           {signedIn && (
@@ -272,26 +293,26 @@ function genderLabel(g: string | null) {
 const s = StyleSheet.create({
   bg: { flex: 1 },
   safe: { flex: 1 },
-  header: { flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 24, paddingTop: 14, paddingBottom: 14 },
-  back: { color: C.white, fontSize: 22 },
-  dateLabel: { color: C.white, fontSize: 11, opacity: 0.85, letterSpacing: 3 },
-  title: { color: C.white, fontSize: 22, fontWeight: "500", letterSpacing: 4, marginTop: 4, fontFamily: F.serif },
-  content: { paddingHorizontal: 16, paddingBottom: 60 },
+  header: { flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 24, paddingTop: 18, paddingBottom: 16 },
+  back: { color: C.white, fontSize: 24, fontWeight: "700" },
+  dateLabel: { color: "#FFF8EA", fontSize: 11, opacity: 0.96, letterSpacing: 3, fontWeight: "700" },
+  title: { color: C.white, fontSize: 24, fontWeight: "800", letterSpacing: 4, marginTop: 4, fontFamily: F.serif },
+  content: { paddingHorizontal: 18, paddingBottom: 64 },
 
   section: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 22, marginBottom: 12 },
-  sectionNum: { color: C.gold, fontSize: 11, fontWeight: "600", letterSpacing: 2 },
-  sectionLine: { flex: 1, height: 1, backgroundColor: "rgba(255,255,255,0.3)" },
-  sectionTitle: { color: C.white, fontSize: 13, fontWeight: "500", letterSpacing: 3, fontFamily: F.serif },
+  sectionNum: { color: "#FFF8EA", fontSize: 11, fontWeight: "800", letterSpacing: 2 },
+  sectionLine: { flex: 1, height: 1, backgroundColor: "rgba(255,248,234,0.42)" },
+  sectionTitle: { color: "#FFF8EA", fontSize: 13, fontWeight: "800", letterSpacing: 3, fontFamily: F.serif },
 
-  group: { backgroundColor: C.white95, borderRadius: 14, borderWidth: 1, borderColor: C.paperBorder, overflow: "hidden" },
-  row: { flexDirection: "row", alignItems: "center", padding: 14, borderBottomWidth: 1, borderBottomColor: C.paperBorder, gap: 12 },
-  rowKey: { color: C.ink, fontSize: 13, fontWeight: "500" },
+  group: { backgroundColor: "#FFF8EA", borderRadius: 14, borderWidth: 1, borderColor: "rgba(126,88,48,0.18)", overflow: "hidden" },
+  row: { flexDirection: "row", alignItems: "center", padding: 15, borderBottomWidth: 1, borderBottomColor: "rgba(126,88,48,0.14)", gap: 12 },
+  rowKey: { color: C.ink, fontSize: 13, fontWeight: "800" },
   rowHint: { color: C.inkSub, fontSize: 10, marginTop: 2 },
   rowVal: { color: C.inkSub, fontSize: 12 },
   arrow: { color: C.inkMuted, fontSize: 14 },
 
   signOut: { marginTop: 32, alignItems: "center", padding: 14 },
-  signOutText: { color: C.white, fontSize: 13, letterSpacing: 2, fontFamily: F.serif },
+  signOutText: { color: C.white, fontSize: 13, letterSpacing: 2, fontFamily: F.serif, fontWeight: "800" },
   danger: { marginTop: 8, alignItems: "center", padding: 14 },
-  dangerText: { color: C.warn, fontSize: 12, letterSpacing: 2 },
+  dangerText: { color: "#FFF8EA", fontSize: 12, letterSpacing: 2, fontWeight: "800" },
 });

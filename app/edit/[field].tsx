@@ -22,12 +22,12 @@ const GENDERS: { v: GenderVal; label: string }[] = [
   { v: "other", label: "その他" }, { v: "none", label: "選択しない" },
 ];
 const THEMES = [
-  "恋愛・パートナーシップ","結婚・家庭","子育て・家族",
-  "仕事・キャリア","副業・独立","お金・金運","勝負・運気",
+  "大切な人・パートナー","結婚・家庭","子育て・家族",
+  "仕事・キャリア","副業・独立","お金の整え方","ここぞの一歩",
   "人間関係","学び・成長","創作・表現",
   "趣味・楽しみ","旅・冒険",
   "健康・体調","メンタル・心","美容・ライフスタイル","食・暮らし",
-  "推し・ファン活動","スピリチュアル",
+  "推し・ファン活動","静かな時間",
 ];
 
 export default function EditField() {
@@ -45,7 +45,7 @@ export default function EditField() {
       <SafeAreaView style={s.safe}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
         <View style={s.header}>
           <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="戻る" hitSlop={12}><Text style={s.back}>‹</Text></Pressable>
@@ -108,7 +108,7 @@ function BirthEditor() {
       <NumWheel label="年" values={Array.from({ length: currentYear - 1900 + 1 }, (_, i) => 1900 + i)} value={u.birthYear} onChange={onYear} />
       <NumWheel label="月" values={Array.from({ length: 12 }, (_, i) => i + 1)} value={u.birthMonth} onChange={onMonth} />
       <NumWheel label="日" values={Array.from({ length: dayMax }, (_, i) => i + 1)} value={u.birthDay} onChange={onDay} />
-      <Text style={s.note}>変更すると命式が再計算されます</Text>
+      <Text style={s.note}>変更すると、朝メモに使う情報が更新されます</Text>
     </View>
   );
 }
@@ -120,20 +120,21 @@ function NumWheel({ label, values, value, onChange }: {
   label: string; values: number[]; value: number; onChange: (v: number) => void;
 }) {
   const ref = useRef<ScrollView>(null);
-  const CELL_W = 60;
+  const ITEM_W = 64;
+  const ITEM_GAP = 4;
   // ScrollView レイアウト確定後に scrollTo を発行する（contentSize が決まるまで待つ）
   // 親が values=Array.from(...) で毎レンダー新規参照を作っても、
   // value 変化のみを依存にして無駄な再スクロールを抑える。
   const onContentSizeChange = () => {
     const idx = values.indexOf(value);
     if (idx >= 0 && ref.current) {
-      ref.current.scrollTo({ x: Math.max(0, idx * CELL_W - 100), animated: false });
+      ref.current.scrollTo({ x: Math.max(0, idx * (ITEM_W + ITEM_GAP) - 120), animated: false });
     }
   };
   useEffect(() => {
     const idx = values.indexOf(value);
     if (idx >= 0 && ref.current) {
-      ref.current.scrollTo({ x: Math.max(0, idx * CELL_W - 100), animated: false });
+      ref.current.scrollTo({ x: Math.max(0, idx * (ITEM_W + ITEM_GAP) - 120), animated: false });
     }
   }, [value]);
   return (
@@ -143,7 +144,7 @@ function NumWheel({ label, values, value, onChange }: {
         ref={ref}
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 12, gap: 4 }}
+        contentContainerStyle={{ paddingHorizontal: 12, gap: ITEM_GAP }}
         onContentSizeChange={onContentSizeChange}
       >
         {values.map((v) => (
@@ -368,7 +369,7 @@ const s = StyleSheet.create({
 
   wheel: { flexDirection: "row", alignItems: "center", backgroundColor: C.white15, borderRadius: 10, borderWidth: 1, borderColor: C.whiteBorder, marginBottom: 8, paddingVertical: 6 },
   wheelLabel: { color: C.white, fontSize: 11, opacity: 0.7, paddingHorizontal: 12, width: 36 },
-  wheelCell: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, minWidth: 56, alignItems: "center" },
+  wheelCell: { width: 64, paddingVertical: 8, borderRadius: 8, alignItems: "center" },
   wheelCellOn: { backgroundColor: C.white95 },
   wheelText: { color: C.white, fontSize: 16, fontFamily: F.serif },
   wheelTextOn: { color: C.red, fontWeight: "600" },

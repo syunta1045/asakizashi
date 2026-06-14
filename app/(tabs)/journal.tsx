@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, KeyboardAvoidingView, Platform, Modal, StyleSheet } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { View, Text, ScrollView, Pressable, TextInput, KeyboardAvoidingView, Platform, Modal, StyleSheet, Keyboard } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useJournal, MOOD_LABELS, MOOD_MARKS, todayKey, nextMilestone, reachedMilestone, moodStats, moodAverage, moodTrend, moodByWeekday, moodSparkline, longestStreakInRange, type Mood } from "../../lib/journal";
 import { haptics } from "../../lib/haptics";
-import { C, dawnGradient, F } from "../../lib/theme";
+import { C, morningGradient, F } from "../../lib/theme";
 
 export default function Journal() {
   const { entries, upsert, getStreak } = useJournal();
@@ -13,14 +13,26 @@ export default function Journal() {
 
   const [mood, setMood] = useState<Mood | null>(todayEntry ? todayEntry.mood : null);
   const [note, setNote] = useState(todayEntry?.note || "");
+  const [saveFeedback, setSaveFeedback] = useState(false);
+  const saveFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   // マイルストーン達成時のお祝いダイアログ
   const [celebrate, setCelebrate] = useState<{ title: string; description: string } | null>(null);
 
+  useEffect(() => {
+    return () => {
+      if (saveFeedbackTimer.current) clearTimeout(saveFeedbackTimer.current);
+    };
+  }, []);
+
   const onSave = () => {
     if (mood === null) return;
+    Keyboard.dismiss();
     const prevStreak = useJournal.getState().getStreak();
     haptics.success();
     upsert(today, mood, note);
+    setSaveFeedback(true);
+    if (saveFeedbackTimer.current) clearTimeout(saveFeedbackTimer.current);
+    saveFeedbackTimer.current = setTimeout(() => setSaveFeedback(false), 2600);
     const newStreak = useJournal.getState().getStreak();
     const reached = reachedMilestone(newStreak);
     if (reached && newStreak !== prevStreak) {
@@ -45,7 +57,7 @@ export default function Journal() {
   const recordRate = Math.round((stats.total / 30) * 100);
 
   return (
-    <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
+    <LinearGradient colors={morningGradient as unknown as [string, string, ...string[]]} style={s.bg}>
       <SafeAreaView style={s.safe} edges={["top"]}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -53,7 +65,7 @@ export default function Journal() {
         >
         <View style={s.header}>
           <View style={{ flex: 1 }}>
-            <Text style={s.dateLabel}>EVENING REFLECTION</Text>
+            <Text style={s.dateLabel}>夜の振り返り</Text>
             <Text style={s.title}>振り返り</Text>
           </View>
         </View>
@@ -90,9 +102,20 @@ export default function Journal() {
               placeholderTextColor={C.inkMuted}
               multiline
             />
-            <Pressable style={s.saveBtn} onPress={onSave} disabled={mood === null} accessibilityRole="button">
-              <Text style={s.saveText}>記録する</Text>
+            <Pressable
+              style={[s.saveBtn, mood === null && s.saveBtnDisabled, saveFeedback && s.saveBtnDone]}
+              onPress={onSave}
+              disabled={mood === null}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: mood === null }}
+            >
+              <Text style={[s.saveText, saveFeedback && s.saveTextDone]}>
+                {saveFeedback ? "記録しました" : todayEntry ? "更新する" : "記録する"}
+              </Text>
             </Pressable>
+            {saveFeedback && (
+              <Text style={s.saveFeedback}>今日の振り返りに保存しました</Text>
+            )}
           </View>
 
           <View style={s.streakCard}>
@@ -105,7 +128,7 @@ export default function Journal() {
                 <Text style={s.streakText}>{streak}日続けて記録しています</Text>
               )}
               {next && (
-                <Text style={s.streakNext}>次の節目: {next.title}（{next.description}）</Text>
+                <Text style={s.streakNext}>次の目標: {next.title}（{next.description}）</Text>
               )}
             </View>
           </View>
@@ -244,7 +267,7 @@ export default function Journal() {
             <Text style={s.celebDesc}>{celebrate?.description}</Text>
             <View style={s.celebDivider} />
             <Text style={s.celebMessage}>
-              続けることで、あなたの日々の流れが{"\n"}より深く読み解けるようになります。
+              続けることで、あなたの日々の調子が{"\n"}少しずつ見えやすくなります。
             </Text>
             <Pressable style={s.celebClose} onPress={() => setCelebrate(null)} accessibilityRole="button">
               <Text style={s.celebCloseText}>ありがとう</Text>
@@ -314,34 +337,38 @@ const s = StyleSheet.create({
   ...celebStyles,
   bg: { flex: 1 },
   safe: { flex: 1 },
-  header: { flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 24, paddingTop: 14, paddingBottom: 14 },
-  dateLabel: { color: C.white, fontSize: 11, opacity: 0.85, letterSpacing: 3 },
-  title: { color: C.white, fontSize: 22, fontWeight: "500", letterSpacing: 4, marginTop: 4, fontFamily: F.serif },
-  content: { paddingHorizontal: 16, paddingBottom: 60 },
+  header: { flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 24, paddingTop: 18, paddingBottom: 16 },
+  dateLabel: { color: "#FFF8EA", fontSize: 11, opacity: 0.96, letterSpacing: 3, fontWeight: "700" },
+  title: { color: C.white, fontSize: 24, fontWeight: "800", letterSpacing: 4, marginTop: 4, fontFamily: F.serif },
+  content: { paddingHorizontal: 18, paddingBottom: 64 },
 
-  todayCard: { backgroundColor: C.paper, borderRadius: 18, padding: 22, borderWidth: 1, borderColor: C.paperBorder },
-  todayLabel: { color: C.gold, fontSize: 9, letterSpacing: 4, textAlign: "center", fontFamily: F.serif },
-  todaySub: { color: C.inkSub, fontSize: 11, textAlign: "center", marginTop: 6, fontFamily: F.serif },
+  todayCard: { backgroundColor: "#FFF8EA", borderRadius: 16, padding: 22, borderWidth: 1, borderColor: "rgba(126,88,48,0.18)", shadowColor: "#42231A", shadowOpacity: 0.1, shadowRadius: 14, shadowOffset: { width: 0, height: 6 } },
+  todayLabel: { color: "#9A6D2C", fontSize: 10, letterSpacing: 3, textAlign: "center", fontFamily: F.serif, fontWeight: "800" },
+  todaySub: { color: "#66554A", fontSize: 12, textAlign: "center", marginTop: 7, fontFamily: F.serif, fontWeight: "600" },
   moodRow: { flexDirection: "row", justifyContent: "space-around", marginTop: 18 },
   moodWrap: { alignItems: "center" },
-  moodCircle: { width: 50, height: 50, borderRadius: 25, borderWidth: 1.5, borderColor: C.paperBorder, alignItems: "center", justifyContent: "center" },
+  moodCircle: { width: 52, height: 52, borderRadius: 26, borderWidth: 1.5, borderColor: "rgba(126,88,48,0.2)", alignItems: "center", justifyContent: "center", backgroundColor: "rgba(255,255,255,0.36)" },
   moodCircleOn: { backgroundColor: C.red, borderColor: C.red },
   moodMark: { color: C.ink, fontSize: 22, fontWeight: "500", fontFamily: F.serif },
   moodMarkOn: { color: C.white },
   moodLabel: { color: C.inkSub, fontSize: 9, marginTop: 6, letterSpacing: 1 },
   moodLabelOn: { color: C.red, fontWeight: "600" },
-  noteInput: { backgroundColor: "rgba(184,150,86,0.1)", borderRadius: 10, padding: 12, marginTop: 16, fontSize: 12, color: C.ink, minHeight: 60, fontFamily: F.serif },
-  saveBtn: { marginTop: 12, paddingVertical: 12, alignItems: "center", backgroundColor: C.red, borderRadius: 24 },
-  saveText: { color: C.white, fontSize: 13, fontWeight: "600", letterSpacing: 4, fontFamily: F.serif },
+  noteInput: { backgroundColor: "rgba(255,255,255,0.48)", borderRadius: 10, padding: 13, marginTop: 16, fontSize: 13, color: C.ink, minHeight: 68, fontFamily: F.serif, borderWidth: 1, borderColor: "rgba(126,88,48,0.1)" },
+  saveBtn: { marginTop: 13, paddingVertical: 13, alignItems: "center", backgroundColor: C.red, borderRadius: 24 },
+  saveBtnDisabled: { opacity: 0.45 },
+  saveBtnDone: { backgroundColor: C.gold },
+  saveText: { color: C.white, fontSize: 13, fontWeight: "800", letterSpacing: 4, fontFamily: F.serif },
+  saveTextDone: { color: C.ink },
+  saveFeedback: { color: C.red, fontSize: 11, lineHeight: 18, textAlign: "center", marginTop: 9, fontWeight: "800", fontFamily: F.serif },
 
-  streakCard: { flexDirection: "row", alignItems: "center", gap: 14, marginTop: 16, padding: 14, backgroundColor: C.white12, borderRadius: 14, borderWidth: 1, borderColor: C.whiteBorder },
-  streakNum: { color: C.paper, fontSize: 30, fontWeight: "300", letterSpacing: 1 },
-  streakLabel: { color: C.white, fontSize: 10, opacity: 0.85, letterSpacing: 2 },
-  streakText: { color: C.white, fontSize: 12, marginTop: 2 },
-  streakNext: { color: C.white, fontSize: 10, opacity: 0.8, marginTop: 4, fontFamily: F.serif },
+  streakCard: { flexDirection: "row", alignItems: "center", gap: 14, marginTop: 16, padding: 15, backgroundColor: "rgba(255,248,234,0.28)", borderRadius: 14, borderWidth: 1, borderColor: "rgba(255,248,234,0.38)" },
+  streakNum: { color: "#FFF8EA", fontSize: 32, fontWeight: "800", letterSpacing: 1 },
+  streakLabel: { color: "#FFF8EA", fontSize: 10, opacity: 0.95, letterSpacing: 2, fontWeight: "800" },
+  streakText: { color: C.white, fontSize: 12, marginTop: 2, fontWeight: "700" },
+  streakNext: { color: "#FFF8EA", fontSize: 10, opacity: 0.86, marginTop: 4, fontFamily: F.serif },
 
-  statsCard: { marginTop: 16, padding: 16, backgroundColor: C.white12, borderRadius: 14, borderWidth: 1, borderColor: C.whiteBorder },
-  statsTitle: { color: C.white, fontSize: 11, opacity: 0.85, letterSpacing: 2, marginBottom: 12, fontFamily: F.serif },
+  statsCard: { marginTop: 16, padding: 16, backgroundColor: "rgba(255,248,234,0.22)", borderRadius: 14, borderWidth: 1, borderColor: "rgba(255,248,234,0.34)" },
+  statsTitle: { color: "#FFF8EA", fontSize: 11, opacity: 0.95, letterSpacing: 2, marginBottom: 12, fontFamily: F.serif, fontWeight: "800" },
 
   summaryRow: { flexDirection: "row", alignItems: "center", paddingVertical: 8, paddingHorizontal: 4, marginBottom: 8 },
   summaryCell: { flex: 1, alignItems: "center" },
@@ -377,9 +404,9 @@ const s = StyleSheet.create({
   statsBarTrack: { width: 18, height: 70, backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 4, justifyContent: "flex-end", overflow: "hidden" },
   statsBarFill: { width: "100%", backgroundColor: C.gold },
   statsBarCount: { color: C.white, fontSize: 10, opacity: 0.8, marginTop: 4, fontFamily: F.serif },
-  historyTitle: { color: C.white, fontSize: 13, fontWeight: "500", letterSpacing: 3, marginTop: 24, marginBottom: 10, fontFamily: F.serif },
+  historyTitle: { color: "#FFF8EA", fontSize: 13, fontWeight: "800", letterSpacing: 3, marginTop: 24, marginBottom: 10, fontFamily: F.serif },
   empty: { color: C.white, fontSize: 12, opacity: 0.7, textAlign: "center", padding: 24 },
-  historyRow: { flexDirection: "row", gap: 12, alignItems: "flex-start", padding: 12, backgroundColor: C.white95, borderRadius: 12, borderWidth: 1, borderColor: C.paperBorder, marginBottom: 6 },
+  historyRow: { flexDirection: "row", gap: 12, alignItems: "flex-start", padding: 13, backgroundColor: "#FFF8EA", borderRadius: 12, borderWidth: 1, borderColor: "rgba(126,88,48,0.18)", marginBottom: 7 },
   historyMood: { width: 28, height: 28, borderRadius: 14, borderWidth: 1, borderColor: C.paperBorder, alignItems: "center", justifyContent: "center", marginTop: 2 },
   historyMoodOn: { backgroundColor: C.red, borderColor: C.red },
   historyMoodText: { color: C.ink, fontSize: 14, fontWeight: "500", fontFamily: F.serif },

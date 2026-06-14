@@ -1,42 +1,173 @@
 {
   "$comment": "App Store Connect / Google Play Console に手動入力 or fastlane deliver 用",
   "ios": {
-    "name": "旭兆",
-    "subtitle": "毎朝届く、あなただけの一行運勢",
+    "name": "朝しるべ",
+    "appStoreConnectAppId": "6772390191",
+    "bundleId": "jp.asakizashi.app",
+    "sku": "asakizashi-001",
+    "subtitle": "朝のセルフケア日記",
     "primaryCategory": "LIFESTYLE",
-    "secondaryCategory": "ENTERTAINMENT",
+    "secondaryCategory": "HEALTH_AND_FITNESS",
     "ageRating": "4+",
-    "languages": ["ja"],
-    "keywords": [
-      "四柱推命","占い","運勢","朝","毎日","命式","干支","鑑定",
-      "日柱","五行","十二支","おみくじ","お告げ","通知","生年月日","MBTI","血液型","相性"
+    "languages": [
+      "ja"
     ],
-    "supportUrl": "https://asakizashi.app/support",
-    "marketingUrl": "https://asakizashi.app",
-    "privacyPolicyUrl": "https://asakizashi.app/privacy",
-    "promotionalText": "四柱推命を朝のルーティンへ。命式 × MBTI × 血液型から、毎日あなただけの一行が届きます。御神籤カード、十二支ランキング、推しや大切な日の相性まで。",
-    "description": "詳細は asakizashi-store-listing.md 参照",
-    "whatsNew": "v0.1.2\n- 朝命から旭兆へ正式リリース\n- 四柱推命の命式計算エンジン搭載\n- 朝の通知（起床+10分）\n- 御神籤カード・十二支ランキング・つながり機能"
+    "keywords": [
+      "朝",
+      "毎日",
+      "内省",
+      "日記",
+      "振り返り",
+      "習慣",
+      "ルーティン",
+      "通知",
+      "セルフケア",
+      "気分",
+      "記録",
+      "カレンダー",
+      "朝メモ",
+      "今日",
+      "メンタル",
+      "つながり",
+      "起床",
+      "暮らし",
+      "自己理解"
+    ],
+    "supportUrl": "https://syunta1045.github.io/asakizashi/support/",
+    "marketingUrl": "https://syunta1045.github.io/asakizashi/",
+    "privacyPolicyUrl": "https://syunta1045.github.io/asakizashi/privacy/",
+    "termsOfUseUrl": "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
+    "promotionalText": "毎朝1分の朝メモと夜の振り返りで、自分のペースを整える小さな習慣を。",
+    "description": "朝しるべは、毎朝1分の朝メモと夜の振り返りで、自分のペースを整えるセルフケア日記アプリです。\n\n起床時間、関心テーマ、前日の振り返りなどをもとに、朝の短いメモと小さな行動ヒントを届けます。忙しい日でも、ほんの少し立ち止まり、今日の自分に合う歩幅を選ぶためのアプリです。\n\n主な機能\n- 毎朝届く、朝メモ\n- 今日のペースと時間帯ごとの行動メモ\n- 大切な人とのつながりメモ\n- 夜の気分・ひとこと記録\n- 月間カレンダー\n- プレミアムで、テーマ別セルフケアや記録の見返し\n\n朝の通知を設定すると、起床時刻の少しあとに朝のメモが届きます。夜は気分とひとことを残せるので、自分の調子の波を少しずつ見返せます。\n\n本アプリの内容は、自己理解と内省のきっかけとしてお楽しみください。未来を断定するものではなく、医療・法律・金融などの専門的助言ではありません。\n\n利用規約: https://syunta1045.github.io/asakizashi/terms/\nプライバシーポリシー: https://syunta1045.github.io/asakizashi/privacy/\nApple標準EULA: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
+    "whatsNew": "v1.0\n- 朝メモと振り返り記録\n- 今日のペースと月間カレンダー\n- つながりメモ\n- プレミアム機能"
   },
   "android": {
-    "title": "旭兆 - 朝の四柱推命お告げ",
-    "shortDescription": "毎朝届く、あなただけの一行運勢",
-    "fullDescription": "詳細は asakizashi-store-listing.md 参照",
+    "title": "朝しるべ - 今日を整える朝メモ",
+    "shortDescription": "毎朝1分、自分のペースを整える",
+    "fullDescription": "朝しるべは、毎朝1分の朝メモと夜の振り返りで、自分のペースを整えるセルフケア日記アプリです。\n\n起床時間、関心テーマ、前日の振り返りなどをもとに、朝の短いメモと小さな行動ヒントを届けます。\n\n主な機能\n・毎朝届く、朝メモ\n・今日のペースと時間帯ごとの行動メモ\n・月間カレンダー\n・大切な人・推し・記念日のつながりメモ\n・夜の気分・ひとこと記録\n・プレミアム機能で、テーマ別セルフケアや記録の見返し\n\n朝の通知を設定すると、起床時刻の少しあとに朝のメモが届きます。忙しい日でも、ほんの少し立ち止まるきっかけとして使えます。\n\n本アプリの内容は、自己理解と内省のきっかけとしてお楽しみください。未来を断定するものではなく、医療・法律・金融などの専門的助言ではありません。",
     "category": "LIFESTYLE",
     "contentRating": "everyone"
   },
   "iap": [
-    { "id": "premium_monthly", "type": "auto-renewable-subscription", "price": 480, "currency": "JPY", "title": "プレミアム 月額" },
-    { "id": "premium_yearly",  "type": "auto-renewable-subscription", "price": 3800, "currency": "JPY", "title": "プレミアム 年額", "introOffer": { "type": "free_trial", "duration": "P7D" } }
+    {
+      "id": "premium_monthly",
+      "appleId": "6772390718",
+      "type": "auto-renewable-subscription",
+      "price": 480,
+      "currency": "JPY",
+      "title": "朝しるべプレミアム 月額",
+      "appStoreConnectStatus": "送信準備完了"
+    },
+    {
+      "id": "premium_yearly",
+      "appleId": "6772396801",
+      "type": "auto-renewable-subscription",
+      "price": 3800,
+      "currency": "JPY",
+      "title": "朝しるべプレミアム 年額",
+      "appStoreConnectStatus": "送信準備完了",
+      "introOffer": {
+        "type": "free_trial",
+        "duration": "P7D",
+        "status": "planned"
+      }
+    }
   ],
   "appPrivacy": {
     "linkedToUser": [
-      { "type": "Name", "purposes": ["AppFunctionality"], "tracking": false },
-      { "type": "EmailAddress", "purposes": ["AppFunctionality"], "tracking": false },
-      { "type": "UserId", "purposes": ["AppFunctionality"], "tracking": false },
-      { "type": "OtherUserContent", "purposes": ["AppFunctionality"], "tracking": false }
+      {
+        "type": "Name",
+        "purposes": [
+          "AppFunctionality"
+        ],
+        "tracking": false
+      },
+      {
+        "type": "EmailAddress",
+        "purposes": [
+          "AppFunctionality"
+        ],
+        "tracking": false
+      },
+      {
+        "type": "Health",
+        "purposes": [
+          "AppFunctionality"
+        ],
+        "tracking": false
+      },
+      {
+        "type": "CoarseLocation",
+        "purposes": [
+          "AppFunctionality"
+        ],
+        "tracking": false,
+        "note": "都道府県を任意入力する場合のみ。GPS位置情報は取得しない。"
+      },
+      {
+        "type": "UserId",
+        "purposes": [
+          "AppFunctionality"
+        ],
+        "tracking": false
+      },
+      {
+        "type": "PurchaseHistory",
+        "purposes": [
+          "AppFunctionality"
+        ],
+        "tracking": false
+      },
+      {
+        "type": "OtherUserContent",
+        "purposes": [
+          "AppFunctionality"
+        ],
+        "tracking": false
+      },
+      {
+        "type": "ProductInteraction",
+        "purposes": [
+          "Analytics",
+          "AppFunctionality"
+        ],
+        "tracking": false
+      },
+      {
+        "type": "CrashData",
+        "purposes": [
+          "Analytics",
+          "AppFunctionality"
+        ],
+        "tracking": false
+      },
+      {
+        "type": "PerformanceData",
+        "purposes": [
+          "Analytics",
+          "AppFunctionality"
+        ],
+        "tracking": false
+      },
+      {
+        "type": "OtherDiagnosticData",
+        "purposes": [
+          "Analytics",
+          "AppFunctionality"
+        ],
+        "tracking": false
+      },
+      {
+        "type": "OtherDataTypes",
+        "purposes": [
+          "AppFunctionality"
+        ],
+        "tracking": false,
+        "note": "生年月日、性別、MBTI、血液型、起床時間、関心テーマ。朝メモ、記録、通知調整に使用。"
+      }
     ],
+    "notLinkedToUser": [],
     "linkedToTracking": false
   },
-  "reviewNotes": "占い・娯楽アプリ。すべての機能はサインインなしで体験可能（オフラインモード）。プレミアムは7日無料体験可。\n\n占いの結果は娯楽目的であり、医療・法律・金融助言ではないことを利用規約に明記しています。"
+  "reviewNotes": "Guideline 4.3(b) のご指摘を受け、アプリの主要体験と表示文言をさらに見直しました。現在のビルドは、毎朝1分の朝メモ、今日のペース確認、夜の気分記録、つながりメモ、月間カレンダーを中心にしたセルフケア日記アプリとして構成しています。\n\n今回の更新では、主要画面を朝の行動メモ、振り返り記録、テーマ別セルフケアに寄せました。ペース画面では朝・昼・夜の使い方を提示し、つながり画面では相手の気持ちを決めつけず、言葉選びと距離感を整えるメモとして表示します。サインインなしでも、オンボーディング後に主要機能を体験できます。Apple Sign in / Google Sign in は任意で、アカウント削除はアプリ内の「設定」から実行できます。\n\nプレミアム機能はApp Storeのアプリ内課金で提供します。premium_yearlyには7日間の無料トライアルを設定しています。購入復元はプレミアム画面下部の「購入を復元」から確認できます。\n\nApp Description に利用規約、プライバシーポリシー、Apple標準EULAへの機能するリンクを追加済みです。スクリーンショットはiOSシミュレータ素材を使用し、iOSユーザー向けの体験を示しています。"
 }

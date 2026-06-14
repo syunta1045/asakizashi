@@ -1,14 +1,12 @@
 import { useEffect, useRef } from "react";
-import { Text, Pressable, Animated, Easing, StyleSheet } from "react-native";
+import { View, Text, Pressable, Animated, Easing, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useUser } from "../lib/store";
-import { stemReading, branchReading } from "../lib/bazi";
-import { requestNotificationPermission, scheduleMorningNotification } from "../lib/notifications";
 import { track } from "../lib/analytics";
 import { haptics } from "../lib/haptics";
-import { C, dawnGradient, F } from "../lib/theme";
+import { C, morningGradient, F } from "../lib/theme";
 
 export default function Reveal() {
   const router = useRouter();
@@ -24,59 +22,52 @@ export default function Reveal() {
   useEffect(() => {
     haptics.success();
     Animated.sequence([
-      Animated.timing(headerFade, { toValue: 1, duration: 600, useNativeDriver: true }),
+      Animated.timing(headerFade, { toValue: 1, duration: 350, useNativeDriver: true }),
       Animated.parallel([
-        Animated.timing(dayFade, { toValue: 1, duration: 800, useNativeDriver: true }),
-        Animated.timing(dayScale, { toValue: 1, duration: 1000, easing: Easing.out(Easing.back(1.2)), useNativeDriver: true }),
+        Animated.timing(dayFade, { toValue: 1, duration: 500, useNativeDriver: true }),
+        Animated.timing(dayScale, { toValue: 1, duration: 600, easing: Easing.out(Easing.back(1.1)), useNativeDriver: true }),
       ]),
-      // メッセージとCTAを並行フェードイン（CTAは少し遅れて開始するが、メッセージが100%になる前に出現）
       Animated.parallel([
-        Animated.timing(messageFade, { toValue: 1, duration: 700, useNativeDriver: true }),
+        Animated.timing(messageFade, { toValue: 1, duration: 450, useNativeDriver: true }),
         Animated.sequence([
-          Animated.delay(300),
-          Animated.timing(ctaFade, { toValue: 1, duration: 500, useNativeDriver: true }),
+          Animated.delay(120),
+          Animated.timing(ctaFade, { toValue: 1, duration: 350, useNativeDriver: true }),
         ]),
       ]),
     ]).start();
   }, []);
 
-  if (!pillars) return null;
-  const { day } = pillars;
-  const reading = `${stemReading[day.stem]}・${branchReading[day.branch]}`;
-
+  // pillars 未生成（生年月日未入力時）でも reveal を表示する
   const onContinue = async () => {
     haptics.medium();
-    track("onboarding_completed", { dayPillar: `${day.stem}${day.branch}` });
+    track("onboarding_completed", {
+      dayPillar: pillars ? `${pillars.day.stem}${pillars.day.branch}` : "(none)",
+    });
     finishOnboarding();
-    // 通知権限を取得してスケジュール（拒否されてもスキップして続行）
-    try {
-      const granted = await requestNotificationPermission();
-      if (granted) {
-        const u = useUser.getState();
-        await scheduleMorningNotification(u.wakeUpTime, u.nickname);
-      }
-    } catch {}
     router.replace("/today");
   };
 
   return (
-    <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
+    <LinearGradient colors={morningGradient as unknown as [string, string, ...string[]]} style={s.bg}>
       <SafeAreaView style={s.safe}>
         <Animated.View style={[s.header, { opacity: headerFade }]}>
-          <Text style={s.headerLabel}>── {nickname || "あなた"}さんの命式 ──</Text>
+          <Text style={s.headerLabel}>── 朝の準備ができました ──</Text>
         </Animated.View>
 
         <Animated.View style={[s.center, { opacity: dayFade, transform: [{ scale: dayScale }] }]}>
-          <Text style={s.day}>{day.stem}{day.branch}</Text>
-          <Text style={s.reading}>{reading}</Text>
+          <View style={s.markHalo}>
+            <View style={s.cardMark}>
+              <View style={s.sunMark} />
+            </View>
+          </View>
         </Animated.View>
 
         <Animated.View style={[s.message, { opacity: messageFade }]}>
           <Text style={s.headline}>
-            あなたの日柱は{"\n"}{day.stem}{day.branch}でした。
+            {(nickname || "あなた")}さんの朝に合わせて{"\n"}朝メモを整えました。
           </Text>
           <Text style={s.lede}>
-            この命式から、毎朝の{"\n"}一行のお告げをお届けします。
+            起きる時間と今の関心に合わせて、{"\n"}毎朝そっとお届けします。
           </Text>
         </Animated.View>
 
@@ -85,9 +76,9 @@ export default function Reveal() {
             style={s.cta}
             onPress={onContinue}
             accessibilityRole="button"
-            accessibilityLabel="今日のお告げを見る"
+            accessibilityLabel="朝メモを見る"
           >
-            <Text style={s.ctaText}>今日のお告げを見る</Text>
+            <Text style={s.ctaText}>朝メモを見る</Text>
           </Pressable>
         </Animated.View>
       </SafeAreaView>
@@ -99,13 +90,14 @@ const s = StyleSheet.create({
   bg: { flex: 1 },
   safe: { flex: 1, paddingHorizontal: 28, paddingBottom: 30, maxWidth: 480, width: "100%", alignSelf: "center" },
   header: { alignItems: "center", marginTop: 60 },
-  headerLabel: { color: C.white, fontSize: 11, opacity: 0.85, letterSpacing: 6, fontFamily: F.serif },
-  center: { alignItems: "center", marginTop: 30 },
-  day: { color: C.white, fontSize: 96, letterSpacing: 12, lineHeight: 100, fontFamily: F.serif, fontWeight: "300" },
-  reading: { color: C.white, fontSize: 11, marginTop: 12, opacity: 0.85, letterSpacing: 4, fontFamily: F.serif },
+  headerLabel: { color: C.white, fontSize: 11, opacity: 0.85, letterSpacing: 4, fontFamily: F.serif },
+  center: { alignItems: "center", marginTop: 52 },
+  markHalo: { width: 168, height: 168, borderRadius: 84, backgroundColor: "rgba(250,244,224,0.12)", alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.16)" },
+  cardMark: { width: 88, height: 112, borderRadius: 18, backgroundColor: C.paper, alignItems: "center", justifyContent: "center", transform: [{ rotate: "-3deg" }], borderWidth: 1, borderColor: C.paperBorder },
+  sunMark: { width: 54, height: 54, borderRadius: 27, backgroundColor: "#F1B95F" },
   message: { flex: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 12 },
   headline: { color: C.white, fontSize: 18, lineHeight: 32, fontWeight: "500", textAlign: "center", fontFamily: F.serif },
   lede: { color: C.white, fontSize: 12, opacity: 0.85, lineHeight: 24, marginTop: 14, textAlign: "center", fontFamily: F.serif },
   cta: { backgroundColor: C.paper, borderRadius: 30, paddingVertical: 16, alignItems: "center", borderWidth: 1, borderColor: C.gold },
-  ctaText: { color: C.ink, fontSize: 14, fontWeight: "600", letterSpacing: 6, fontFamily: F.serif },
+  ctaText: { color: C.ink, fontSize: 14, fontWeight: "600", letterSpacing: 3, fontFamily: F.serif },
 });

@@ -1,4 +1,4 @@
-# Android 単独リリース手順（旭兆）
+# Android 単独リリース手順（朝しるべ）
 
 iOS を後回しにして Google Play だけで先に出すための完全手順。
 **所要: 実作業 1〜2日 / 待ち時間込み 1〜2週間**
@@ -22,7 +22,7 @@ iOS は後から追加可能（同じコードベース、`eas build -p ios` を
 
 ## Phase 0: 開発前提（コード側は既に完了済）
 
-- ✅ `app.json` の `android.package`: `jp.asakizashi.app`
+- ✅ `app.json` の `android.package`: `jp.asashirube.app`
 - ✅ Adaptive icon, splash, notification icon
 - ✅ `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY` 投入箇所準備済
 - ✅ `EXPO_PUBLIC_GOOGLE_OAUTH_CLIENT_ID_ANDROID` 投入箇所準備済
@@ -106,7 +106,7 @@ eas build --platform android --profile preview
 
 ビルド結果が緑になったら、実機にインストールして以下を確認：
 - [ ] オンボーディング 7 ステップが通る
-- [ ] today タブで御神籤カードが表示される
+- [ ] today タブで朝メモカードが表示される
 - [ ] Google サインインができる
 - [ ] 通知許可 → 起床時刻+10分 にプッシュが来る（時刻を1分後に設定して検証）
 - [ ] 設定 → サインアウト → 再ログインでデータ復元
@@ -121,7 +121,7 @@ eas build --platform android --profile preview
 ### 4-1. Play Console でアプリ作成
 1. https://play.google.com/console → **アプリを作成**
 2. デフォルト言語: 日本語（日本）
-3. **アプリ名**: 旭兆 / Asakizashi
+3. **アプリ名**: 朝しるべ
 4. アプリ or ゲーム: アプリ
 5. 無料 or 有料: 無料（アプリ内課金あり）
 
@@ -130,21 +130,21 @@ eas build --platform android --profile preview
 - 短い説明（80文字以内）
 - 詳しい説明（4,000文字以内）
 - アプリのアイコン（512×512 PNG）→ `assets/icon.png` から生成済
-- フィーチャーグラフィック（1024×500 PNG）→ 要作成
+- フィーチャーグラフィック（1024×500 PNG）→ `assets/feature-graphic.png` からアップロード
 - スクリーンショット（最低 2枚、推奨 4〜8枚）→ 要作成
 
 ### 4-3. ストア素材を作る
 今あるもの:
 - `assets/icon.png` (1024×1024)
 - `assets/og-image.png` (1200×630)
+- `assets/feature-graphic.png` (1024×500)
 
 足りないもの:
-- **フィーチャーグラフィック** 1024×500: 朝焼けグラデ + ロゴ
 - **スクリーンショット** 1080×1920 を 4〜8枚: 実機 or シミュレータでスクショ
   推奨シーン:
   1. オンボーディング welcome
-  2. today タブ（御神籤カード表示）
-  3. 命式詳細（チャート）
+  2. today タブ（朝メモ）
+  3. 傾向メモ
   4. つながり登録一覧
   5. 振り返り mood + 連続記録
   6. プレミアム比較表
@@ -156,7 +156,7 @@ eas build --platform android --profile preview --local   # ローカルビルド
 ```
 
 ### 4-4. コンテンツレーティング
-- 質問票に回答（占い・娯楽用途、暴力なし、性的表現なし）
+- 質問票に回答（セルフケア・ライフスタイル用途、暴力なし、性的表現なし）
 - 結果は IARC: Everyone / 全年齢
 
 ### 4-5. データセーフティ
@@ -202,7 +202,7 @@ eas submit --platform android --profile production
 ### ダウンロードリンクを LP に反映
 [public-site/index.html](../public-site/index.html) の TODO を更新：
 ```html
-<a href="https://play.google.com/store/apps/details?id=jp.asakizashi.app">Google Play</a>
+<a href="https://play.google.com/store/apps/details?id=jp.asashirube.app">Google Play</a>
 ```
 
 ### iOS 追加（後日）

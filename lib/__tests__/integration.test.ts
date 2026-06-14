@@ -2,7 +2,7 @@
  * 統合テスト: ロジックレイヤーの主要フローを検証
  */
 import { threePillars, dayPillar, calcAge } from "../bazi";
-import { rankingForDay } from "../ranking";
+import { paceForDay } from "../pace";
 import { compatibility } from "../relations";
 import { applyTone, type BaseMessage } from "../tone";
 import { buildMonth } from "../calendar";
@@ -20,6 +20,7 @@ describe("統合: 命式から今日のメッセージまで", () => {
 
     // 1. 命式算出
     const pillars = threePillars(birthDate);
+    expect(pillars.year.branch).toBe("寅");
     expect(pillars.day.stem).toBe("庚");
     expect(pillars.day.branch).toBe("申");
 
@@ -27,18 +28,18 @@ describe("統合: 命式から今日のメッセージまで", () => {
     const todayPillar = dayPillar(today);
     expect(todayPillar.stem).toBeDefined();
 
-    // 3. 12位ランキング
-    const ranking = rankingForDay(todayPillar.branch);
-    expect(ranking).toHaveLength(12);
-    const myRank = ranking.find((r) => r.branch === pillars.day.branch);
-    expect(myRank).toBeDefined();
-    expect(myRank!.rank).toBeGreaterThanOrEqual(1);
-    expect(myRank!.rank).toBeLessThanOrEqual(12);
+    // 3. 12種類のペース
+    const paceEntries = paceForDay(todayPillar.branch);
+    expect(paceEntries).toHaveLength(12);
+    const myPace = paceEntries.find((r) => r.branch === pillars.year.branch);
+    expect(myPace).toBeDefined();
+    expect(myPace!.position).toBeGreaterThanOrEqual(1);
+    expect(myPace!.position).toBeLessThanOrEqual(12);
 
     // 4. メッセージにトーン適用
     const base: BaseMessage = {
       headline: "歩幅を半歩、ゆるめる日。",
-      body: "火の気つよく巡る一日。",
+      body: "やる気が高まりやすい一日。",
       doActions: ["散歩する", "ありがとうを言う", "本を読む"],
       avoidActions: ["即決", "衝動買い"],
     };

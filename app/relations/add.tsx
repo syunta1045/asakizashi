@@ -1,32 +1,20 @@
 import { useEffect, useRef, useState } from "react";
-import { View, Text, ScrollView, Pressable, TextInput, KeyboardAvoidingView, Platform, Alert, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, TextInput, KeyboardAvoidingView, Platform, Alert, StyleSheet, Keyboard } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useUser } from "../../lib/store";
-import { useRelations, GENRE_INFO, compatibility, RelationLimitError, FREE_RELATION_LIMIT, type Genre } from "../../lib/relations";
+import { useRelations, ACTIVE_GENRES, GENRE_INFO, compatibility, RelationLimitError, FREE_RELATION_LIMIT, type Genre } from "../../lib/relations";
 import { useSubscription } from "../../lib/subscription";
 import { C, dawnGradient, F } from "../../lib/theme";
-
-const SUB_LABELS: Record<Genre, string[]> = {
-  person: ["夫", "妻", "恋人", "家族", "子ども", "友人"],
-  oshi: ["アイドル", "俳優", "アーティスト", "声優", "スポーツ選手", "キャラ"],
-  work: ["上司", "部下", "取引先", "クライアント", "同僚"],
-  key_day: ["結婚した日", "転職日", "開業日", "出会った日", "引越し日"],
-  pet: ["犬", "猫", "うさぎ", "鳥", "その他"],
-  first_meet: ["初対面", "お見合い", "気になる人"],
-  past: ["元恋人", "故人", "ご先祖"],
-  place: ["お店", "会社", "住んでいる場所"],
-};
 
 export default function AddRelation() {
   const router = useRouter();
   const { pillars } = useUser();
   const { add } = useRelations();
   const isPremium = useSubscription((s) => s.isPremium);
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2>(1);
   const [genre, setGenre] = useState<Genre | null>(null);
-  const [label, setLabel] = useState("");
   const [name, setName] = useState("");
   const [year, setYear] = useState(1995);
   const [month, setMonth] = useState(7);
@@ -41,18 +29,19 @@ export default function AddRelation() {
 
   const onSave = () => {
     if (!genre || !pillars) return;
+    Keyboard.dismiss();
     try {
       const r = add({
-        genre, label: label || GENRE_INFO[genre].label,
+        genre, label: GENRE_INFO[genre].label,
         name, birthYear: year, birthMonth: month, birthDay: day,
       }, isPremium);
-      compatibility(pillars.day.branch, r.pillars.day.branch);
+      compatibility(pillars.year.branch, r.pillars.year.branch);
       router.replace("/(tabs)/relations");
     } catch (e) {
       if (e instanceof RelationLimitError) {
         Alert.alert(
           "登録上限に達しました",
-          `無料プランでは${FREE_RELATION_LIMIT}件まで登録できます。プレミアムにアップグレードすると無制限になります。`,
+          `通常プランでは${FREE_RELATION_LIMIT}件まで登録できます。プレミアムをはじめると無制限になります。`,
           [
             { text: "キャンセル", style: "cancel" },
             { text: "プレミアムを見る", onPress: () => router.replace("/premium") },
@@ -69,26 +58,27 @@ export default function AddRelation() {
       <SafeAreaView style={s.safe}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
         <View style={s.headerRow}>
-          <Pressable onPress={() => step === 1 ? router.back() : setStep((step - 1) as 1 | 2 | 3)} accessibilityRole="button">
+          <Pressable onPress={() => step === 1 ? router.back() : setStep(1)} accessibilityRole="button">
             <Text style={s.back}>‹</Text>
           </Pressable>
           <View style={{ flex: 1, flexDirection: "row", gap: 6 }}>
-            {[1, 2, 3].map((i) => (
+            {[1, 2].map((i) => (
               <View key={i} style={[s.bar, i <= step && s.barOn]} />
             ))}
           </View>
-          <Text style={s.stepText}>{step}/3</Text>
+          <Text style={s.stepText}>{step}/2</Text>
         </View>
 
         {step === 1 && (
           <ScrollView contentContainerStyle={s.body} keyboardShouldPersistTaps="handled">
-            <Text style={s.title}>何を占いますか</Text>
-            <Text style={s.sub}>ジャンルを選んでください</Text>
+            <Text style={s.title}>何を登録しますか</Text>
+            <Text style={s.sub}>あとから削除できます</Text>
             <View style={s.grid}>
-              {(Object.entries(GENRE_INFO) as [Genre, typeof GENRE_INFO[Genre]][]).map(([key, g]) => {
+              {ACTIVE_GENRES.map((key) => {
+                const g = GENRE_INFO[key];
                 const on = genre === key;
                 return (
                   <Pressable
@@ -108,7 +98,7 @@ export default function AddRelation() {
 
         {step === 2 && genre && (
           <ScrollView contentContainerStyle={s.body} keyboardShouldPersistTaps="handled">
-            <Text style={s.title}>名前と詳細</Text>
+            <Text style={s.title}>名前と生年月日</Text>
             <Text style={s.sub}>{GENRE_INFO[genre].label}を登録します</Text>
 
             <Text style={s.fieldLabel}>名前</Text>
@@ -118,24 +108,14 @@ export default function AddRelation() {
               onChangeText={setName}
               placeholder="例: たくみ"
               placeholderTextColor="rgba(255,255,255,0.4)"
+              returnKeyType="done"
+              onSubmitEditing={Keyboard.dismiss}
             />
-
-            <Text style={s.fieldLabel}>関係・カテゴリ</Text>
-            <View style={s.subRow}>
-              {SUB_LABELS[genre].map((l) => {
-                const on = label === l;
-                return (
-                  <Pressable key={l} onPress={() => setLabel(l)} style={[s.chip, on && s.chipOn]} accessibilityRole="button">
-                    <Text style={[s.chipText, on && s.chipTextOn]}>{l}</Text>
-                  </Pressable>
-                );
-              })}
-            </View>
 
             <Text style={s.fieldLabel}>生年月日</Text>
             <NumWheel
               label="年"
-              values={Array.from({ length: new Date().getFullYear() + 1 - 1900 + 1 }, (_, i) => 1900 + i)}
+              values={Array.from({ length: new Date().getFullYear() - 1900 + 1 }, (_, i) => 1900 + i)}
               value={year}
               onChange={setYear}
             />
@@ -156,12 +136,12 @@ export default function AddRelation() {
 
         {(step === 1 || step === 2) && (
           <Pressable
-            style={[s.cta, (step === 1 && !genre) || (step === 2 && (!name || !label)) ? { opacity: 0.5 } : null]}
+            style={[s.cta, (step === 1 && !genre) || (step === 2 && !name.trim()) ? { opacity: 0.5 } : null]}
             onPress={() => {
               if (step === 1 && genre) setStep(2);
-              else if (step === 2 && name && label) onSave();
+              else if (step === 2 && name.trim()) onSave();
             }}
-            disabled={(step === 1 && !genre) || (step === 2 && (!name || !label))}
+            disabled={(step === 1 && !genre) || (step === 2 && !name.trim())}
           accessibilityRole="button">
             <Text style={s.ctaText}>{step === 2 ? "登録する" : "次へ"}</Text>
           </Pressable>
@@ -180,11 +160,12 @@ function NumWheel({ label, values, value, onChange }: {
   label: string; values: number[]; value: number; onChange: (v: number) => void;
 }) {
   const ref = useRef<ScrollView>(null);
-  const CELL_W = 60;
+  const ITEM_W = 64;
+  const ITEM_GAP = 4;
   const scrollToValue = () => {
     const idx = values.indexOf(value);
     if (idx >= 0 && ref.current) {
-      ref.current.scrollTo({ x: Math.max(0, idx * CELL_W - 100), animated: false });
+      ref.current.scrollTo({ x: Math.max(0, idx * (ITEM_W + ITEM_GAP) - 120), animated: false });
     }
   };
   useEffect(() => {
@@ -197,7 +178,7 @@ function NumWheel({ label, values, value, onChange }: {
         ref={ref}
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 12, gap: 4 }}
+        contentContainerStyle={{ paddingHorizontal: 12, gap: ITEM_GAP }}
         onContentSizeChange={scrollToValue}
       >
         {values.map((v) => (
@@ -218,42 +199,36 @@ function NumWheel({ label, values, value, onChange }: {
 
 const s = StyleSheet.create({
   bg: { flex: 1 },
-  safe: { flex: 1, paddingHorizontal: 28 },
-  headerRow: { flexDirection: "row", alignItems: "center", gap: 10, marginVertical: 24 },
+  safe: { flex: 1, paddingHorizontal: 24 },
+  headerRow: { flexDirection: "row", alignItems: "center", gap: 10, marginVertical: 18 },
   back: { color: C.white, fontSize: 22, paddingHorizontal: 4 },
   bar: { flex: 1, height: 3, borderRadius: 2, backgroundColor: "rgba(255,255,255,0.25)" },
   barOn: { backgroundColor: "rgba(255,255,255,0.95)" },
   stepText: { color: C.white, fontSize: 10, opacity: 0.85 },
 
-  body: { paddingBottom: 24 },
-  title: { color: C.white, fontSize: 22, lineHeight: 36, fontWeight: "500", fontFamily: F.serif },
-  sub: { color: C.white, fontSize: 12, opacity: 0.85, marginTop: 12, lineHeight: 22, fontFamily: F.serif },
+  body: { paddingBottom: 18 },
+  title: { color: C.white, fontSize: 22, lineHeight: 32, fontWeight: "500", fontFamily: F.serif },
+  sub: { color: C.white, fontSize: 12, opacity: 0.85, marginTop: 8, lineHeight: 20, fontFamily: F.serif },
 
-  grid: { marginTop: 22, flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  gCard: { width: "48%", padding: 14, alignItems: "center", borderRadius: 14, backgroundColor: C.white12, borderWidth: 1, borderColor: C.whiteBorder },
+  grid: { marginTop: 18, flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  gCard: { width: "48%", minHeight: 82, padding: 12, alignItems: "center", justifyContent: "center", borderRadius: 14, backgroundColor: C.white12, borderWidth: 1, borderColor: C.whiteBorder },
   gCardOn: { backgroundColor: C.white95, borderColor: "rgba(255,255,255,0.5)" },
   gIcon: { color: C.white, fontSize: 22, marginBottom: 6 },
   gIconOn: { color: C.red },
   gLabel: { color: C.white, fontSize: 12, fontWeight: "600" },
   gLabelOn: { color: C.ink },
-  gSub: { color: C.white, fontSize: 9, opacity: 0.85, marginTop: 3 },
+  gSub: { color: C.white, fontSize: 9, opacity: 0.85, marginTop: 3, textAlign: "center", lineHeight: 13 },
   gSubOn: { color: C.inkSub, opacity: 1 },
 
   fieldLabel: { color: C.white, fontSize: 11, opacity: 0.85, letterSpacing: 1, marginTop: 18, marginBottom: 8 },
   input: { backgroundColor: C.white15, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, color: C.white, fontSize: 16, borderWidth: 1, borderColor: C.whiteBorder, fontFamily: F.serif },
-  subRow: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
-  chip: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18, backgroundColor: C.white12, borderWidth: 1, borderColor: C.whiteBorder },
-  chipOn: { backgroundColor: C.white95, borderColor: "rgba(255,255,255,0.5)" },
-  chipText: { color: C.white, fontSize: 12, fontFamily: F.serif },
-  chipTextOn: { color: C.red, fontWeight: "600" },
-
   wheel: { flexDirection: "row", alignItems: "center", backgroundColor: C.white15, borderRadius: 10, borderWidth: 1, borderColor: C.whiteBorder, marginBottom: 8, paddingVertical: 6 },
   wheelLabel: { color: C.white, fontSize: 11, opacity: 0.7, paddingHorizontal: 12, width: 36 },
-  wheelCell: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, minWidth: 56, alignItems: "center" },
+  wheelCell: { width: 64, paddingVertical: 8, borderRadius: 8, alignItems: "center" },
   wheelCellOn: { backgroundColor: C.white95 },
   wheelText: { color: C.white, fontSize: 16, fontFamily: F.serif },
   wheelTextOn: { color: C.red, fontWeight: "600" },
 
-  cta: { backgroundColor: C.paper, borderRadius: 30, paddingVertical: 16, alignItems: "center", borderWidth: 1, borderColor: C.gold, marginBottom: 8 },
-  ctaText: { color: C.ink, fontSize: 14, fontWeight: "600", letterSpacing: 6, fontFamily: F.serif },
+  cta: { backgroundColor: C.paper, borderRadius: 30, paddingVertical: 15, alignItems: "center", borderWidth: 1, borderColor: C.gold, marginBottom: 8 },
+  ctaText: { color: C.ink, fontSize: 14, fontWeight: "600", letterSpacing: 2, fontFamily: F.serif },
 });

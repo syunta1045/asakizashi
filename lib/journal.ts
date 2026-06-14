@@ -115,7 +115,7 @@ export function reachedMilestone(streak: number): Milestone | null {
   return {
     days: streak,
     title: milestoneTitle(streak),
-    description: `${streak}日連続で旭兆と過ごしています`,
+    description: `${streak}日連続で朝しるべと過ごしています`,
   };
 }
 
@@ -241,6 +241,6 @@ function milestoneTitle(days: number): string {
   if (days >= 60) return "二月の継続者";
   if (days >= 30) return "ひと月の習慣";
   if (days >= 14) return "二週の継続";
-  if (days >= 7) return "一週間の節目";
+  if (days >= 7) return "一週間の目標";
   return "三日の芽生え";
 }

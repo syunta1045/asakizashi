@@ -21,6 +21,8 @@ export const GENRE_INFO: Record<Genre, { icon: string; label: string; sub: strin
   place:      { icon: "▢", label: "場所",          sub: "創業日のあるもの",   color: "#7E8B9E" },
 };
 
+export const ACTIVE_GENRES: Genre[] = ["person", "oshi", "work", "key_day", "pet"];
+
 export type Relation = {
   id: string;
   genre: Genre;
@@ -33,12 +35,12 @@ export type Relation = {
   createdAt: number;
 };
 
-/** 無料プランの登録上限。FEATURE_LOCKS.relations.freeLimit と一致させる */
+/** 通常プランの登録上限。FEATURE_LOCKS.relations.freeLimit と一致させる */
 export const FREE_RELATION_LIMIT = 5;
 
 export class RelationLimitError extends Error {
   constructor() {
-    super(`無料プランでは${FREE_RELATION_LIMIT}件までしか登録できません`);
+    super(`通常プランでは${FREE_RELATION_LIMIT}件までしか登録できません`);
     this.name = "RelationLimitError";
   }
 }

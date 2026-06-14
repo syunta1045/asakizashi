@@ -5,13 +5,13 @@ import { useUser } from "../../lib/store";
 import { C, F } from "../../lib/theme";
 
 const THEMES = [
-  "恋愛・パートナーシップ",
+  "大切な人・パートナー",
   "結婚・家庭",
   "子育て・家族",
   "仕事・キャリア",
   "副業・独立",
-  "お金・金運",
-  "勝負・運気",
+  "お金の整え方",
+  "ここぞの一歩",
   "人間関係",
   "学び・成長",
   "創作・表現",
@@ -22,7 +22,7 @@ const THEMES = [
   "美容・ライフスタイル",
   "食・暮らし",
   "推し・ファン活動",
-  "スピリチュアル",
+  "静かな時間",
 ];
 
 export default function ThemesStep() {
@@ -45,9 +45,9 @@ export default function ThemesStep() {
     <OnboardShell
       step={7}
       title={"気になっていることを\n教えてください"}
-      sub="毎朝のメッセージの主題に反映します（最大3つ）"
+      sub="朝メモを今の関心に近づけます。1つ以上、最大3つまで選べます"
       onNext={onNext}
-      ctaLabel="入力内容を確認"
+      ctaLabel={themes.length === 0 ? "選択してください" : "入力内容を確認"}
       disabled={themes.length === 0}
     >
       <View style={s.grid}>
@@ -61,7 +61,7 @@ export default function ThemesStep() {
           );
         })}
       </View>
-      <Text style={s.counter}>{themes.length} / 3 選択中</Text>
+      <Text style={s.counter}>{themes.length === 0 ? "1つ以上選んでください" : `${themes.length} / 3 選択中`}</Text>
     </OnboardShell>
   );
 }

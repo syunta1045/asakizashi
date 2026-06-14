@@ -6,7 +6,6 @@ import { useRouter } from "expo-router";
 import { useUser } from "../lib/store";
 import { useSubscription, isLocked } from "../lib/subscription";
 import { buildMonth, nextKeyDays, type CalendarDay } from "../lib/calendar";
-import { stemReading, branchReading } from "../lib/bazi";
 import { haptics } from "../lib/haptics";
 import { PremiumLock } from "../components/PremiumLock";
 import { C, dawnGradient, F } from "../lib/theme";
@@ -30,7 +29,36 @@ export default function Calendar() {
   );
 
   // === 条件分岐 return（hooks の後） ===
-  if (!pillars || !userBranch) return null;
+  if (!pillars || !userBranch) {
+    return (
+      <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
+        <SafeAreaView style={s.safe} edges={["top"]}>
+          <View style={s.header}>
+            <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="戻る" hitSlop={12}><Text style={s.back}>‹</Text></Pressable>
+            <View style={{ flex: 1 }}>
+              <Text style={s.dateLabel}>月のメモ</Text>
+              <Text style={s.title}>月間カレンダー</Text>
+            </View>
+          </View>
+          <View style={{ padding: 24, alignItems: "center", marginTop: 40 }}>
+            <Text style={{ color: C.white, fontSize: 16, lineHeight: 26, textAlign: "center", fontWeight: "600", marginBottom: 12 }}>
+              生年月日を入力すると{"\n"}月間カレンダーが見られます
+            </Text>
+            <Text style={{ color: C.white, opacity: 0.85, fontSize: 12, lineHeight: 20, textAlign: "center", marginBottom: 24 }}>
+              生年月日は任意です。未入力でも朝メモ・振り返り・つながりは使えます。
+            </Text>
+            <Pressable
+              onPress={() => router.push("/edit/birth")}
+              style={{ backgroundColor: C.paper, paddingHorizontal: 24, paddingVertical: 14, borderRadius: 24, borderWidth: 1, borderColor: C.gold }}
+              accessibilityRole="button"
+            >
+              <Text style={{ color: C.ink, fontSize: 13, fontWeight: "700", letterSpacing: 2 }}>生年月日を入力する</Text>
+            </Pressable>
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    );
+  }
 
   if (isLocked("monthCalendar", isPremium)) {
     return (
@@ -39,13 +67,13 @@ export default function Calendar() {
           <View style={s.header}>
             <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="戻る" hitSlop={12}><Text style={s.back}>‹</Text></Pressable>
             <View style={{ flex: 1 }}>
-              <Text style={s.dateLabel}>MONTHLY FLOW</Text>
-              <Text style={s.title}>月の流れ</Text>
+              <Text style={s.dateLabel}>月のメモ</Text>
+              <Text style={s.title}>月間カレンダー</Text>
             </View>
           </View>
           <PremiumLock
-            title="月の流れはプレミアム限定"
-            description="今月の節目の日と、やわらかな日が一目でわかります"
+            title="月間カレンダーはプレミアム限定"
+            description="今月の意識したい日と、過ごしやすい日が一目でわかります"
           />
         </SafeAreaView>
       </LinearGradient>
@@ -84,7 +112,7 @@ export default function Calendar() {
           <Pressable onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="戻る" hitSlop={12}><Text style={s.back}>‹</Text></Pressable>
           <View style={{ flex: 1 }}>
             <Text style={s.dateLabel}>{year}年</Text>
-            <Text style={s.title}>{month}月の流れ</Text>
+            <Text style={s.title}>{month}月カレンダー</Text>
           </View>
           {!isCurrentMonth && (
             <Pressable onPress={goToday} accessibilityRole="button">
@@ -131,31 +159,31 @@ export default function Calendar() {
               })}
             </View>
             <View style={s.legend}>
-              <Text style={s.legendItem}>● 大切な日</Text>
-              <Text style={s.legendItem}>○ やわらかな日</Text>
+              <Text style={s.legendItem}>● 意識したい日</Text>
+              <Text style={s.legendItem}>○ 整えやすい日</Text>
               <Text style={[s.legendItem, { color: C.red }]}>■ 今日</Text>
             </View>
           </View>
 
-          {/* 節目リスト */}
-          <Text style={s.sectionTitle}>今月の節目</Text>
+          {/* 気になる日のリスト */}
+          <Text style={s.sectionTitle}>今月の気になる日</Text>
           {keyDays.length === 0 && (
             <View style={s.emptyBox}>
-              <Text style={s.empty}>今月、この先の節目はありません</Text>
-              <Text style={s.emptySub}>節目の日は月によって変わります。翌月もチェックしてみてください。</Text>
+              <Text style={s.empty}>今月、この先の気になる日はありません</Text>
+              <Text style={s.emptySub}>気になる日は月によって変わります。翌月もチェックしてみてください。</Text>
             </View>
           )}
           {keyDays.map((d) => (
             <View key={d.date} style={s.keyCard}>
               <View style={[s.keyIcon, d.isKey ? { backgroundColor: C.red } : { backgroundColor: C.gold }]}>
-                <Text style={s.keyIconText}>{d.pillar.branch}</Text>
+              <Text style={s.keyIconText}>{d.date}</Text>
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={[s.keyType, { color: d.isKey ? C.red : C.gold }]}>
-                  {d.isKey ? "◆ 大切な日" : "○ やわらかな日"}
+                  {d.isKey ? "◆ 意識したい日" : "○ 整えやすい日"}
                 </Text>
-                <Text style={s.keyDate}>{month}月{d.date}日 — {d.pillar.stem}{d.pillar.branch}</Text>
-                <Text style={s.keyReading}>{stemReading[d.pillar.stem]}・{branchReading[d.pillar.branch]}</Text>
+                <Text style={s.keyDate}>{month}月{d.date}日</Text>
+                <Text style={s.keyNote}>{d.isKey ? "予定を詰めすぎず、朝の一手を丁寧に。" : "小さな用事を進めやすい日です。"}</Text>
               </View>
             </View>
           ))}
@@ -170,15 +198,15 @@ export default function Calendar() {
                   {year}年 {month}月{selected.date}日
                 </Text>
                 <Text style={s.modalPillar}>
-                  {selected.pillar.stem}{selected.pillar.branch}
+                  {selected.isKey ? "意識したい日" : selected.isSoft ? "整えやすい日" : "通常の日"}
                 </Text>
-                <Text style={s.modalReading}>
-                  {stemReading[selected.pillar.stem]}・{branchReading[selected.pillar.branch]}
+                <Text style={s.modalNote}>
+                  今日の予定を見直すための小さなメモです。
                 </Text>
                 <Text style={s.modalKind}>
                   {selected.isToday   ? "■ 今日"
-                  : selected.isKey    ? "● あなたにとって大切な日"
-                  : selected.isSoft   ? "○ やわらかな日"
+                  : selected.isKey    ? "● あなたにとって意識したい日"
+                  : selected.isSoft   ? "○ 整えやすい日"
                   : selected.isCaution? "△ 控えめに過ごす日"
                   :                     "穏やかな一日"}
                 </Text>
@@ -230,12 +258,12 @@ const s = StyleSheet.create({
   keyIconText: { color: C.white, fontSize: 16, fontWeight: "500", fontFamily: F.serif },
   keyType: { fontSize: 9, letterSpacing: 2, fontWeight: "600" },
   keyDate: { color: C.ink, fontSize: 13, fontWeight: "600", marginTop: 2, fontFamily: F.serif },
-  keyReading: { color: C.inkSub, fontSize: 10, marginTop: 2, fontFamily: F.serif },
+  keyNote: { color: C.inkSub, fontSize: 10, marginTop: 2, fontFamily: F.serif },
 
   modalBg: { flex: 1, backgroundColor: "rgba(0,0,0,0.4)", alignItems: "center", justifyContent: "center", padding: 28 },
   modalCard: { backgroundColor: C.paper, borderRadius: 18, padding: 24, alignItems: "center", borderWidth: 1, borderColor: C.paperBorder, minWidth: 240 },
   modalDate: { color: C.gold, fontSize: 11, letterSpacing: 2, fontFamily: F.serif },
   modalPillar: { color: C.red, fontSize: 36, fontWeight: "600", letterSpacing: 4, marginTop: 14, fontFamily: F.serif },
-  modalReading: { color: C.inkSub, fontSize: 11, marginTop: 6, letterSpacing: 2, fontFamily: F.serif },
+  modalNote: { color: C.inkSub, fontSize: 11, marginTop: 6, letterSpacing: 2, fontFamily: F.serif },
   modalKind: { color: C.ink, fontSize: 13, marginTop: 16, fontFamily: F.serif },
 });

@@ -1,0 +1,27 @@
+# Dependencies and local state
+node_modules/
+.expo/
+.git/
+
+# Local build outputs
+ios/
+android/
+release/
+tmp/
+dist/
+web-build/
+coverage/
+*.aab
+*.apk
+*.ipa
+*.xcarchive
+
+# Store/public artifacts not needed by the native build
+assets/store/
+public-site/
+docs/
+
+# Local secrets
+.env
+.env*.local
+google-play-service-account.json

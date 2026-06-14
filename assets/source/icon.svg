@@ -1,38 +1,37 @@
 <svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- 朝焼けグラデーション -->
-    <linearGradient id="dawn" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"   stop-color="#1F2E4A"/>
-      <stop offset="30%"  stop-color="#5B4274"/>
-      <stop offset="60%"  stop-color="#C26E70"/>
-      <stop offset="80%"  stop-color="#EBA47E"/>
-      <stop offset="100%" stop-color="#F5DDB5"/>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0B1422"/>
+      <stop offset="56%" stop-color="#462638"/>
+      <stop offset="100%" stop-color="#D99B68"/>
     </linearGradient>
-    <!-- 太陽の光輪 -->
-    <radialGradient id="sun" cx="50%" cy="50%" r="50%">
-      <stop offset="0%"   stop-color="#FFFCEF" stop-opacity="1"/>
-      <stop offset="50%"  stop-color="#FFE4A8" stop-opacity="0.9"/>
-      <stop offset="100%" stop-color="#FFD89E" stop-opacity="0"/>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF9EA"/>
+      <stop offset="100%" stop-color="#EBD0A0"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="50%" cy="44%" r="42%">
+      <stop offset="0%" stop-color="#FFF6DA"/>
+      <stop offset="100%" stop-color="#F1B95F"/>
     </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="56%" r="56%">
+      <stop offset="0%" stop-color="#F6C66F" stop-opacity="0.48"/>
+      <stop offset="100%" stop-color="#F6C66F" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.76" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.032"/>
+      </feComponentTransfer>
+    </filter>
   </defs>
 
-  <!-- 背景: 朝焼けグラデ -->
-  <rect width="1024" height="1024" fill="url(#dawn)"/>
+  <rect width="1024" height="1024" fill="url(#sky)"/>
+  <rect width="1024" height="1024" filter="url(#grain)" opacity="0.34"/>
+  <circle cx="512" cy="596" r="352" fill="url(#glow)"/>
 
-  <!-- 太陽の光輪 -->
-  <circle cx="512" cy="640" r="320" fill="url(#sun)"/>
-  <circle cx="512" cy="640" r="180" fill="#FFFCEF"/>
-
-  <!-- 「旭」一文字を中央に -->
-  <text
-    x="512" y="540"
-    font-family="Yu Mincho, Hiragino Mincho ProN, serif"
-    font-size="540"
-    font-weight="500"
-    text-anchor="middle"
-    fill="#FFFFFF"
-    style="paint-order: stroke; stroke: #1F2E4A; stroke-width: 0;"
-    letter-spacing="0">
-    旭
-  </text>
+  <g transform="translate(512 540) rotate(-2)">
+    <rect x="-190" y="-236" width="380" height="472" rx="52" fill="url(#paper)"/>
+    <circle cx="0" cy="-28" r="136" fill="url(#sun)"/>
+  </g>
 </svg>

@@ -1,0 +1,74 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="dawn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#07111B"/>
+      <stop offset="48%" stop-color="#4A2430"/>
+      <stop offset="76%" stop-color="#A75B52"/>
+      <stop offset="100%" stop-color="#E0A96E"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="50%" cy="60%" r="48%">
+      <stop offset="0%" stop-color="#FFF5D8" stop-opacity="0.86"/>
+      <stop offset="44%" stop-color="#E6B86B" stop-opacity="0.48"/>
+      <stop offset="100%" stop-color="#E6B86B" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="shadow" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.38"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFF4C8"/>
+      <stop offset="100%" stop-color="#B9873B"/>
+    </linearGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.05"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#dawn)"/>
+  <rect width="1024" height="1024" filter="url(#grain)" opacity="0.42"/>
+  <circle cx="512" cy="620" r="330" fill="url(#sunGlow)"/>
+  <circle cx="512" cy="642" r="168" fill="#FFF2D4" opacity="0.94"/>
+
+  <path d="M146 690 C258 648 392 642 512 674 C632 706 766 698 878 648" fill="none" stroke="#FFF2D4" stroke-width="14" stroke-linecap="round" opacity="0.56"/>
+  <path d="M260 732 C352 704 456 700 552 718 C638 734 722 728 804 700" fill="none" stroke="#FFF2D4" stroke-width="7" stroke-linecap="round" opacity="0.38"/>
+
+  <circle cx="512" cy="512" r="300" fill="none" stroke="#C89B4C" stroke-width="8" opacity="0.72"/>
+  <circle cx="512" cy="512" r="220" fill="none" stroke="#F7DFA5" stroke-width="2.5" opacity="0.42"/>
+  <circle cx="512" cy="512" r="150" fill="none" stroke="#B9873B" stroke-width="2" opacity="0.24"/>
+
+  <g stroke="#D8B66A" stroke-linecap="round" opacity="0.78">
+    <path d="M512 168 L512 398" stroke-width="5"/>
+    <path d="M512 626 L512 856" stroke-width="5"/>
+    <path d="M168 512 L398 512" stroke-width="5"/>
+    <path d="M626 512 L856 512" stroke-width="5"/>
+    <path d="M282 282 L428 428" stroke-width="3.5"/>
+    <path d="M742 282 L596 428" stroke-width="3.5"/>
+    <path d="M282 742 L428 596" stroke-width="3.5"/>
+    <path d="M742 742 L596 596" stroke-width="3.5"/>
+  </g>
+
+  <polygon
+    points="512,196 548,424 728,304 608,476 836,512 608,548 728,728 548,608 512,836 476,608 296,728 416,548 188,512 416,476 296,304 476,424"
+    fill="url(#gold)"
+  />
+  <polygon
+    points="512,318 536,444 642,382 580,488 706,512 580,536 642,642 536,580 512,706 488,580 382,642 444,536 318,512 444,488 382,382 488,444"
+    fill="#FFFDF4"
+    opacity="0.97"
+  />
+
+  <g fill="none" stroke="#F3D58A" stroke-linecap="round" stroke-linejoin="round" opacity="0.88">
+    <path d="M176 184 L194 236 L248 254 L194 272 L176 324 L158 272 L104 254 L158 236 Z" stroke-width="5.5"/>
+    <path d="M848 184 L866 236 L920 254 L866 272 L848 324 L830 272 L776 254 L830 236 Z" stroke-width="5.5"/>
+    <path d="M176 700 L194 752 L248 770 L194 788 L176 840 L158 788 L104 770 L158 752 Z" stroke-width="5.5"/>
+    <path d="M848 700 L866 752 L920 770 L866 788 L848 840 L830 788 L776 770 L830 752 Z" stroke-width="5.5"/>
+  </g>
+
+  <circle cx="512" cy="512" r="34" fill="#07111B"/>
+  <circle cx="512" cy="512" r="14" fill="#D8A94F"/>
+  <rect width="1024" height="1024" fill="url(#shadow)"/>
+</svg>

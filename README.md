@@ -1,12 +1,12 @@
-# 旭兆 (Asakizashi) — A morning oracle
+# 朝しるべ — 今日を整える一行
 
-毎朝、あなたへの一行のお告げをお届けする四柱推命アプリ。
+朝のひとときに、今日を整える一行を届ける四柱推命アプリ。
 
 ## 状態
 
 - **コードベース**: 100% 完成
 - **品質指標**:
-  - テスト: 80件 / 全合格
+  - テスト: 129件 / 全合格
   - TypeScript エラー: 0
   - ESLint warnings: 0
   - 循環依存: 0
@@ -149,4 +149,4 @@ REVENUECAT_WEBHOOK_SECRET
 
 ## ライセンス
 
-Private. © 2026 Asakizashi Team.
+Private. © 2026 朝しるべ Team.

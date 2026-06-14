@@ -50,6 +50,7 @@ export default function BirthStep() {
 
   const today = new Date();
   const isFuture = new Date(birthYear, birthMonth - 1, birthDay) > today;
+  const hasBirthPlace = birthPlace.trim().length > 0;
 
   const currentYear = today.getFullYear();
   const years = Array.from({ length: currentYear - 1929 }, (_, i) => currentYear - i);
@@ -62,13 +63,24 @@ export default function BirthStep() {
     if (birthDay > dayMax) setField("birthDay", dayMax);
   }, [birthYear, birthMonth, dayMax]);
 
+  const onNext = () => {
+    setField("birthDateProvided", true);
+    router.push("/(onboarding)/mbti");
+  };
+
+  const onSkip = () => {
+    setField("birthDateProvided", false);
+    router.push("/(onboarding)/mbti");
+  };
+
   return (
     <OnboardShell
       step={2}
-      title={"生まれた日を\n教えてください"}
-      sub="あなたの命式（めいしき）を読み解きます"
-      onNext={() => router.push("/(onboarding)/mbti")}
-      disabled={isFuture}
+      title={"誕生日を\n教えてください（任意）"}
+      sub="MBTI と合わせて、朝メモのトーンを整えます。入力なしでも全機能を使えます"
+      onNext={onNext}
+      onSkip={onSkip}
+      disabled={isFuture || !hasBirthPlace}
     >
       <Text style={s.section}>生年月日</Text>
       <NumWheel values={years} value={birthYear} unit="年" onChange={(v) => setField("birthYear", v)} />
@@ -77,13 +89,14 @@ export default function BirthStep() {
 
       <Text style={[s.section, { marginTop: 18 }]}>生まれた場所</Text>
       <PlaceSelectButton value={birthPlace} onPress={() => setPlaceOpen(true)} />
-      <Text style={s.hint}>日柱の境界判定に使います・海外もOK</Text>
+      <Text style={s.hint}>地域の暦に合わせるために使います。あとから変更できます</Text>
       <PlacePickerModal
         visible={placeOpen}
         value={birthPlace}
         onPick={(v) => setField("birthPlace", v)}
         onClose={() => setPlaceOpen(false)}
       />
+      <Text style={s.optional}>※ 入力しない場合は「スキップ」を押してください。プロフィールから後で入力できます。</Text>
     </OnboardShell>
   );
 }
@@ -96,5 +109,6 @@ const s = StyleSheet.create({
   wheelCellOn: { backgroundColor: C.white95 },
   wheelText: { color: C.white, fontSize: 16, fontFamily: F.serif },
   wheelTextOn: { color: C.red, fontWeight: "600" },
-  hint: { color: C.white, fontSize: 10, opacity: 0.75, marginTop: 8 },
+  hint: { color: C.white, fontSize: 10, opacity: 0.85, marginTop: 8, lineHeight: 18 },
+  optional: { color: C.white, fontSize: 10, opacity: 0.7, marginTop: 14, lineHeight: 16 },
 });

@@ -9,19 +9,24 @@ import { C, F } from "../../lib/theme";
 export default function NameStep() {
   const router = useRouter();
   const { nickname, setField } = useUser();
+  const trimmedNickname = nickname.trim();
+  const isInvalid = trimmedNickname.length === 0 || trimmedNickname.length > 20;
   useEffect(() => { track("onboarding_started"); }, []);
+
+  const goNext = () => {
+    if (isInvalid) return;
+    setField("nickname", trimmedNickname);
+    router.push("/(onboarding)/birth");
+  };
+
   return (
     <OnboardShell
       step={1}
-      title={"はじめまして。\nお名前を教えてください"}
-      sub="朝、お名前でお呼びさせていただきます"
-      onNext={() => {
-        const trimmed = nickname.trim();
-        if (!trimmed) return;
-        setField("nickname", trimmed);
-        router.push("/(onboarding)/birth");
-      }}
-      disabled={!nickname.trim() || nickname.trim().length > 20}
+      title={"はじめまして。\n呼び名を決めましょう"}
+      sub="朝メモで呼びかける名前です。あとからいつでも変更できます"
+      onNext={goNext}
+      ctaLabel="この名前で進む"
+      disabled={isInvalid}
     >
       <View style={s.field}>
         <Text style={s.label}>ニックネーム</Text>
@@ -36,9 +41,10 @@ export default function NameStep() {
           autoComplete="nickname"
           maxLength={20}
           returnKeyType="next"
+          onSubmitEditing={goNext}
         />
       </View>
-      <Text style={s.hint}>・ 本名でなくても構いません{"\n"}・ あとから変更できます</Text>
+      <Text style={s.hint}>本名でなくて大丈夫です。通知や朝メモでだけ使います。</Text>
     </OnboardShell>
   );
 }

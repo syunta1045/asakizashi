@@ -22,9 +22,10 @@ export default function BloodStep() {
   return (
     <OnboardShell
       step={4}
-      title="血液型を教えてください"
-      sub="行動指針の出し方を細かく調整します"
+      title={"血液型を\n選びましょう"}
+      sub="わからない場合は、わからないを選んで進めます"
       onNext={() => router.push("/(onboarding)/gender")}
+      ctaLabel={bloodType === null ? "選択してください" : "次へ"}
       disabled={bloodType === null}
     >
       <View style={{ gap: 8 }}>
@@ -39,8 +40,7 @@ export default function BloodStep() {
         })}
       </View>
       <Text style={s.note}>
-        「わからない」を選んだ場合、{"\n"}
-        血液型に依存しないメッセージになります。
+        わからない場合や入れたくない場合は、「わからない」を選んでください。血液型なしでも朝メモは届きます。
       </Text>
     </OnboardShell>
   );
@@ -52,5 +52,5 @@ const s = StyleSheet.create({
   text: { color: C.white, fontSize: 16, fontFamily: F.serif },
   textOn: { color: C.ink, fontWeight: "600" },
   check: { color: C.red, fontSize: 14 },
-  note: { color: C.white, fontSize: 11, opacity: 0.85, marginTop: 14, lineHeight: 20, padding: 12, backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 10 },
+  note: { color: C.white, fontSize: 11, opacity: 0.9, marginTop: 14, lineHeight: 20, padding: 12, backgroundColor: "rgba(255,255,255,0.1)", borderRadius: 10, fontFamily: F.serif },
 });

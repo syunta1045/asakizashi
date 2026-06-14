@@ -21,9 +21,10 @@ export default function GenderStep() {
   return (
     <OnboardShell
       step={5}
-      title="性別を教えてください"
-      sub="一部のメッセージや相性占いに使います"
+      title={"性別を\n入れますか？"}
+      sub="必要な場面だけ、表現を少し調整します。入れない場合は選択しないを選べます"
       onNext={() => router.push("/(onboarding)/wake-up")}
+      ctaLabel={gender === null ? "選択してください" : "次へ"}
       disabled={gender === null}
     >
       <View style={{ gap: 8 }}>
@@ -38,7 +39,7 @@ export default function GenderStep() {
         })}
       </View>
       <Text style={s.note}>
-        選択しない場合、性別に依存しないメッセージのみお届けします。
+        「選択しない」の場合は、性別に寄せない表現にします。
       </Text>
     </OnboardShell>
   );

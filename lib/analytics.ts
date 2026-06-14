@@ -12,7 +12,7 @@ export type EventName =
   | "onboarding_step_completed"
   | "onboarding_completed"
   | "today_viewed"
-  | "ranking_viewed"
+  | "pace_viewed"
   | "relations_viewed"
   | "relation_added"
   | "journal_entry_saved"

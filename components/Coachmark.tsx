@@ -9,16 +9,26 @@ type Props = {
   k: CoachKey;
   title: string;
   body: string;
+  onDismiss?: () => void;
 };
 
-export function Coachmark({ k, title, body }: Props) {
+export function Coachmark({ k, title, body, onDismiss }: Props) {
   const { seen, markSeen } = useCoachmark();
   if (seen[k]) return null;
 
+  const dismiss = () => {
+    markSeen(k);
+    onDismiss?.();
+  };
+
   return (
-    <Pressable style={s.overlay} onPress={() => markSeen(k)}>
+    <Pressable style={s.overlay} onPress={dismiss}>
       <View style={s.card}>
-        <Text style={s.icon}>朝</Text>
+        <View style={s.iconWrap}>
+          <View style={s.iconCard}>
+            <View style={s.iconSun} />
+          </View>
+        </View>
         <Text style={s.title}>{title}</Text>
         <Text style={s.body}>{body}</Text>
         <View style={s.btn}>
@@ -36,7 +46,9 @@ const s = StyleSheet.create({
     alignItems: "center", justifyContent: "center", padding: 28, zIndex: 100,
   },
   card: { backgroundColor: C.paper, borderRadius: 18, padding: 28, alignItems: "center", borderWidth: 1, borderColor: C.paperBorder, maxWidth: 320 },
-  icon: { color: C.red, fontSize: 36, fontFamily: F.serif, marginBottom: 14 },
+  iconWrap: { width: 68, height: 68, borderRadius: 34, backgroundColor: "rgba(168,131,64,0.12)", alignItems: "center", justifyContent: "center", marginBottom: 16 },
+  iconCard: { width: 34, height: 44, borderRadius: 9, backgroundColor: C.white, alignItems: "center", justifyContent: "center", transform: [{ rotate: "-4deg" }], borderWidth: 1, borderColor: C.paperBorder },
+  iconSun: { width: 21, height: 21, borderRadius: 11, backgroundColor: "#F1B95F" },
   title: { color: C.ink, fontSize: 16, fontWeight: "600", textAlign: "center", lineHeight: 26, fontFamily: F.serif },
   body: { color: C.inkSub, fontSize: 12, lineHeight: 22, textAlign: "center", marginTop: 12, fontFamily: F.serif },
   btn: { marginTop: 20, paddingHorizontal: 24, paddingVertical: 10, borderRadius: 20, backgroundColor: C.red },

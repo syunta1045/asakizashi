@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AppState } from "react-native";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import * as Notifications from "expo-notifications";
@@ -11,19 +11,24 @@ import { registerPushToken, ensureNotificationsScheduled } from "../lib/notifica
 import { track } from "../lib/analytics";
 import { initSentry, wrap } from "../lib/sentry";
 import { useSubscription } from "../lib/subscription";
-import { ensureRevenueCatConfigured } from "../lib/revenuecat";
+import { checkEntitlementState, ensureRevenueCatConfigured } from "../lib/revenuecat";
 import { ErrorBoundary } from "../components/ErrorBoundary";
 import { OfflineBanner } from "../components/OfflineBanner";
+import { useUser } from "../lib/store";
 
 // Sentry はモジュールロード時に初期化（DSN 未設定時は no-op）
 initSentry();
 
-// スプラッシュを最低800ms見せてからフェードアウト
+// ネイティブスプラッシュがアプリ画面に重なって見えないよう、フェードなしで閉じる
 SplashScreen.preventAutoHideAsync().catch(() => {});
-SplashScreen.setOptions({ duration: 800, fade: true });
+SplashScreen.setOptions({ duration: 0, fade: false });
 
 function RootLayout() {
   const router = useRouter();
+  const segments = useSegments();
+  const isOnboarded = useUser((s) => s.isOnboarded);
+  // pillars は使用しない（ナビゲーション分岐から外したため）
+  const hasHydrated = useUser((s) => s.hasHydrated);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -32,13 +37,18 @@ function RootLayout() {
       // トライアル期限切れを起動時に判定
       useSubscription.getState().checkTrialExpiry();
       try { await restoreSession(); } catch {}
-      // セッション復元後に RevenueCat 初期化（未設定/未ログインなら no-op）
+      // RevenueCat 初期化（未ログインなら匿名ID、ログイン済みなら Supabase user.id）
       // 失敗しても起動は止めないが、無音で握りつぶさず可観測化する
       ensureRevenueCatConfigured()
-        .then((r) => {
-          if (!r.ok && r.error && r.error !== "未設定" && r.error !== "未ログイン") {
+        .then(async (r) => {
+          if (!r.ok && r.error && r.error !== "未設定") {
             console.warn("[RevenueCat] 起動時初期化失敗:", r.error);
             track("revenuecat_init_failed", { reason: r.error, phase: "boot" });
+            return;
+          }
+          if (r.ok) {
+            const entitlement = await checkEntitlementState();
+            useSubscription.getState().applyEntitlement(entitlement.active, entitlement.plan);
           }
         })
         .catch((e) => {
@@ -47,22 +57,66 @@ function RootLayout() {
         });
       // プッシュトークン登録（fire-and-forget、未許可でも続行）
       registerPushToken().catch(() => {});
-      // ローカル通知の safety net: 設定ON & 権限grantedなのに schedule が0件なら復旧
-      ensureNotificationsScheduled()
-        .then((r) => {
-          if (r.rescheduled) track("notifications_rescheduled");
-          else if (!r.ok) console.warn("[notifications] ensure 失敗:", r.reason);
-        })
-        .catch((e) => console.warn("[notifications] ensure 例外:", e));
+      await SplashScreen.hideAsync().catch(() => {});
       setReady(true);
-      SplashScreen.hideAsync().catch(() => {});
     })();
   }, []);
+
+  useEffect(() => {
+    if (!ready || !hasHydrated || !isOnboarded) return;
+    // ローカル通知の safety net: 永続化データ復元後に、欠けた予約だけ復旧する
+    ensureNotificationsScheduled()
+      .then((r) => {
+        if (r.rescheduled) track("notifications_rescheduled");
+        else if (!r.ok) console.warn("[notifications] ensure 失敗:", r.reason);
+      })
+      .catch((e) => console.warn("[notifications] ensure 例外:", e));
+  }, [ready, hasHydrated, isOnboarded]);
+
+  useEffect(() => {
+    if (!ready || !hasHydrated) return;
+    const first = segments[0];
+    const protectedRoots = new Set([
+      "(tabs)",
+      "today",
+      "journal",
+      "calendar",
+      "chart",
+      "relations",
+      "settings",
+      "premium",
+      "edit",
+      "notifications-settings",
+    ]);
+    // 生年月日（pillars）はオプション。isOnboarded だけでホームへ進める。
+    if (isOnboarded && (!first || first === "welcome")) {
+      router.replace("/today");
+      return;
+    }
+    if (!isOnboarded && first && protectedRoots.has(first)) {
+      router.replace("/welcome");
+    }
+  }, [ready, hasHydrated, isOnboarded, router, segments]);
 
   // フォアグラウンド復帰時にも期限切れ判定（長時間バックグラウンド対策）
   useEffect(() => {
     const sub = AppState.addEventListener("change", (state) => {
-      if (state === "active") useSubscription.getState().checkTrialExpiry();
+      if (state === "active") {
+        useSubscription.getState().checkTrialExpiry();
+        ensureRevenueCatConfigured()
+          .then(async (r) => {
+            if (r.ok) {
+              const entitlement = await checkEntitlementState();
+              useSubscription.getState().applyEntitlement(entitlement.active, entitlement.plan);
+            }
+          })
+          .catch(() => {});
+        ensureNotificationsScheduled()
+          .then((r) => {
+            if (r.rescheduled) track("notifications_rescheduled");
+          })
+          .catch(() => {});
+      }
     });
     return () => sub.remove();
   }, []);
@@ -95,7 +149,7 @@ function RootLayout() {
     return () => sub.remove();
   }, []);
 
-  if (!ready) return null;
+  if (!ready || !hasHydrated) return null;
 
   return (
     <ErrorBoundary>

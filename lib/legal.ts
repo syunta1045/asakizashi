@@ -3,21 +3,21 @@
  * 本番までに弁護士レビューを推奨
  *
  * 公開URL（Cloudflare Pages 等にホスティング）:
- *   https://asakizashi.app/privacy
- *   https://asakizashi.app/terms
+ *   https://syunta1045.github.io/asakizashi/privacy/
+ *   https://syunta1045.github.io/asakizashi/terms/
  */
-export const PRIVACY_URL = "https://asakizashi.app/privacy";
-export const TERMS_URL = "https://asakizashi.app/terms";
-export const SUPPORT_URL = "https://asakizashi.app/support";
+export const PRIVACY_URL = "https://syunta1045.github.io/asakizashi/privacy/";
+export const TERMS_URL = "https://syunta1045.github.io/asakizashi/terms/";
+export const SUPPORT_URL = "https://syunta1045.github.io/asakizashi/support/";
 
 export const TERMS_TEXT = `
-旭兆 利用規約
+朝しるべ 利用規約
 
 第1条（適用）
-本規約は、運営者（以下「当社」）が提供するモバイルアプリケーション「旭兆（Asakizashi）」（以下「本サービス」）の利用条件を定めるものです。利用者（以下「ユーザー」）は本規約に同意の上、本サービスを利用するものとします。
+本規約は、運営者（以下「当社」）が提供するモバイルアプリケーション「朝しるべ」（以下「本サービス」）の利用条件を定めるものです。利用者（以下「ユーザー」）は本規約に同意の上、本サービスを利用するものとします。
 
 第2条（サービス内容）
-本サービスは、ユーザーの生年月日等から四柱推命に基づく日々のメッセージを表示する占い・娯楽サービスです。記載される内容は娯楽を目的としたものであり、医療・法律・金融等の助言を提供するものではありません。
+本サービスは、ユーザーの生年月日、起床時間、関心テーマ、振り返り記録などをもとに、毎朝の短いメッセージと行動ヒントを表示するセルフケア・振り返りサービスです。記載される内容は自己理解と内省のきっかけを目的としたものであり、医療・法律・金融等の助言を提供するものではありません。
 
 第3条（アカウント）
 ユーザーは、自身の責任において登録情報を管理するものとします。ニックネーム、生年月日、その他の入力情報の正確性についてはユーザーが責任を負います。
@@ -26,22 +26,26 @@ export const TERMS_TEXT = `
 本サービスのリバースエンジニアリング、不正アクセス、他者への嫌がらせ、その他法令違反行為を禁じます。
 
 第5条（有料機能）
-プレミアム機能は App Store または Google Play の決済システムを通じて提供されます。解約は各ストアの設定から行ってください。
+プレミアム機能（有料機能）は App Store または Google Play の決済システムを通じて提供されます。解約は各ストアの設定から行ってください。
 
 第6条（免責）
-本サービスのメッセージ・占い結果に基づく判断・行動は、すべてユーザーの自己責任で行うものとします。当社は、本サービスの利用または利用不能から生じた損害について一切の責任を負いません。
+本サービスのメッセージに基づく判断・行動は、すべてユーザーの自己責任で行うものとします。当社は、本サービスの利用または利用不能から生じた損害について一切の責任を負いません。
 
-第7条（変更）
+第7条（Apple標準EULA）
+iOSアプリの利用には、本規約に加えて Apple 標準 EULA が適用されます。
+https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+
+第8条（変更）
 当社は本規約を予告なく変更することがあります。変更後の規約は、本サービス上での掲示をもって効力を生じます。
 
-第8条（準拠法・管轄）
+第9条（準拠法・管轄）
 本規約は日本法に準拠し、本サービスに関する紛争は東京地方裁判所を第一審の専属的合意管轄裁判所とします。
 
 最終更新日: 2026年4月25日
 `.trim();
 
 export const PRIVACY_TEXT = `
-旭兆 プライバシーポリシー
+朝しるべ プライバシーポリシー
 
 1. 取得する情報
 本サービスは以下の情報を取得します：
@@ -59,7 +63,7 @@ export const PRIVACY_TEXT = `
 
 2. 利用目的
 取得した情報は以下の目的のために利用します：
-・命式（四柱推命）の算出
+・生年月日にもとづく朝メモの調整
 ・パーソナライズされた朝のメッセージ生成
 ・プッシュ通知の送信
 ・サービス改善
@@ -85,7 +89,7 @@ export const PRIVACY_TEXT = `
 本ポリシーは予告なく改定されることがあります。重要な変更がある場合はアプリ内で通知します。
 
 9. お問い合わせ
-support@asakizashi.app
+syunta15032720@gmail.com
 
 最終更新日: 2026年4月25日
 `.trim();

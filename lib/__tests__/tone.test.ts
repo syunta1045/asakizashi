@@ -2,7 +2,7 @@ import { applyTone, type BaseMessage, type ToneInput } from "../tone";
 
 const base: BaseMessage = {
   headline: "歩幅を半歩、ゆるめる日。",
-  body: "火の気つよく巡る一日。",
+  body: "やる気が高まりやすい一日。",
   doActions: ["近くの人に「ありがとう」を伝える", "昼休みに五分外を歩く", "しばらく連絡してない人へ一言"],
   avoidActions: ["夕方以降の即決", "衝動買い"],
 };
@@ -40,10 +40,10 @@ describe("applyTone", () => {
     expect(r.body).toContain("誰かに話すと整います");
   });
 
-  test("F型MBTIは「理屈より体感を信じて」が含まれる", () => {
+  test("F型MBTIは気持ちの言語化ヒントが含まれる", () => {
     const t: ToneInput = { mbti: "INFP", bloodType: null, themes: [] };
     const r = applyTone(base, t);
-    expect(r.body).toContain("理屈より体感を信じて");
+    expect(r.body).toContain("気持ちを一度言葉にして");
   });
 
   test("複数テーマで関連アクションが優先される", () => {
@@ -62,5 +62,32 @@ describe("applyTone", () => {
     const t: ToneInput = { mbti: "XXXX", bloodType: null, themes: [] };
     const r = applyTone(base, t);
     expect(r.doActions).toHaveLength(3);
+  });
+
+  test("personalSeed で個人向けの本文と行動が足される", () => {
+    const a = applyTone(base, { mbti: null, bloodType: null, themes: [], personalSeed: "甲子|乙丑|丙寅|丁卯" });
+    const b = applyTone(base, { mbti: null, bloodType: null, themes: [], personalSeed: "甲子|乙丑|丙寅|丁卯" });
+    expect(a.body).toBe(b.body);
+    expect(a.body).not.toBe(base.body);
+    expect(a.doActions).toHaveLength(3);
+    expect(a.doActions[0]).not.toBe(base.doActions[0]);
+  });
+
+  test("personalSeed で同じテーマでもおすすめの並びが変わる", () => {
+    const a = applyTone(base, {
+      mbti: null,
+      bloodType: null,
+      themes: ["健康・体調"],
+      personalSeed: "甲子|乙丑|丙寅|丁卯",
+    });
+    const b = applyTone(base, {
+      mbti: null,
+      bloodType: null,
+      themes: ["健康・体調"],
+      personalSeed: "甲子|乙丑|丙寅|戊辰",
+    });
+
+    expect(a.doActions).not.toEqual(b.doActions);
+    expect(new Set([...a.doActions, ...b.doActions]).size).toBeGreaterThan(3);
   });
 });

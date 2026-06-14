@@ -3,7 +3,7 @@ import { View, Text, Pressable, Alert, Platform, ActivityIndicator, StyleSheet }
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { signInWithApple, signInWithGoogle, isSupabaseConfigured } from "../../lib/supabase";
+import { signInWithApple, signInWithGoogle, isSupabaseConfigured, isGoogleSignInConfigured } from "../../lib/supabase";
 import { finishSignIn } from "../../lib/postSignIn";
 import { useUser } from "../../lib/store";
 import { track } from "../../lib/analytics";
@@ -107,14 +107,14 @@ export default function SignIn() {
         </View>
 
         <View style={s.center}>
-          <Text style={s.brand}>旭兆</Text>
+          <Text style={s.brand}>朝しるべ</Text>
           <Text style={s.lede}>
-            毎朝のお告げを、{"\n"}どの端末でも受け取るために
+            朝メモを、{"\n"}どの端末でも受け取るために
           </Text>
         </View>
 
         <View style={s.bottom}>
-          {Platform.OS === "ios" && appleAvailable && !loading && (
+          {isSupabaseConfigured && Platform.OS === "ios" && appleAvailable && !loading && (
             <AppleSignInButton onPress={onAppleSignIn} />
           )}
           {loading && (
@@ -123,10 +123,14 @@ export default function SignIn() {
             </View>
           )}
 
-          {!loading && (
+          {!loading && isSupabaseConfigured && isGoogleSignInConfigured && (
             <Pressable style={s.googleBtn} onPress={onGoogleSignIn} accessibilityRole="button">
               <Text style={s.googleBtnText}>Google で続ける</Text>
             </Pressable>
+          )}
+
+          {!loading && !isSupabaseConfigured && (
+            <Text style={s.offlineNote}>同期ログインは現在準備中です</Text>
           )}
 
           <Pressable
@@ -151,13 +155,14 @@ const s = StyleSheet.create({
   header: { flexDirection: "row", paddingTop: 8 },
   back: { color: C.white, fontSize: 22 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  brand: { color: C.white, fontSize: 56, letterSpacing: 16, fontFamily: F.serif, fontWeight: "500", lineHeight: 60 },
+  brand: { color: C.white, fontSize: 50, letterSpacing: 8, fontFamily: F.serif, fontWeight: "500", lineHeight: 60 },
   lede: { color: C.white, fontSize: 14, lineHeight: 26, marginTop: 28, textAlign: "center", opacity: 0.9, fontFamily: F.serif },
   bottom: { paddingBottom: 30, gap: 12 },
   appleBtn: { width: "100%", height: 52 },
   googleBtn: { width: "100%", height: 52, borderRadius: 24, backgroundColor: C.white, alignItems: "center", justifyContent: "center", borderWidth: 1, borderColor: C.gold },
   googleBtnText: { color: C.ink, fontSize: 14, fontWeight: "600" },
+  offlineNote: { color: C.white, fontSize: 12, opacity: 0.85, textAlign: "center", lineHeight: 20, fontFamily: F.serif },
   skip: { paddingVertical: 14, alignItems: "center" },
-  skipText: { color: C.white, fontSize: 13, opacity: 0.85, fontFamily: F.serif },
+  skipText: { color: C.inkSub, fontSize: 13, opacity: 0.95, fontWeight: "600", fontFamily: F.serif },
   note: { color: C.white, fontSize: 10, opacity: 0.7, textAlign: "center", lineHeight: 18 },
 });

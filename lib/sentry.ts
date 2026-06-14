@@ -64,4 +64,7 @@ export function setUser(userId: string | null) {
  * ErrorBoundary から最上位を Sentry でラップしたい場合に使用。
  * 例: export default Sentry.wrap(RootLayout);
  */
-export const wrap = Sentry.wrap;
+export const wrap: typeof Sentry.wrap = ((component: Parameters<typeof Sentry.wrap>[0]) => {
+  if (__DEV__ || !isSentryConfigured) return component as ReturnType<typeof Sentry.wrap>;
+  return Sentry.wrap(component);
+}) as typeof Sentry.wrap;

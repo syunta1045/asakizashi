@@ -9,6 +9,11 @@ import { threePillars, pillarToString, type ThreePillars } from "./bazi";
 
 export type UserProfile = {
   nickname: string;
+  /**
+   * 生年月日はオプション入力。birthDateProvided=true のときだけ
+   * 命式計算に使う。未入力でも全機能が動作する設計。
+   */
+  birthDateProvided: boolean;
   birthYear: number;
   birthMonth: number;
   birthDay: number;
@@ -19,7 +24,7 @@ export type UserProfile = {
   wakeUpTime: string;        // "06:30"
   themes: string[];          // 最大3
   // 通知設定
-  morningEnabled: boolean;   // 朝のお告げ
+  morningEnabled: boolean;   // 朝メモ
   eveningEnabled: boolean;   // 夜の振り返りリマインダー
   eveningTime: string;       // "21:00"
 };
@@ -30,9 +35,11 @@ export type UserState = UserProfile & {
   dayPillarStr: string;      // 例: "戊午"
   // ナビゲーション状態
   isOnboarded: boolean;
+  hasHydrated: boolean;
 
   // actions
   setField: <K extends keyof UserProfile>(k: K, v: UserProfile[K]) => void;
+  setHasHydrated: (v: boolean) => void;
   computePillars: () => void;
   finishOnboarding: () => void;
   reset: () => void;
@@ -40,10 +47,11 @@ export type UserState = UserProfile & {
 
 const DEFAULTS: UserProfile = {
   nickname: "",
+  birthDateProvided: false,
   birthYear: 1998,
   birthMonth: 7,
   birthDay: 12,
-  birthPlace: "東京都",
+  birthPlace: "",
   mbti: null,
   bloodType: null,
   gender: null,
@@ -61,6 +69,7 @@ export const useUser = create<UserState>()(
       pillars: null,
       dayPillarStr: "",
       isOnboarded: false,
+      hasHydrated: false,
 
       setField: (k, v) => {
         set({ [k]: v } as Partial<UserState>);
@@ -69,9 +78,15 @@ export const useUser = create<UserState>()(
           schedulePush();
         }
       },
+      setHasHydrated: (v) => set({ hasHydrated: v }),
 
       computePillars: () => {
-        const { birthYear, birthMonth, birthDay } = get();
+        const { birthDateProvided, birthYear, birthMonth, birthDay } = get();
+        // 生年月日未入力時は命式を持たない（MBTI ベースの動作にフォールバック）
+        if (!birthDateProvided) {
+          set({ pillars: null, dayPillarStr: "" });
+          return;
+        }
         const date = new Date(Date.UTC(birthYear, birthMonth - 1, birthDay));
         const p = threePillars(date);
         set({ pillars: p, dayPillarStr: pillarToString(p.day) });
@@ -79,11 +94,18 @@ export const useUser = create<UserState>()(
 
       finishOnboarding: () => set({ isOnboarded: true }),
 
-      reset: () => set({ ...DEFAULTS, pillars: null, dayPillarStr: "", isOnboarded: false }),
+      reset: () => set({ ...DEFAULTS, pillars: null, dayPillarStr: "", isOnboarded: false, hasHydrated: true }),
     }),
     {
       name: "asakizashi-user",
       storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => {
+        const { hasHydrated: _hasHydrated, ...persisted } = state;
+        return persisted;
+      },
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

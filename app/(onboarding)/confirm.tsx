@@ -11,8 +11,29 @@ export default function ConfirmStep() {
   const u = useUser();
 
   const onConfirm = () => {
+    if (!u.nickname.trim()) {
+      router.push("/(onboarding)/name");
+      return;
+    }
+    // 生年月日と生まれた場所は任意。入力されていれば命式計算する
+    if (u.birthDateProvided && !u.birthPlace.trim()) {
+      router.push("/(onboarding)/birth");
+      return;
+    }
+    if (u.bloodType === null) {
+      router.push("/(onboarding)/blood");
+      return;
+    }
+    if (u.gender === null) {
+      router.push("/(onboarding)/gender");
+      return;
+    }
+    if (u.themes.length === 0) {
+      router.push("/(onboarding)/themes");
+      return;
+    }
     haptics.medium();
-    u.computePillars();
+    u.computePillars(); // birthDateProvided=false なら内部で no-op
     router.push("/reveal");
   };
 
@@ -31,13 +52,13 @@ export default function ConfirmStep() {
         </View>
 
         <ScrollView contentContainerStyle={s.body} showsVerticalScrollIndicator={false}>
-          <Text style={s.title}>入力内容のご確認</Text>
-          <Text style={s.sub}>これで合っていますか？{"\n"}変更したい項目は左の戻るボタンから</Text>
+          <Text style={s.title}>これで始めますか？</Text>
+          <Text style={s.sub}>あとから設定で変更できます</Text>
 
           <View style={s.card}>
             <Row k="ニックネーム" v={u.nickname || "—"} />
-            <Row k="生年月日" v={`${u.birthYear}年${u.birthMonth}月${u.birthDay}日`} />
-            <Row k="生まれた場所" v={u.birthPlace} />
+            <Row k="生年月日" v={u.birthDateProvided ? `${u.birthYear}年${u.birthMonth}月${u.birthDay}日` : "あとで設定"} />
+            <Row k="生まれた場所" v={u.birthDateProvided && u.birthPlace ? u.birthPlace : "—"} />
             <Row k="MBTI" v={u.mbti || "—"} />
             <Row k="血液型" v={
               u.bloodType
@@ -58,14 +79,10 @@ export default function ConfirmStep() {
               </View>
             </View>
           </View>
-
-          <Text style={s.note}>
-            登録すると、生年月日から「命式（めいしき）」が自動で算出されます。
-          </Text>
         </ScrollView>
 
         <Pressable style={s.cta} onPress={onConfirm} accessibilityRole="button">
-          <Text style={s.ctaText}>命式を見る</Text>
+          <Text style={s.ctaText}>朝メモへ</Text>
         </Pressable>
         <Pressable style={s.editBtn} onPress={() => router.back()} accessibilityRole="button">
           <Text style={s.editText}>修正する</Text>
@@ -111,10 +128,8 @@ const s = StyleSheet.create({
   themeChip: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: "rgba(184,150,86,0.15)", borderWidth: 1, borderColor: C.paperBorder },
   themeChipText: { color: C.ink, fontSize: 11, fontFamily: F.serif },
 
-  note: { color: C.white, fontSize: 11, opacity: 0.85, marginTop: 18, lineHeight: 18, textAlign: "center", fontFamily: F.serif },
-
   cta: { backgroundColor: C.paper, borderRadius: 30, paddingVertical: 16, alignItems: "center", borderWidth: 1, borderColor: C.gold, marginBottom: 8 },
-  ctaText: { color: C.ink, fontSize: 14, fontWeight: "600", letterSpacing: 6, fontFamily: F.serif },
+  ctaText: { color: C.ink, fontSize: 14, fontWeight: "600", letterSpacing: 3, fontFamily: F.serif },
   editBtn: { paddingVertical: 8, alignItems: "center" },
   editText: { color: C.white, fontSize: 12, opacity: 0.85, fontFamily: F.serif },
 });

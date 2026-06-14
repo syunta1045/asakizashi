@@ -1,0 +1,38 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="dawn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#07111F"/>
+      <stop offset="46%" stop-color="#3F263D"/>
+      <stop offset="74%" stop-color="#B87355"/>
+      <stop offset="100%" stop-color="#F2C178"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="50%" cy="44%" r="58%">
+      <stop offset="0%" stop-color="#FFF4C8"/>
+      <stop offset="58%" stop-color="#F6BE5F"/>
+      <stop offset="100%" stop-color="#E68742"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="63%" r="52%">
+      <stop offset="0%" stop-color="#FFD37E" stop-opacity="0.58"/>
+      <stop offset="66%" stop-color="#F3A45E" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#F3A45E" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="morningMist" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F8D394" stop-opacity="0"/>
+      <stop offset="58%" stop-color="#F8D394" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#F8D394" stop-opacity="0.6"/>
+    </linearGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.68" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.026"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" rx="224" fill="url(#dawn)"/>
+  <circle cx="512" cy="642" r="390" fill="url(#glow)"/>
+  <circle cx="512" cy="650" r="188" fill="url(#sun)"/>
+  <rect y="588" width="1024" height="436" fill="url(#morningMist)"/>
+  <rect width="1024" height="1024" rx="224" filter="url(#grain)" opacity="0.34"/>
+</svg>

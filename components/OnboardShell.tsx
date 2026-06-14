@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { haptics } from "../lib/haptics";
 import { track } from "../lib/analytics";
-import { C, dawnGradient, F } from "../lib/theme";
+import { C, morningGradient, F } from "../lib/theme";
 
 type Props = {
   step: number;
@@ -23,7 +23,7 @@ export function OnboardShell({ step, total = 7, title, sub, children, onNext, on
   const router = useRouter();
   useEffect(() => { track("onboarding_step_completed", { step, total }); }, [step]);
   return (
-    <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
+    <LinearGradient colors={morningGradient as unknown as [string, string, ...string[]]} style={s.bg}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -88,6 +88,6 @@ const s = StyleSheet.create({
   sub: { color: C.white, fontSize: 12, opacity: 0.85, marginTop: 12, lineHeight: 22, fontFamily: F.serif },
   cta: { backgroundColor: C.paper, borderRadius: 30, paddingVertical: 16, alignItems: "center", borderWidth: 1, borderColor: C.gold, marginBottom: 8 },
   skipBtn: { paddingVertical: 8, alignItems: "center" },
-  skipText: { color: C.white, fontSize: 12, opacity: 0.85, fontFamily: F.serif },
-  ctaText: { color: C.ink, fontSize: 14, fontWeight: "600", letterSpacing: 6, fontFamily: F.serif },
+  skipText: { color: C.inkSub, fontSize: 12, opacity: 0.95, fontWeight: "600", fontFamily: F.serif },
+  ctaText: { color: C.ink, fontSize: 14, fontWeight: "600", letterSpacing: 3, fontFamily: F.serif },
 });

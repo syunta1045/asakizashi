@@ -35,13 +35,13 @@ export function ErrorView({ title = "うまく読めませんでした", message
 }
 
 /**
- * オフライン用フォールバック。「電波の届かない場所でも、命式は手元で読める」とトーンを保つ。
+ * オフライン用フォールバック。「電波の届かない場所でも、今日の一行は手元で読める」とトーンを保つ。
  */
 export function OfflineView({ onRetry }: { onRetry?: () => void }) {
   return (
     <ErrorView
       title="ネットにつながりません"
-      message={"通信が不安定です。\n命式と今日の干支は手元で読み解いていますので、しばらくしてからもう一度お試しください。"}
+      message={"通信が不安定です。\n今日の一行は手元で準備しています。しばらくしてからもう一度お試しください。"}
       onRetry={onRetry}
     />
   );

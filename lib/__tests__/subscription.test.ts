@@ -2,7 +2,21 @@
  * subscription のトライアル期限ロジック
  * Date.now() を mock してテストする
  */
-import { isTrialActive, trialDaysRemaining } from "../subscription";
+const storage: Record<string, string> = {};
+
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  getItem: jest.fn((key: string) => Promise.resolve(storage[key] ?? null)),
+  setItem: jest.fn((key: string, value: string) => {
+    storage[key] = value;
+    return Promise.resolve();
+  }),
+  removeItem: jest.fn((key: string) => {
+    delete storage[key];
+    return Promise.resolve();
+  }),
+}));
+
+import { isTrialActive, trialDaysRemaining, useSubscription } from "../subscription";
 
 const FIXED_NOW = 1_700_000_000_000; // 任意の固定時刻
 const DAY = 24 * 60 * 60 * 1000;
@@ -90,5 +104,36 @@ describe("trialDaysRemaining", () => {
       plan: "premium_yearly", isPremium: true,
       trialStartedAt: FIXED_NOW,
     } as any)).toBe(0);
+  });
+});
+
+describe("applyEntitlement", () => {
+  beforeEach(() => {
+    useSubscription.setState({ plan: "free", isPremium: false, trialStartedAt: null });
+  });
+
+  test("uses RevenueCat plan when provided", () => {
+    useSubscription.getState().applyEntitlement(true, "premium_yearly");
+    expect(useSubscription.getState()).toMatchObject({
+      plan: "premium_yearly",
+      isPremium: true,
+      trialStartedAt: null,
+    });
+  });
+
+  test("preserves existing premium plan when active plan is unknown", () => {
+    useSubscription.setState({ plan: "premium_yearly", isPremium: true, trialStartedAt: null });
+    useSubscription.getState().applyEntitlement(true);
+    expect(useSubscription.getState().plan).toBe("premium_yearly");
+  });
+
+  test("clears trial state when store entitlement is active", () => {
+    useSubscription.setState({ plan: "trial", isPremium: true, trialStartedAt: FIXED_NOW });
+    useSubscription.getState().applyEntitlement(true, "premium_monthly");
+    expect(useSubscription.getState()).toMatchObject({
+      plan: "premium_monthly",
+      isPremium: true,
+      trialStartedAt: null,
+    });
   });
 });

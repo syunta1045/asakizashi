@@ -1,7 +1,7 @@
 /**
  * 干支の相性ロジック（統一版）
  *
- * これまで relations.ts / calendar.ts / ranking.ts に散在していた
+ * これまで relations.ts / calendar.ts / pace.ts に散在していた
  * 三合・六合・冲・五行相生/相剋 のテーブルと判定関数をここに集約。
  *
  * 用語:
@@ -70,27 +70,26 @@ export function elementRelation(a: Element, b: Element): ElementRelation {
 export type CompatKind = "best" | "good" | "neutral" | "warn";
 
 export function branchCompatibility(myBranch: Branch, otherBranch: Branch): { kind: CompatKind; reason: string } {
-  if (myBranch === otherBranch) return { kind: "good", reason: "同じ干支、共鳴の関係" };
+  if (myBranch === otherBranch) return { kind: "good", reason: "感覚が近く、話し始めやすい関係です" };
 
   if (isSango(myBranch, otherBranch)) {
-    const triad = SANGO.find((t) => t.includes(myBranch) && t.includes(otherBranch))!;
-    return { kind: "best", reason: `三合（${triad.join("")}）の関係。互いを高め合う` };
+    return { kind: "best", reason: "自然に話しやすい関係です。互いの良さを引き出しやすい日。" };
   }
-  if (isRikugo(myBranch, otherBranch)) return { kind: "best", reason: "六合の関係。穏やかに支え合う" };
-  if (isChu(myBranch, otherBranch)) return { kind: "warn", reason: "冲の関係。要件は短く、距離を保つと吉" };
+  if (isRikugo(myBranch, otherBranch)) return { kind: "best", reason: "支え合いやすい関係です。穏やかに進めて。" };
+  if (isChu(myBranch, otherBranch)) return { kind: "warn", reason: "少しすれ違いやすい日です。用件は短く、距離を大切に。" };
 
   const myE = branchElement[myBranch] as Element;
   const otE = branchElement[otherBranch] as Element;
   const rel = elementRelation(myE, otE);
-  if (rel === "gen_to" || rel === "gen_from") return { kind: "good", reason: "五行が育み合う関係" };
-  if (rel === "self") return { kind: "good", reason: "同じ五行、安定した関係" };
-  if (rel === "overcome_to") return { kind: "warn", reason: "気を抑える関係、無理せず距離をとって" };
-  if (rel === "overcome_from") return { kind: "warn", reason: "気を抑えられる関係、自分のペースを守って" };
-  return { kind: "neutral", reason: "穏やかな距離感" };
+  if (rel === "gen_to" || rel === "gen_from") return { kind: "good", reason: "タイプが合いやすい関係です" };
+  if (rel === "self") return { kind: "good", reason: "似たところがあり、安心しやすい関係です" };
+  if (rel === "overcome_to") return { kind: "warn", reason: "強く出すぎない方が話しやすい関係です" };
+  if (rel === "overcome_from") return { kind: "warn", reason: "自分のペースを守ると落ち着きやすい関係です" };
+  return { kind: "neutral", reason: "穏やかな距離感です" };
 }
 
 // ============================================================
-// ランキング用: 当日の干支に対する 0-100 スコア
+// 今日のペース用: 当日の内部コードに対する 0-100 スコア
 // ============================================================
 export function dailyScore(myBranch: Branch, targetBranch: Branch): number {
   if (myBranch === targetBranch) return 98;

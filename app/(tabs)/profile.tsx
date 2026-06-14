@@ -3,37 +3,34 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useUser, notifyTimeFrom } from "../../lib/store";
-import { stemReading, branchReading } from "../../lib/bazi";
-import { C, dawnGradient, F } from "../../lib/theme";
+import { C, morningGradient, F } from "../../lib/theme";
 
 export default function Profile() {
   const router = useRouter();
   const u = useUser();
-  if (!u.pillars) return null;
-  const day = u.pillars.day;
+  // 生年月日が未入力でもプロフィール画面は表示できる
   return (
-    <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
+    <LinearGradient colors={morningGradient as unknown as [string, string, ...string[]]} style={s.bg}>
       <SafeAreaView style={s.safe} edges={["top"]}>
         <ScrollView contentContainerStyle={s.content}>
-          <Text style={s.heading}>YOUR PROFILE</Text>
+          <Text style={s.heading}>プロフィール</Text>
           <Text style={s.title}>あなたのこと</Text>
 
           <View style={s.card}>
-            <Text style={s.sectionLabel}>◆ 命 式</Text>
-            <Text style={s.dayPillar}>{day.stem}{day.branch}</Text>
-            <Text style={s.dayReading}>{stemReading[day.stem]}・{branchReading[day.branch]} 日柱</Text>
+            <Text style={s.sectionLabel}>◆ 朝のパーソナル設定</Text>
+            <Text style={s.profileLead}>朝メモ・通知・振り返りを、あなたの生活リズムに合わせます。</Text>
 
             <View style={s.divider} />
-            <Row k="ニックネーム" v={u.nickname} />
-            <Row k="生年月日" v={`${u.birthYear}年${u.birthMonth}月${u.birthDay}日`} />
-            <Row k="生まれた場所" v={u.birthPlace} />
+            <Row k="ニックネーム" v={u.nickname || "未設定"} />
+            <Row k="生年月日" v={u.birthDateProvided ? `${u.birthYear}年${u.birthMonth}月${u.birthDay}日` : "未入力（任意）"} />
+            <Row k="生まれた場所" v={u.birthDateProvided && u.birthPlace ? u.birthPlace : "—"} />
             <Row k="MBTI" v={u.mbti || "未設定"} />
             <Row k="血液型" v={u.bloodType ? (u.bloodType === "unknown" ? "わからない" : `${u.bloodType}型`) : "未設定"} />
             <Row k="性別" v={genderLabel(u.gender)} />
             <Row k="起床時間" v={`${u.wakeUpTime}（通知 ${notifyTimeFrom(u.wakeUpTime)}）`} />
           </View>
 
-          <Text style={s.sectionTitle}>気にしていること</Text>
+          <Text style={s.sectionTitle}>今気になっていること</Text>
           <View style={s.themeRow}>
             {u.themes.length === 0 && <Text style={s.themeEmpty}>未設定</Text>}
             {u.themes.map((t) => (
@@ -43,15 +40,15 @@ export default function Profile() {
 
           <View style={s.linkGroup}>
             <Pressable style={s.linkRow} onPress={() => router.push("/chart")} accessibilityRole="button">
-              <Text style={s.linkText}>命式の詳細を見る</Text>
+              <Text style={s.linkText}>自分のことを見る</Text>
               <Text style={s.linkArrow}>›</Text>
             </Pressable>
             <Pressable style={s.linkRow} onPress={() => router.push("/calendar")} accessibilityRole="button">
-              <Text style={s.linkText}>月の流れ</Text>
+              <Text style={s.linkText}>月間カレンダー</Text>
               <Text style={s.linkArrow}>›</Text>
             </Pressable>
             <Pressable style={s.linkRow} onPress={() => router.push("/premium")} accessibilityRole="button">
-              <Text style={s.linkText}>プレミアムにアップグレード</Text>
+              <Text style={s.linkText}>プレミアムをはじめる</Text>
               <Text style={s.linkArrow}>›</Text>
             </Pressable>
             <Pressable style={s.linkRowLast} onPress={() => router.push("/settings")} accessibilityRole="button">
@@ -80,25 +77,24 @@ function genderLabel(g: string | null) {
 const s = StyleSheet.create({
   bg: { flex: 1 },
   safe: { flex: 1 },
-  content: { paddingHorizontal: 16, paddingBottom: 60 },
-  heading: { color: C.white, fontSize: 11, opacity: 0.85, letterSpacing: 3, marginTop: 14, paddingHorizontal: 8 },
-  title: { color: C.white, fontSize: 22, fontWeight: "500", letterSpacing: 4, marginBottom: 14, paddingHorizontal: 8, fontFamily: F.serif },
-  card: { backgroundColor: C.paper, borderRadius: 18, padding: 22, borderWidth: 1, borderColor: C.paperBorder },
+  content: { paddingHorizontal: 18, paddingBottom: 64 },
+  heading: { color: "#FFF8EA", fontSize: 11, opacity: 0.96, letterSpacing: 3, marginTop: 18, paddingHorizontal: 6, fontWeight: "700" },
+  title: { color: C.white, fontSize: 24, fontWeight: "800", letterSpacing: 4, marginBottom: 16, paddingHorizontal: 6, fontFamily: F.serif },
+  card: { backgroundColor: "#FFF8EA", borderRadius: 16, padding: 23, borderWidth: 1, borderColor: "rgba(126,88,48,0.18)", shadowColor: "#42231A", shadowOpacity: 0.1, shadowRadius: 14, shadowOffset: { width: 0, height: 6 } },
   sectionLabel: { color: C.gold, fontSize: 9, letterSpacing: 4, fontFamily: F.serif },
-  dayPillar: { color: C.red, fontSize: 50, fontWeight: "600", letterSpacing: 4, lineHeight: 56, marginTop: 12, textAlign: "center", fontFamily: F.serif },
-  dayReading: { color: C.inkSub, fontSize: 11, textAlign: "center", marginTop: 6, letterSpacing: 2, fontFamily: F.serif },
+  profileLead: { color: C.ink, fontSize: 14, lineHeight: 24, marginTop: 10, fontWeight: "700", fontFamily: F.serif },
   divider: { height: 1, backgroundColor: C.paperBorder, marginVertical: 16 },
   row: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 6 },
-  rowKey: { color: C.gold, fontSize: 12 },
-  rowVal: { color: C.ink, fontSize: 12 },
-  sectionTitle: { color: C.white, fontSize: 13, fontWeight: "500", letterSpacing: 3, marginTop: 24, marginBottom: 10, paddingHorizontal: 8, fontFamily: F.serif },
+  rowKey: { color: "#9A6D2C", fontSize: 12, fontWeight: "800" },
+  rowVal: { color: C.ink, fontSize: 12, fontWeight: "700" },
+  sectionTitle: { color: "#FFF8EA", fontSize: 13, fontWeight: "800", letterSpacing: 3, marginTop: 24, marginBottom: 10, paddingHorizontal: 6, fontFamily: F.serif },
   themeRow: { flexDirection: "row", flexWrap: "wrap", gap: 6, paddingHorizontal: 8 },
-  themeChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14, backgroundColor: "rgba(255,255,255,0.18)", borderWidth: 1, borderColor: C.whiteBorder },
-  themeText: { color: C.white, fontSize: 11, letterSpacing: 1, fontFamily: F.serif },
-  themeEmpty: { color: C.white, fontSize: 12, opacity: 0.7, paddingHorizontal: 8 },
-  linkGroup: { marginTop: 24, backgroundColor: C.white95, borderRadius: 14, borderWidth: 1, borderColor: C.paperBorder, overflow: "hidden" },
+  themeChip: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 14, backgroundColor: "#FFF8EA", borderWidth: 1, borderColor: "rgba(126,88,48,0.18)" },
+  themeText: { color: "#574740", fontSize: 11, fontWeight: "800", letterSpacing: 1, fontFamily: F.serif },
+  themeEmpty: { color: C.inkSub, fontSize: 12, opacity: 0.9, paddingHorizontal: 8, fontWeight: "600" },
+  linkGroup: { marginTop: 24, backgroundColor: "#FFF8EA", borderRadius: 14, borderWidth: 1, borderColor: "rgba(126,88,48,0.18)", overflow: "hidden" },
   linkRow: { flexDirection: "row", alignItems: "center", padding: 14, borderBottomWidth: 1, borderBottomColor: C.paperBorder },
   linkRowLast: { flexDirection: "row", alignItems: "center", padding: 14 },
-  linkText: { flex: 1, color: C.ink, fontSize: 13, fontWeight: "500" },
+  linkText: { flex: 1, color: C.ink, fontSize: 13, fontWeight: "800" },
   linkArrow: { color: C.inkMuted, fontSize: 14 },
 });
