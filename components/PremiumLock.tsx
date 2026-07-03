@@ -10,12 +10,15 @@ type Props = {
   title?: string;
   description?: string;
   cta?: string;
+  /** 課金ファネル計測用。premium 画面側で premium_viewed の source になる */
+  source?: string;
 };
 
 export function PremiumLock({
   title = "プレミアム機能",
-  description = "テーマ別ヒントと記録の見返しを広げます",
+  description = "4テーマの深掘りと、30日・90日の見返しが使えます",
   cta = "プレミアムを見る",
+  source = "lock",
 }: Props) {
   const router = useRouter();
   return (
@@ -29,7 +32,7 @@ export function PremiumLock({
         </View>
         <Text style={s.title}>{title}</Text>
         <Text style={s.desc}>{description}</Text>
-        <Pressable style={s.cta} onPress={() => router.push("/premium")}>
+        <Pressable style={s.cta} onPress={() => router.push(`/premium?source=${source}`)}>
           <Text style={s.ctaText}>{cta}</Text>
         </Pressable>
       </LinearGradient>

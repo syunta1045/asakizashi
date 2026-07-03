@@ -62,7 +62,7 @@ export async function getNotificationPermissionGranted(): Promise<boolean> {
 export async function scheduleMorningNotification(
   wakeUpTime: string,
   nickname: string,
-  options: { morningEnabled?: boolean; eveningEnabled?: boolean; eveningTime?: string } = {}
+  options: { morningEnabled?: boolean; eveningEnabled?: boolean; eveningTime?: string; streak?: number } = {}
 ) {
   // 動的 import で循環依存を回避
   const { useUser } = await import("./store");
@@ -75,11 +75,13 @@ export async function scheduleMorningNotification(
   if (morningEnabled) {
     const notify = notifyTimeFrom(wakeUpTime);
     const [h, m] = notify.split(":").map(Number);
+    // streak は振り返り保存と ensureNotificationsScheduled（起動/復帰）で更新される
+    const morningBody = morningBodyFor(nickname, options.streak);
     try {
       const id = await Notifications.scheduleNotificationAsync({
         content: {
           title: "朝しるべ",
-          body: `おはよう、${nickname || "あなた"}さん。今朝の朝メモが届きました。`,
+          body: morningBody,
           sound: "default",
           data: { deeplink: "asakizashi://today" },
         },
@@ -122,6 +124,24 @@ export async function scheduleMorningNotification(
 
 export async function cancelAllNotifications() {
   await Notifications.cancelAllScheduledNotificationsAsync();
+}
+
+/** 朝通知の本文。schedule と ensure の両方が同じ文面を組めるよう一箇所に置く */
+function morningBodyFor(nickname: string, streak?: number): string {
+  return streak && streak >= 2
+    ? `おはよう、${nickname || "あなた"}さん。連続${streak}日目の朝メモです。`
+    : `おはよう、${nickname || "あなた"}さん。今朝の朝メモが届きました。`;
+}
+
+/** 記録が途切れた後も古い「連続N日目」を出し続けないための現在値。hydration 前は null */
+async function currentStreakIfReady(): Promise<number | null> {
+  try {
+    const { useJournal } = await import("./journal");
+    if (!useJournal.persist.hasHydrated()) return null;
+    return useJournal.getState().getStreak();
+  } catch {
+    return null;
+  }
 }
 
 function hasScheduledDeepLink(scheduled: Notifications.NotificationRequest[], deeplink: string) {
@@ -191,13 +211,22 @@ export async function ensureNotificationsScheduled(): Promise<{ ok: boolean; res
     // 権限なし（黙って no-op、許可ダイアログは出さない）
     const { status } = await Notifications.getPermissionsAsync();
     if (status !== "granted") return { ok: true, rescheduled: false, reason: "permission-denied" };
-    // 必要な通知が揃っていれば何もしない
     const scheduled = await Notifications.getAllScheduledNotificationsAsync();
     const hasMorning = !u.morningEnabled || hasScheduledDeepLink(scheduled, "asakizashi://today");
     const hasEvening = !u.eveningEnabled || hasScheduledDeepLink(scheduled, "asakizashi://journal");
-    if (hasMorning && hasEvening) return { ok: true, rescheduled: false, reason: "already-scheduled" };
+    const streak = await currentStreakIfReady();
+    if (hasMorning && hasEvening) {
+      // 予約は揃っていても、朝通知の「連続N日目」が実態とズレていたら貼り替える
+      // （記録が途切れたユーザーに古い日数を出し続けない）
+      const morningReq = scheduled.find((n) => n.content.data?.deeplink === "asakizashi://today");
+      if (u.morningEnabled && morningReq && streak !== null && morningReq.content.body !== morningBodyFor(u.nickname, streak)) {
+        await scheduleMorningNotification(u.wakeUpTime, u.nickname, { streak });
+        return { ok: true, rescheduled: true };
+      }
+      return { ok: true, rescheduled: false, reason: "already-scheduled" };
+    }
     // 再スケジュール
-    await scheduleMorningNotification(u.wakeUpTime, u.nickname);
+    await scheduleMorningNotification(u.wakeUpTime, u.nickname, streak !== null ? { streak } : {});
     return { ok: true, rescheduled: true };
   } catch (e: unknown) {
     return { ok: false, rescheduled: false, reason: errorMessage(e) };

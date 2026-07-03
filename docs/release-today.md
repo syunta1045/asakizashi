@@ -116,6 +116,8 @@ npx supabase functions deploy delete-account --no-verify-jwt
 
 # Cron 設定（Supabase Dashboard > Edge Functions > Schedules）
 # daily-message-batch: 0 0 * * *  (UTC 0:00 = JST 9:00)
+# ⚠️ 事前に supabase secrets set CRON_SECRET=<ランダム値> と
+#    Cron 側ヘッダ Authorization: Bearer <CRON_SECRET> の設定が必須（無いと401）
 ```
 
 ---

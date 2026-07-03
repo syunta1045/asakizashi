@@ -41,7 +41,7 @@ export default function AddRelation() {
           `通常プランでは${FREE_RELATION_LIMIT}件まで登録できます。プレミアムをはじめると無制限になります。`,
           [
             { text: "キャンセル", style: "cancel" },
-            { text: "プレミアムを見る", onPress: () => router.replace("/premium") },
+            { text: "プレミアムを見る", onPress: () => router.replace("/premium?source=relations_limit") },
           ]
         );
         return;

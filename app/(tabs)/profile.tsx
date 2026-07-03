@@ -47,7 +47,7 @@ export default function Profile() {
               <Text style={s.linkText}>月間カレンダー</Text>
               <Text style={s.linkArrow}>›</Text>
             </Pressable>
-            <Pressable style={s.linkRow} onPress={() => router.push("/premium")} accessibilityRole="button">
+            <Pressable style={s.linkRow} onPress={() => router.push("/premium?source=profile")} accessibilityRole="button">
               <Text style={s.linkText}>プレミアムをはじめる</Text>
               <Text style={s.linkArrow}>›</Text>
             </Pressable>

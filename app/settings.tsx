@@ -209,7 +209,7 @@ export default function Settings() {
                 <Section num={next()} title="プラン" />
                 <Group>
                   {!sub.isPremium && (
-                    <Pressable onPress={() => router.push("/premium")} accessibilityRole="button">
+                    <Pressable onPress={() => router.push("/premium?source=settings")} accessibilityRole="button">
                       <Row label="プレミアムをはじめる" value="" arrow />
                     </Pressable>
                   )}

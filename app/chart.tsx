@@ -3,9 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import { useUser } from "../lib/store";
-import { useSubscription, isLocked } from "../lib/subscription";
 import { fiveElementBalance, yongShinOf, type Element, type ThreePillars } from "../lib/bazi";
-import { PremiumLock } from "../components/PremiumLock";
 import { C, dawnGradient, F } from "../lib/theme";
 
 const ELEMENT_COLOR: Record<Element, string> = {
@@ -16,7 +14,6 @@ export default function Chart() {
   const router = useRouter();
   const u = useUser();
   const { pillars } = u;
-  const { isPremium } = useSubscription();
   if (!pillars) {
     return (
       <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
@@ -58,7 +55,6 @@ export default function Chart() {
   const balance = fiveElementBalance(pillars);
   const max = Math.max(...Object.values(balance));
   const elements: Element[] = ["木", "火", "土", "金", "水"];
-  const fiveLocked = isLocked("fiveElements", isPremium);
   const yongShin = yongShinOf(pillars);
   const summary = buildTendencySummary(pillars, balance);
 
@@ -127,13 +123,7 @@ export default function Chart() {
             title="5つの傾向"
             desc="成長・表現・安定・決断・思考の5つを、暮らしの傾向として見たバランスです。多いテーマは強み、少ないテーマは少し足すと整いやすいポイントです。"
           />
-          {fiveLocked ? (
-            <PremiumLock
-              title="5つの傾向はプレミアム限定"
-              description="強みと、少し足したいことを見られます"
-            />
-          ) : (
-            <View style={s.fiveCard}>
+          <View style={s.fiveCard}>
               <View style={s.bars}>
                 {elements.map((e) => {
                   const v = balance[e];
@@ -160,7 +150,6 @@ export default function Chart() {
                 <Text style={s.yongShinDesc}>{balanceAction(yongShin.yongShin)}</Text>
               </View>
             </View>
-          )}
 
           <Section
             num="03"

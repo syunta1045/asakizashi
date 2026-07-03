@@ -172,7 +172,10 @@ export default function NotificationsSettings() {
               <>
                 {customTimeLocked ? (
                   <View style={{ padding: 12, backgroundColor: "rgba(184,150,86,0.1)", borderRadius: 10 }}>
-                    <Text style={s.lockText}>通知時間の調整はプレミアム限定です</Text>
+                    <Text style={s.lockText}>夜の通知時刻の変更はプレミアム限定です</Text>
+                    <Pressable onPress={() => router.push("/premium?source=notifications_settings")} accessibilityRole="button" hitSlop={8}>
+                      <Text style={s.lockLink}>プレミアムを見る ›</Text>
+                    </Pressable>
                   </View>
                 ) : (
                   <View style={s.timeRow}>
@@ -233,6 +236,7 @@ const s = StyleSheet.create({
   timeChipTextOn: { color: C.red, fontWeight: "600" },
 
   lockText: { color: C.inkSub, fontSize: 11, fontFamily: F.serif },
+  lockLink: { color: C.red, fontSize: 11, fontWeight: "700", marginTop: 8, fontFamily: F.serif },
 
   dangerBtn: { marginTop: 16, padding: 14, alignItems: "center" },
   dangerText: { color: C.warn, fontSize: 12, letterSpacing: 2 },

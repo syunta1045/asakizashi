@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, ScrollView, Pressable, Alert, Platform, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSubscription, isTrialActive, trialDaysRemaining } from "../lib/subscription";
-import { ensureRevenueCatConfigured, restorePurchases, isRevenueCatConfigured, getOfferings, purchasePackage } from "../lib/revenuecat";
+import { ensureRevenueCatConfigured, restorePurchases, isRevenueCatConfigured, getOfferings, purchasePackage, checkIntroEligibility } from "../lib/revenuecat";
+import { track } from "../lib/analytics";
 import { haptics } from "../lib/haptics";
 import { C, morningGradient, F } from "../lib/theme";
 
@@ -15,8 +16,9 @@ const FEATURES: { f: string; free: string | boolean; prem: string | boolean }[] 
   { f: "月間カレンダー", free: true, prem: true },
   { f: "自分の傾向まとめ", free: true, prem: true },
   { f: "4テーマの深掘り", free: "一部", prem: "全テーマ" },
+  { f: "気分の見返し", free: "直近7日", prem: "30日・90日" },
   { f: "大切な人を登録", free: "5件", prem: "無制限" },
-  { f: "通知時間の調整", free: false, prem: true },
+  { f: "夜の通知時刻の調整", free: false, prem: true },
 ];
 
 const DAILY_BENEFITS = [
@@ -26,14 +28,19 @@ const DAILY_BENEFITS = [
     body: "仕事・大切な人・人間関係・お金を、今日の小さな行動に分けて全文で見られます。",
   },
   {
+    label: "波",
+    title: "30日・90日の見返し",
+    body: "気分の波・曜日のくせ・最長連続を、長い目でふり返れます。",
+  },
+  {
     label: "人",
     title: "大切な人を無制限に登録",
     body: "家族・推し・パートナーを上限なく登録して、距離感のメモを増やせます。",
   },
   {
     label: "時",
-    title: "通知の時間を自由に",
-    body: "起きる時間や生活に合わせて、朝メモが届く時刻を細かく調整できます。",
+    title: "夜の振り返り時刻を選べる",
+    body: "夜のリマインダーを19時〜23時から選んで、生活のリズムに合わせられます。",
   },
 ];
 
@@ -55,14 +62,61 @@ function matchesPackagePlan(pkg: any, plan: PlanChoice): boolean {
 
 export default function Premium() {
   const router = useRouter();
+  const { source } = useLocalSearchParams<{ source?: string }>();
   const [plan, setPlan] = useState<PlanChoice>("yearly");
   const sub = useSubscription();
   const onTrial = isTrialActive(sub);
   const daysLeft = trialDaysRemaining(sub);
+
+  // ストア実価格と intro 適格性。取得できない間は現行の固定表記にフォールバック
+  const [prices, setPrices] = useState<{ yearly?: string; monthly?: string; yearlyNum?: number; monthlyNum?: number }>({});
+  const [introEligible, setIntroEligible] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    track("premium_viewed", { source: source ?? "unknown" });
+    if (!isRevenueCatConfigured) return;
+    let cancelled = false;
+    (async () => {
+      const init = await ensureRevenueCatConfigured();
+      if (!init.ok || cancelled) return;
+      const offerings = (await getOfferings()) as { current?: { availablePackages?: any[] } } | null;
+      const pkgs = offerings?.current?.availablePackages ?? [];
+      const yearly = pkgs.find((p: any) => matchesPackagePlan(p, "yearly"));
+      const monthly = pkgs.find((p: any) => matchesPackagePlan(p, "monthly"));
+      if (cancelled) return;
+      setPrices({
+        yearly: yearly?.product?.priceString,
+        monthly: monthly?.product?.priceString,
+        yearlyNum: typeof yearly?.product?.price === "number" ? yearly.product.price : undefined,
+        monthlyNum: typeof monthly?.product?.price === "number" ? monthly.product.price : undefined,
+      });
+      const yearlyId = yearly?.product?.identifier;
+      if (yearlyId) {
+        const eligible = await checkIntroEligibility(yearlyId);
+        if (!cancelled) setIntroEligible(eligible);
+      }
+    })();
+    // source は初回表示の計測にだけ使う
+    return () => { cancelled = true; };
+  }, []);
+
+  const yearlyPrice = prices.yearly ?? "¥3,800";
+  const monthlyPrice = prices.monthly ?? "¥480";
+  // 不適格が「確定」した時だけ 7日間無料の表記を落とす（判定不能は現行表記のまま）
+  const showTrial = introEligible !== false;
+  const perMonth = prices.yearlyNum
+    ? `（月あたり ¥${Math.floor(prices.yearlyNum / 12).toLocaleString("ja-JP")}）`
+    : prices.yearly
+      ? ""
+      : "（月あたり ¥316）";
+  const discount = prices.yearlyNum && prices.monthlyNum
+    ? Math.max(0, Math.round((1 - prices.yearlyNum / (prices.monthlyNum * 12)) * 100))
+    : 33;
+
   const ctaLabel = sub.isPremium
     ? (onTrial ? `お試し残り ${daysLeft} 日` : "ご利用中")
     : plan === "yearly"
-      ? "プレミアムを7日間試す"
+      ? (showTrial ? "プレミアムを7日間試す" : "年額プランを購入")
       : "月額プランを購入";
 
   const onStartTrial = async () => {
@@ -83,26 +137,35 @@ export default function Premium() {
         matchesPackagePlan(p, plan)
       );
       if (!target) {
+        track("purchase_failed", { plan, reason: "no_offerings" });
         Alert.alert("商品を取得できませんでした", "通信環境を確認してもう一度お試しください。");
         return;
       }
+      // 表示金額は必ずストア実価格を優先（請求額との不一致を作らない）
+      const targetPrice = (target as any)?.product?.priceString ?? (plan === "yearly" ? yearlyPrice : monthlyPrice);
       Alert.alert(
         plan === "yearly" ? "プレミアム 年額を開始" : "プレミアム 月額を購入",
         plan === "yearly"
-          ? "最初の7日間は無料です。トライアル後、年額 ¥3,800 の自動更新が始まります。いつでも解約できます。"
-          : "無料体験はありません。購入後すぐに月額 ¥480 の自動更新が始まります。いつでも解約できます。",
+          ? (showTrial
+              ? `最初の7日間は無料です。トライアル後、年額 ${targetPrice} の自動更新が始まります。いつでも解約できます。`
+              : `無料体験の対象外のため、購入後すぐに年額 ${targetPrice} の自動更新が始まります。いつでも解約できます。`)
+          : `無料体験はありません。購入後すぐに月額 ${targetPrice} の自動更新が始まります。いつでも解約できます。`,
         [
           { text: "キャンセル", style: "cancel" },
           { text: "購入", onPress: async () => {
+              track("purchase_started", { plan, source: source ?? "unknown" });
               const r = await purchasePackage(target);
               if (!r.ok) {
+                track("purchase_failed", { plan, reason: r.error ?? "unknown" });
                 Alert.alert("購入できませんでした", r.error || "もう一度お試しください。");
                 return;
               }
               if (!r.isPremium) {
+                track("purchase_failed", { plan, reason: "not_confirmed" });
                 Alert.alert("購入を確認できませんでした", "ストアの反映に少し時間がかかっている可能性があります。購入を復元してもう一度確認してください。");
                 return;
               }
+              track("purchase_completed", { plan: r.plan ?? plan, source: source ?? "unknown" });
               haptics.success();
               sub.setPlan(r.plan ?? (plan === "yearly" ? "premium_yearly" : "premium_monthly"));
               Alert.alert("ありがとうございます", "プレミアム機能がご利用いただけます。");
@@ -161,14 +224,14 @@ export default function Premium() {
               onPress={() => setPlan("yearly")}
               style={[s.planChip, plan === "yearly" && s.planChipOn]}
             accessibilityRole="button">
-              <Text style={[s.planChipText, plan === "yearly" && s.planChipTextOn]}>年額 ¥3,800</Text>
-              {plan === "yearly" && <Text style={s.planSale}>33%お得</Text>}
+              <Text style={[s.planChipText, plan === "yearly" && s.planChipTextOn]}>年額 {yearlyPrice}</Text>
+              {plan === "yearly" && discount > 0 && <Text style={s.planSale}>{discount}%お得</Text>}
             </Pressable>
             <Pressable
               onPress={() => setPlan("monthly")}
               style={[s.planChip, plan === "monthly" && s.planChipOn]}
             accessibilityRole="button">
-              <Text style={[s.planChipText, plan === "monthly" && s.planChipTextOn]}>月額 ¥480</Text>
+              <Text style={[s.planChipText, plan === "monthly" && s.planChipTextOn]}>月額 {monthlyPrice}</Text>
             </Pressable>
           </View>
 
@@ -195,7 +258,11 @@ export default function Premium() {
 
           <Text style={s.legal}>
             いつでも解約できます（解約は{Platform.OS === "ios" ? "App Store" : "Google Play"}の設定から）{"\n"}
-            {plan === "yearly" ? "初回のみ7日間無料。その後、年額 ¥3,800（月あたり ¥316）" : "無料体験なし。購入後すぐに月額 ¥480"}
+            {plan === "yearly"
+              ? (showTrial
+                  ? `初回のみ7日間無料。その後、年額 ${yearlyPrice}${perMonth}`
+                  : `無料体験の対象外です。購入後すぐに年額 ${yearlyPrice}${perMonth}`)
+              : `無料体験なし。購入後すぐに月額 ${monthlyPrice}`}
           </Text>
         </ScrollView>
         <View style={s.footer}>
@@ -223,6 +290,7 @@ export default function Premium() {
                 return;
               }
               const result = await restorePurchases();
+              track("restore_completed", { ok: result.ok, found: result.isPremium });
               if (result.isPremium) {
                 sub.setPlan(result.plan ?? (sub.plan === "premium_yearly" ? "premium_yearly" : "premium_monthly"));
                 Alert.alert("復元しました", "プレミアム機能がご利用いただけます。");

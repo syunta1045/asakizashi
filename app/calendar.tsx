@@ -3,7 +3,7 @@ import { View, Text, ScrollView, Pressable, Modal, StyleSheet } from "react-nati
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { useJournal, MOOD_LABELS, moodStats, longestStreakInRange, moodSparkline, type JournalEntry } from "../lib/journal";
+import { useJournal, MOOD_LABELS, moodStats, moodSparkline, type JournalEntry } from "../lib/journal";
 import { haptics } from "../lib/haptics";
 import { C, dawnGradient, F } from "../lib/theme";
 
@@ -43,9 +43,9 @@ export default function Calendar() {
   const monthPrefix = `${year}-${String(month).padStart(2, "0")}`;
   const recordedThisMonth = Object.keys(entries).filter((k) => k.startsWith(monthPrefix)).length;
 
-  const stats = moodStats(entries, 30);
-  const longest = longestStreakInRange(entries, 30);
-  const spark = moodSparkline(entries, 14);
+  // 集計は直近7日まで（30日・90日の見返しはプレミアムの lookback に集約）
+  const stats = moodStats(entries, 7);
+  const spark = moodSparkline(entries, 7);
 
   const goPrev = () => {
     haptics.select();
@@ -94,11 +94,6 @@ export default function Calendar() {
               <Text style={s.streakNum}>{recordedThisMonth}</Text>
               <Text style={s.streakLabel}>今月の記録</Text>
             </View>
-            <View style={s.streakDivider} />
-            <View style={s.streakCol}>
-              <Text style={s.streakNum}>{longest}</Text>
-              <Text style={s.streakLabel}>最長（30日）</Text>
-            </View>
           </View>
 
           <View style={s.calCard}>
@@ -132,7 +127,7 @@ export default function Calendar() {
             </View>
           </View>
 
-          <Text style={s.sectionTitle}>直近14日の気分の波</Text>
+          <Text style={s.sectionTitle}>直近7日の気分の波</Text>
           <View style={s.waveCard}>
             {stats.total === 0 ? (
               <Text style={s.empty}>まだ記録がありません。夜の振り返りから始めてみましょう。</Text>
@@ -147,10 +142,14 @@ export default function Calendar() {
                     </View>
                   ))}
                 </View>
-                <Text style={s.waveNote}>過去30日で {stats.total} 日記録。{topMoodLine(stats.counts)}</Text>
+                <Text style={s.waveNote}>直近7日で {stats.total} 日記録。{topMoodLine(stats.counts)}</Text>
               </>
             )}
           </View>
+
+          <Pressable style={s.cta} onPress={() => router.push("/lookback")} accessibilityRole="button">
+            <Text style={s.ctaText}>30日・90日の見返し ›</Text>
+          </Pressable>
 
           <Pressable style={s.cta} onPress={() => router.push("/journal")} accessibilityRole="button">
             <Text style={s.ctaText}>今日の振り返りを書く ›</Text>

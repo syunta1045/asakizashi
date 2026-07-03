@@ -10,7 +10,7 @@ import { applyTone } from "../../lib/tone";
 import { reiwaLabel, localTodayAsUTC } from "../../lib/dateUtils";
 import { getDailyMessage, type DailyMessage } from "../../lib/interpretation";
 import { useSubscription } from "../../lib/subscription";
-import { useJournal } from "../../lib/journal";
+import { useJournal, longestStreakInRange } from "../../lib/journal";
 import { useRelations, compatibility } from "../../lib/relations";
 import {
   buildMorningReflection,
@@ -132,8 +132,8 @@ export default function Today() {
   });
   const primaryDeepInsight = pickPrimaryInsight(deepInsights, themes);
   const openPremium = (source: string) => {
-    track("premium_viewed", { source });
-    router.push("/premium");
+    // premium_viewed は premium.tsx 側で source 付きで一元計測する
+    router.push(`/premium?source=${source}`);
   };
   const shareRelationLine = async () => {
     if (!dailyRelationNudge) return;
@@ -264,6 +264,15 @@ export default function Today() {
                   </Pressable>
                 )}
 
+                {/* 途切れ直後は「おかえり」に一本化し、連続記録カードとの二枚積みを避ける */}
+                {streak === 0 && longestStreakInRange(journalEntries, 90) >= 2 ? (
+                  <Pressable style={s.dailyCard} onPress={() => router.push("/journal")} accessibilityRole="button">
+                    <Text style={s.dailyLabel}>おかえりなさい</Text>
+                    <Text style={s.dailyTitle}>これまでの最長は {longestStreakInRange(journalEntries, 90)}日</Text>
+                    <Text style={s.dailyBody}>今夜の振り返りから、また1日目。</Text>
+                    <Text style={s.dailyAction}>夜の振り返りへ ›</Text>
+                  </Pressable>
+                ) : (
                 <View style={s.dailyCard}>
                   <View style={s.dailyHeaderRow}>
                     <View style={{ flex: 1 }}>
@@ -282,6 +291,7 @@ export default function Today() {
                     <Text style={s.dailySubtleText}>夜の振り返りを続ける ›</Text>
                   </Pressable>
                 </View>
+                )}
               </View>
             </>
           )}

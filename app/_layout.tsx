@@ -48,6 +48,11 @@ function RootLayout() {
           }
           if (r.ok) {
             const entitlement = await checkEntitlementState();
+            // 確認失敗（オフライン等）は「非加入」ではないので降格せず直前の状態を維持
+            if (entitlement.failed) {
+              track("entitlement_check_failed", { phase: "boot" });
+              return;
+            }
             useSubscription.getState().applyEntitlement(entitlement.active, entitlement.plan);
           }
         })
@@ -82,6 +87,7 @@ function RootLayout() {
       "journal",
       "calendar",
       "chart",
+      "lookback",
       "relations",
       "settings",
       "premium",
@@ -107,6 +113,10 @@ function RootLayout() {
           .then(async (r) => {
             if (r.ok) {
               const entitlement = await checkEntitlementState();
+              if (entitlement.failed) {
+                track("entitlement_check_failed", { phase: "foreground" });
+                return;
+              }
               useSubscription.getState().applyEntitlement(entitlement.active, entitlement.plan);
             }
           })

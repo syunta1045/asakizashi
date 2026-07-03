@@ -110,14 +110,12 @@ export function trialDaysRemaining(s: SubscriptionState): number {
 // 機能ロックフラグ
 // ============================================================
 export const FEATURE_LOCKS = {
-  // 占い色の強い chartDetail/fiveElements/sixLuckyItems と monthCalendar は課金価値から外す（無料）。
-  // 有料はユーティリティの customNotificationTime と、画面側で isPremium 判定する 4テーマ深掘り／つながり無制限。
-  chartDetail: { premium: false,  freeLimit: 0 },
-  monthCalendar: { premium: false, freeLimit: 0 },
-  fiveElements: { premium: false, freeLimit: 0 },
+  // 実際にゲートしている機能だけを載せる（premium:false の死に定義は置かない）。
+  // 4テーマ深掘りは today.tsx が isPremium を直接見る。
   relations: { premium: false, freeLimit: 5 },
   customNotificationTime: { premium: true, freeLimit: 0 },
-  sixLuckyItems: { premium: false, freeLimit: 3 },
+  // 見返し: 無料は直近7日、プレミアムは30日・90日
+  lookback: { premium: true, freeLimit: 7 },
 } as const;
 
 export type FeatureKey = keyof typeof FEATURE_LOCKS;

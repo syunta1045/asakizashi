@@ -2,14 +2,28 @@
  * 毎日 0:00 UTC（JST 9:00）に走るバッチ。
  * 全ユーザーに対し、当日の interpretation を引いて daily_messages に保存する。
  *
+ * 認証: --no-verify-jwt でデプロイするため、CRON_SECRET の Bearer 検証を必須にする。
+ * （未設定のまま起動した場合は全リクエスト拒否 = fail closed）
+ *
  * デプロイ:
+ *   supabase secrets set CRON_SECRET=<ランダム値>
  *   supabase functions deploy daily-message-batch --no-verify-jwt
- *   supabase functions schedule daily-message-batch --cron "0 0 * * *"
+ *   スケジューラ側の呼び出しに Authorization: Bearer <CRON_SECRET> を付与
+ *   （pg_cron + pg_net の場合は headers に設定）
  */
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const CRON_SECRET = Deno.env.get("CRON_SECRET") ?? "";
+
+// revenuecat-webhook と同じタイミング攻撃対策付き比較
+function constantTimeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
 
 // ---- 60干支テーブル ----
 const STEMS = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"] as const;
@@ -74,7 +88,14 @@ function rankFor(myBranch: string, todayBranch: string): number {
 }
 
 // ---- メイン処理 ----
-Deno.serve(async (_req) => {
+Deno.serve(async (req) => {
+  // CRON_SECRET 未設定時も拒否（fail closed）。設定漏れで公開エンドポイントにしない
+  const auth = req.headers.get("authorization") ?? "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  if (!CRON_SECRET || !constantTimeEqual(token, CRON_SECRET)) {
+    return new Response("unauthorized", { status: 401 });
+  }
+
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
   const today = new Date().toISOString().slice(0, 10);
   const targetDayPillar = todayPillar();

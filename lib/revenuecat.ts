@@ -102,6 +102,27 @@ export async function getOfferings(): Promise<unknown | null> {
   }
 }
 
+/**
+ * intro オファー（7日無料）の適格性。Apple 仕様で intro は1ユーザー1回のため、
+ * 再加入者に「7日間無料」と表示しないための判定。
+ * true=適格 / false=不適格 / null=判定不能（表示は現行文言にフォールバック）
+ */
+export async function checkIntroEligibility(productIdentifier: string): Promise<boolean | null> {
+  if (!configured || Platform.OS !== "ios") return null;
+  const Purchases = await loadPurchases();
+  if (!Purchases?.checkTrialOrIntroductoryPriceEligibility) return null;
+  try {
+    const map = await Purchases.checkTrialOrIntroductoryPriceEligibility([productIdentifier]);
+    const status = map?.[productIdentifier]?.status;
+    // 0=UNKNOWN, 1=INELIGIBLE, 2=ELIGIBLE, 3=NO_INTRO_OFFER_EXISTS
+    if (status === 2) return true;
+    if (status === 1 || status === 3) return false;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export function planFromProductIdentifier(identifier: unknown): RevenueCatPlan | undefined {
   if (typeof identifier !== "string") return undefined;
   if (/(premium_yearly|year|annual|yearly|annually)/i.test(identifier)) return "premium_yearly";
@@ -151,7 +172,11 @@ export async function checkEntitlement(): Promise<boolean> {
   return result.active;
 }
 
-export async function checkEntitlementState(): Promise<{ active: boolean; plan?: RevenueCatPlan }> {
+/**
+ * failed=true は「確認できなかった」（オフライン・RC障害）であり「非加入」ではない。
+ * 呼び出し側は failed のとき降格処理をスキップし、直前のローカル状態を維持すること。
+ */
+export async function checkEntitlementState(): Promise<{ active: boolean; plan?: RevenueCatPlan; failed?: boolean }> {
   if (!configured) return { active: false };
   const Purchases = await loadPurchases();
   if (!Purchases) return { active: false };
@@ -163,7 +188,7 @@ export async function checkEntitlementState(): Promise<{ active: boolean; plan?:
       plan: active ? activePlanFromCustomerInfo(info) : undefined,
     };
   } catch {
-    return { active: false };
+    return { active: false, failed: true };
   }
 }
 

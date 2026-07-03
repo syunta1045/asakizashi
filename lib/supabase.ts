@@ -124,7 +124,16 @@ export async function signInWithGoogle(): Promise<{ error?: string; userId?: str
 
   try {
     const AuthSession = await import("expo-auth-session");
+    const Crypto = await import("expo-crypto");
     if (!googleClientId) return { error: "Google Client ID 未設定" };
+
+    // OIDC nonce: 暗号乱数の生値を Supabase へ、その SHA-256 を Google へ渡し、
+    // Supabase 側で id_token の nonce クレームと照合させる（トークン注入・リプレイ防御）
+    const rawNonce = Crypto.randomUUID();
+    const hashedNonce = await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      rawNonce
+    );
 
     const redirectUri = AuthSession.makeRedirectUri({ scheme: "asakizashi" });
     const discovery = await AuthSession.fetchDiscoveryAsync("https://accounts.google.com");
@@ -133,7 +142,7 @@ export async function signInWithGoogle(): Promise<{ error?: string; userId?: str
       scopes: ["openid", "profile", "email"],
       redirectUri,
       responseType: AuthSession.ResponseType.IdToken,
-      extraParams: { nonce: Math.random().toString(36).slice(2) },
+      extraParams: { nonce: hashedNonce },
     });
     const result = await request.promptAsync(discovery);
     if (result.type !== "success") return { error: "サインインがキャンセルされました" };
@@ -144,6 +153,7 @@ export async function signInWithGoogle(): Promise<{ error?: string; userId?: str
     const { data, error } = await supabase.auth.signInWithIdToken({
       provider: "google",
       token: idToken,
+      nonce: rawNonce,
     });
     if (error) return { error: error.message };
     return { userId: data.user?.id };

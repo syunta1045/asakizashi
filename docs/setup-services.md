@@ -47,9 +47,15 @@ supabase secrets set SUPABASE_URL=https://<ref>.supabase.co
 ```
 
 ### Cron 設定（daily-message-batch を 0:00 UTC = JST 9:00 に毎日実行）
+⚠️ daily-message-batch は `CRON_SECRET` の Bearer 認証必須（未設定だと全リクエスト401 = fail closed）。
+デプロイ前に必ず `supabase secrets set CRON_SECRET=<ランダム値>` を実行し、Cron 側にも同じ値のヘッダを付ける。
+
 Supabase Dashboard → Database → Webhooks → Cron Jobs:
 - Function: `daily-message-batch`
 - Schedule: `0 0 * * *`
+- HTTP Headers: `Authorization: Bearer <CRON_SECRET>`
+
+順序: ① `secrets set CRON_SECRET` → ② Cron のヘッダ設定 → ③ `functions deploy`（逆順だと生成が401で止まる）
 
 ---
 
