@@ -1,0 +1,16 @@
+{
+  "name": "store-screenshots",
+  "version": "1.0.0",
+  "description": "シミュレータの素のスクショに、**朝焼けグラデ背景＋キャプション＋端末フレーム**を付けて、 App Store 正寸（1242×2688px）の見栄えするスクショを書き出すツール。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "puppeteer": "^25.2.1"
+  }
+}

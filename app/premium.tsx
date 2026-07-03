@@ -9,12 +9,12 @@ import { haptics } from "../lib/haptics";
 import { C, morningGradient, F } from "../lib/theme";
 
 const FEATURES: { f: string; free: string | boolean; prem: string | boolean }[] = [
-  { f: "朝メモ", free: true, prem: true },
-  { f: "4テーマの行動ヒント", free: "一部", prem: "全テーマ" },
-  { f: "持ちもの・色・場所", free: "3つ", prem: "6つ" },
-  { f: "自分の傾向まとめ", free: false, prem: true },
-  { f: "強み・足したいこと", free: false, prem: true },
-  { f: "月間カレンダー", free: false, prem: true },
+  { f: "朝メモ・今日のペース", free: true, prem: true },
+  { f: "夜の振り返り・連続記録", free: true, prem: true },
+  { f: "今日の小さな準備", free: true, prem: true },
+  { f: "月間カレンダー", free: true, prem: true },
+  { f: "自分の傾向まとめ", free: true, prem: true },
+  { f: "4テーマの深掘り", free: "一部", prem: "全テーマ" },
   { f: "大切な人を登録", free: "5件", prem: "無制限" },
   { f: "通知時間の調整", free: false, prem: true },
 ];
@@ -23,17 +23,17 @@ const DAILY_BENEFITS = [
   {
     label: "朝",
     title: "今日の動き方がすぐ決まる",
-    body: "仕事・大切な人・人間関係・お金を、今日の小さな行動に分けて見られます。",
-  },
-  {
-    label: "月",
-    title: "気になる日を先に見られる",
-    body: "今月の意識したい日がわかるので、予定を少し立てやすくなります。",
+    body: "仕事・大切な人・人間関係・お金を、今日の小さな行動に分けて全文で見られます。",
   },
   {
     label: "人",
-    title: "大切な人への一言が見つかる",
-    body: "登録した相手との距離感を見て、送る言葉をやわらかく整えられます。",
+    title: "大切な人を無制限に登録",
+    body: "家族・推し・パートナーを上限なく登録して、距離感のメモを増やせます。",
+  },
+  {
+    label: "時",
+    title: "通知の時間を自由に",
+    body: "起きる時間や生活に合わせて、朝メモが届く時刻を細かく調整できます。",
   },
 ];
 

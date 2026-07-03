@@ -60,13 +60,10 @@ export async function pushUserToServer(): Promise<{ ok: boolean; error?: string 
   if (!session) return { ok: false, error: "未ログイン" };
 
   const u = useUser.getState();
-  if (!u.pillars) return { ok: false, error: "生年月日の情報が未算出です" };
-
-  const pillarsStr = {
-    y: pillarToString(u.pillars.year),
-    m: pillarToString(u.pillars.month),
-    d: pillarToString(u.pillars.day),
-  };
+  // 生年月日スキップ時も profile・記録は保存する（命式は空文字で送る）
+  const pillarsStr = u.pillars
+    ? { y: pillarToString(u.pillars.year), m: pillarToString(u.pillars.month), d: pillarToString(u.pillars.day) }
+    : { y: "", m: "", d: "" };
   const payload = profileToDb(u, session.user.id, pillarsStr);
   const { error } = await supabase.from("users").upsert(payload, { onConflict: "auth_id" });
   if (error) return { ok: false, error: error.message };
@@ -124,7 +121,7 @@ export type SyncResult = {
  */
 export async function syncOnSignIn(): Promise<SyncResult> {
   const u = useUser.getState();
-  if (u.isOnboarded && u.pillars) {
+  if (u.isOnboarded) {
     const r = await pushUserToServer();
     return { ok: r.ok, direction: "push", hasServerProfile: u.isOnboarded, error: r.error };
   }

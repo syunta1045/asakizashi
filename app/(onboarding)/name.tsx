@@ -16,12 +16,13 @@ export default function NameStep() {
   const goNext = () => {
     if (isInvalid) return;
     setField("nickname", trimmedNickname);
-    router.push("/(onboarding)/birth");
+    router.push("/(onboarding)/wake-up");
   };
 
   return (
     <OnboardShell
       step={1}
+      total={3}
       title={"はじめまして。\n呼び名を決めましょう"}
       sub="朝メモで呼びかける名前です。あとからいつでも変更できます"
       onNext={goNext}

@@ -3,14 +3,12 @@ import { View, Text, ScrollView, Pressable, TextInput, KeyboardAvoidingView, Pla
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
-import { useUser } from "../../lib/store";
-import { useRelations, ACTIVE_GENRES, GENRE_INFO, compatibility, RelationLimitError, FREE_RELATION_LIMIT, type Genre } from "../../lib/relations";
+import { useRelations, ACTIVE_GENRES, GENRE_INFO, RelationLimitError, FREE_RELATION_LIMIT, type Genre } from "../../lib/relations";
 import { useSubscription } from "../../lib/subscription";
 import { C, dawnGradient, F } from "../../lib/theme";
 
 export default function AddRelation() {
   const router = useRouter();
-  const { pillars } = useUser();
   const { add } = useRelations();
   const isPremium = useSubscription((s) => s.isPremium);
   const [step, setStep] = useState<1 | 2>(1);
@@ -28,14 +26,13 @@ export default function AddRelation() {
   }, [year, month, dayMax]);
 
   const onSave = () => {
-    if (!genre || !pillars) return;
+    if (!genre) return;
     Keyboard.dismiss();
     try {
-      const r = add({
+      add({
         genre, label: GENRE_INFO[genre].label,
         name, birthYear: year, birthMonth: month, birthDay: day,
       }, isPremium);
-      compatibility(pillars.year.branch, r.pillars.year.branch);
       router.replace("/(tabs)/relations");
     } catch (e) {
       if (e instanceof RelationLimitError) {

@@ -15,19 +15,6 @@ export default function ConfirmStep() {
       router.push("/(onboarding)/name");
       return;
     }
-    // 生年月日と生まれた場所は任意。入力されていれば命式計算する
-    if (u.birthDateProvided && !u.birthPlace.trim()) {
-      router.push("/(onboarding)/birth");
-      return;
-    }
-    if (u.bloodType === null) {
-      router.push("/(onboarding)/blood");
-      return;
-    }
-    if (u.gender === null) {
-      router.push("/(onboarding)/gender");
-      return;
-    }
     if (u.themes.length === 0) {
       router.push("/(onboarding)/themes");
       return;
@@ -45,7 +32,7 @@ export default function ConfirmStep() {
           <Pressable onPress={() => router.back()} hitSlop={12} accessibilityRole="button">
             <Text style={s.back}>‹</Text>
           </Pressable>
-          {Array.from({ length: 7 }).map((_, i) => (
+          {Array.from({ length: 3 }).map((_, i) => (
             <View key={i} style={[s.bar, s.barOn]} />
           ))}
           <Text style={s.stepText}>確認</Text>
@@ -57,15 +44,6 @@ export default function ConfirmStep() {
 
           <View style={s.card}>
             <Row k="ニックネーム" v={u.nickname || "—"} />
-            <Row k="生年月日" v={u.birthDateProvided ? `${u.birthYear}年${u.birthMonth}月${u.birthDay}日` : "あとで設定"} />
-            <Row k="生まれた場所" v={u.birthDateProvided && u.birthPlace ? u.birthPlace : "—"} />
-            <Row k="MBTI" v={u.mbti || "—"} />
-            <Row k="血液型" v={
-              u.bloodType
-                ? (u.bloodType === "unknown" ? "わからない" : `${u.bloodType}型`)
-                : "—"
-            } />
-            <Row k="性別" v={genderLabel(u.gender)} />
             <Row k="起床時間" v={`${u.wakeUpTime}（通知 ${notifyTimeFrom(u.wakeUpTime)}）`} />
             <View style={s.themesRow}>
               <Text style={s.rowKey}>関心テーマ</Text>
@@ -99,10 +77,6 @@ function Row({ k, v }: { k: string; v: string }) {
       <Text style={s.rowVal}>{v}</Text>
     </View>
   );
-}
-
-function genderLabel(g: string | null): string {
-  return ({ female: "女性", male: "男性", other: "その他", none: "選択しない" } as Record<string, string>)[g || ""] || "—";
 }
 
 const s = StyleSheet.create({

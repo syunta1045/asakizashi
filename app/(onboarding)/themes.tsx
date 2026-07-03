@@ -43,7 +43,8 @@ export default function ThemesStep() {
 
   return (
     <OnboardShell
-      step={7}
+      step={3}
+      total={3}
       title={"気になっていることを\n教えてください"}
       sub="朝メモを今の関心に近づけます。1つ以上、最大3つまで選べます"
       onNext={onNext}

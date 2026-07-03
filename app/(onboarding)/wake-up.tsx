@@ -60,7 +60,8 @@ export default function WakeUpStep() {
 
   return (
     <OnboardShell
-      step={6}
+      step={2}
+      total={3}
       title={"起きる時間を\n決めましょう"}
       sub="目が覚めて少し落ち着いた頃に、朝メモをお届けします"
       onNext={() => router.push("/(onboarding)/themes")}

@@ -110,12 +110,14 @@ export function trialDaysRemaining(s: SubscriptionState): number {
 // 機能ロックフラグ
 // ============================================================
 export const FEATURE_LOCKS = {
-  chartDetail: { premium: true,  freeLimit: 0 },
-  monthCalendar: { premium: true, freeLimit: 0 },
-  fiveElements: { premium: true, freeLimit: 0 },
+  // 占い色の強い chartDetail/fiveElements/sixLuckyItems と monthCalendar は課金価値から外す（無料）。
+  // 有料はユーティリティの customNotificationTime と、画面側で isPremium 判定する 4テーマ深掘り／つながり無制限。
+  chartDetail: { premium: false,  freeLimit: 0 },
+  monthCalendar: { premium: false, freeLimit: 0 },
+  fiveElements: { premium: false, freeLimit: 0 },
   relations: { premium: false, freeLimit: 5 },
   customNotificationTime: { premium: true, freeLimit: 0 },
-  sixLuckyItems: { premium: true, freeLimit: 3 },
+  sixLuckyItems: { premium: false, freeLimit: 3 },
 } as const;
 
 export type FeatureKey = keyof typeof FEATURE_LOCKS;

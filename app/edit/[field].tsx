@@ -190,7 +190,7 @@ function MbtiEditor() {
           </Pressable>
         ))}
       </View>
-      <Pressable onPress={() => setField("mbti", null)} style={[s.fullRow, mbti === null && s.fullRowOn]} accessibilityRole="button">
+      <Pressable onPress={() => setField("mbti", null)} style={[s.fullRow, { marginTop: 12 }, mbti === null && s.fullRowOn]} accessibilityRole="button">
         <Text style={[s.fullRowText, mbti === null && s.fullRowTextOn]}>わからない</Text>
       </Pressable>
     </View>

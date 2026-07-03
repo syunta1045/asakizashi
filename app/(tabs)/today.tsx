@@ -9,7 +9,7 @@ import { paceForDay } from "../../lib/pace";
 import { applyTone } from "../../lib/tone";
 import { reiwaLabel } from "../../lib/dateUtils";
 import { getDailyMessage, type DailyMessage } from "../../lib/interpretation";
-import { FEATURE_LOCKS, useSubscription } from "../../lib/subscription";
+import { useSubscription } from "../../lib/subscription";
 import { useJournal } from "../../lib/journal";
 import { useRelations, compatibility } from "../../lib/relations";
 import {
@@ -110,14 +110,9 @@ export default function Today() {
   ].join("|");
   const tuned = applyTone(base, { mbti, bloodType, themes, personalSeed });
   const m = { ...base, ...tuned };
-  const luckyEntries = Object.entries(m.lucky);
-  const visibleLuckyEntries = isPremium
-    ? luckyEntries
-    : luckyEntries.slice(0, FEATURE_LOCKS.sixLuckyItems.freeLimit);
-  const hiddenLuckyEntries = isPremium
-    ? []
-    : luckyEntries.slice(FEATURE_LOCKS.sixLuckyItems.freeLimit);
-  const hiddenLuckyLabels = hiddenLuckyEntries.map(([k]) => labelOf(k));
+  // 「今日の小さな準備」は持ちもの・食事・音の3つだけ（色/場所/目安の占い要素は出さない）。全員に無料表示。
+  const PREP_KEYS = ["item", "food", "sound"];
+  const visibleLuckyEntries = Object.entries(m.lucky).filter(([k]) => PREP_KEYS.includes(k));
 
   const tempo = morningTempo(m.score);
   const displayBody = formatDailyBody(m.body);
@@ -356,7 +351,7 @@ export default function Today() {
             )}
           </View>
 
-          <Section num="03" title="整えるヒント" />
+          <Section num="03" title="今日の小さな準備" />
           <View style={s.luckyGrid}>
             {visibleLuckyEntries.map(([k, v]) => (
               <View key={k} style={s.luckyCard}>
@@ -364,29 +359,13 @@ export default function Today() {
                 <Text style={s.luckyValue}>{v}</Text>
               </View>
             ))}
-            {hiddenLuckyEntries.map(([k]) => (
-              <Pressable
-                key={k}
-                style={[s.luckyCard, s.luckyCardLocked]}
-                onPress={() => openPremium("today_lucky_locked")}
-                accessibilityRole="button"
-              >
-                <Text style={s.luckyLabel}>{labelOf(k)}</Text>
-                <Text style={s.luckyLockedValue}>プレミアム</Text>
-              </Pressable>
-            ))}
           </View>
-          {!isPremium && hiddenLuckyLabels.length > 0 && (
-            <Pressable style={s.luckyTeaser} onPress={() => openPremium("today_lucky_teaser")} accessibilityRole="button">
-              <Text style={s.luckyTeaserText}>プレミアムで、{hiddenLuckyLabels.join("・")}まで整える ›</Text>
-            </Pressable>
-          )}
 
           <Pressable style={s.linkCard} onPress={() => router.push("/calendar")} accessibilityRole="button">
             <View style={s.linkIcon} />
             <View style={{ flex: 1 }}>
               <Text style={s.linkTitle}>月間カレンダーを見る</Text>
-              <Text style={s.linkSub}>今月の意識したい日をメモできます</Text>
+              <Text style={s.linkSub}>今月の記録と続いた日を見返せます</Text>
             </View>
             <Text style={s.linkArrow}>›</Text>
           </Pressable>
@@ -403,7 +382,7 @@ export default function Today() {
           {!isPremium && (
             <Pressable style={s.premiumBanner} onPress={() => openPremium("today_bottom_banner")} accessibilityRole="button">
               <Text style={s.premiumBannerLabel}>◆ プレミアムで もっと使いやすく</Text>
-              <Text style={s.premiumBannerTitle}>毎朝の4テーマヒント・月間カレンダー</Text>
+              <Text style={s.premiumBannerTitle}>仕事・大切な人・人間関係・お金の深掘り</Text>
               <Text style={s.premiumBannerCta}>7日間試してみる ›</Text>
             </Pressable>
           )}
@@ -533,7 +512,7 @@ function buildDeepInsights(input: DeepInput): DeepInsight[] {
       preview: hasCareTheme
         ? "大切な人には、言葉の量より温度が大事。短くても丁寧な一言が効きます。"
         : "大切な人とは、追いかけるより相手の反応を受け取る日です。",
-      detail: `大切な人には、相手を動かそうとするより「${secondAction}」くらいの小さな接点が合います。${typeHint} 今日の色の${input.lucky.color}を身近に置くと、言葉がやわらぎます。`,
+      detail: `大切な人には、相手を動かそうとするより「${secondAction}」くらいの小さな接点が合います。${typeHint}`,
     },
     {
       key: "people",
@@ -549,7 +528,7 @@ function buildDeepInsights(input: DeepInput): DeepInsight[] {
       preview: hasMoneyTheme
         ? "お金は、増やす前に整える日。小さな見直しが効きます。"
         : "お金は、使うより整える日。買う前の一呼吸がおすすめです。",
-      detail: `お金まわりは派手な動きより管理に向きます。財布・サブスク・領収書のどれか一つを見直して。落ち着きやすい場所は${input.lucky.direction}、目安は${input.lucky.number}。買い足すより、余白を作るほど落ち着きます。`,
+      detail: `お金まわりは派手な動きより管理に向きます。財布・サブスク・領収書のどれか一つを見直して。買い足すより、余白を作るほど落ち着きます。`,
     },
   ];
 }

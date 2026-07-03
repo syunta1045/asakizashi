@@ -77,7 +77,7 @@ export default function BirthStep() {
     <OnboardShell
       step={2}
       title={"誕生日を\n教えてください（任意）"}
-      sub="MBTI と合わせて、朝メモのトーンを整えます。入力なしでも全機能を使えます"
+      sub="MBTI と合わせて朝メモのトーンを整えます。なくても始められます（傾向メモと月間カレンダーは入力すると見られます）"
       onNext={onNext}
       onSkip={onSkip}
       disabled={isFuture || !hasBirthPlace}

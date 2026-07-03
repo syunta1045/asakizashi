@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>朝しるべ App Store スクショ</title>
+<style>
+  :root { --w: 1242px; --h: 2688px; }
+  * { margin: 0; box-sizing: border-box; }
+  body { background: #3a3a3a; font-family: -apple-system, BlinkMacSystemFont, "Hiragino Mincho ProN", "游明朝", serif; }
+  .item { margin: 28px; }
+  .panel {
+    width: var(--w); height: var(--h);
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center;
+    padding-top: 112px;
+    background: linear-gradient(180deg, #1F2E4A 0%, #5B4274 38%, #C26E70 72%, #F5DDB5 100%);
+  }
+  .cap {
+    color: #FFF8EA; font-size: 76px; line-height: 1.4; letter-spacing: 3px;
+    text-align: center; font-weight: 500; padding: 0 90px;
+    text-shadow: 0 2px 18px rgba(20,16,30,0.2);
+  }
+  .sub {
+    color: #FFF8EA; opacity: 0.9; font-size: 37px; line-height: 1.4; letter-spacing: 2px;
+    text-align: center; font-weight: 400; padding: 0 90px; margin-top: 22px;
+    text-shadow: 0 1px 12px rgba(20,16,30,0.18);
+  }
+
+  /* ── 表紙カード ─────────────────────────────────── */
+  .cover { padding-top: 0; justify-content: center; }
+  .cover-icon {
+    width: 296px; height: 296px; border-radius: 66px; display: block;
+    box-shadow: 0 34px 76px rgba(18,14,28,0.42);
+  }
+  .cover-name {
+    color: #FFF8EA; font-size: 54px; letter-spacing: 12px; font-weight: 500;
+    margin-top: 42px; text-shadow: 0 2px 14px rgba(20,16,30,0.2);
+  }
+  .cover-tagline {
+    color: #FFF8EA; font-size: 98px; line-height: 1.46; letter-spacing: 5px; font-weight: 500;
+    text-align: center; margin-top: 118px; text-shadow: 0 3px 22px rgba(20,16,30,0.24);
+  }
+  .cover-pillars {
+    color: #FFF8EA; opacity: 0.82; font-size: 35px; letter-spacing: 4px; font-weight: 400;
+    margin-top: 66px; text-shadow: 0 1px 12px rgba(20,16,30,0.18);
+  }
+
+  /* ── iPhone 15 Pro 風フレーム ─────────────────────── */
+  .frame {
+    position: relative; margin-top: 58px; width: 900px;
+    border-radius: 132px; padding: 7px;
+    /* ブラッシュドチタンの縁：明暗のバンドで金属の映り込みを表現 */
+    background: linear-gradient(125deg,
+      #cfcfd4 0%, #74747a 11%, #3b3b40 24%, #62626a 38%,
+      #2c2c31 52%, #5e5e66 67%, #343439 82%, #b8b8be 100%);
+    box-shadow:
+      0 62px 130px rgba(18,14,28,0.5),
+      0 10px 26px rgba(18,14,28,0.32),
+      inset 0 0 3px rgba(255,255,255,0.45);
+  }
+  .bezel {
+    position: relative;
+    background: #000; border-radius: 126px; padding: 12px;
+  }
+  .bezel img { display: block; width: 100%; border-radius: 114px; }
+  /* ガラスの映り込み（斜めの淡いハイライト） */
+  .glare {
+    position: absolute; inset: 12px; border-radius: 114px; pointer-events: none; z-index: 2;
+    background: linear-gradient(122deg,
+      rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.05) 16%,
+      rgba(255,255,255,0) 34%, rgba(255,255,255,0) 100%);
+  }
+  /* Dynamic Island */
+  .island {
+    position: absolute; top: 42px; left: 50%; transform: translateX(-50%);
+    width: 250px; height: 78px; background: #000; border-radius: 40px; z-index: 3;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+  }
+  /* 側面ボタン（左:アクション/音量＋/音量−、右:電源） */
+  .btn {
+    position: absolute; z-index: 1;
+    background: linear-gradient(180deg, #9c9ca2 0%, #6c6c72 46%, #4c4c52 100%);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.45), -1px 0 2px rgba(0,0,0,0.3);
+  }
+  .btn.act   { left: -7px; top: 236px; width: 7px; height: 52px;  border-radius: 4px 0 0 4px; }
+  .btn.volup { left: -7px; top: 332px; width: 7px; height: 104px; border-radius: 4px 0 0 4px; }
+  .btn.voldn { left: -7px; top: 452px; width: 7px; height: 104px; border-radius: 4px 0 0 4px; }
+  .btn.pwr   { right: -7px; top: 360px; width: 7px; height: 168px; border-radius: 0 4px 4px 0; }
+
+  .bezel .missing {
+    width: 100%; aspect-ratio: 1206 / 2622; border-radius: 114px;
+    background: #FFF8EA; display: flex; align-items: center; justify-content: center;
+    color: #B89656; font-size: 40px; text-align: center; padding: 40px; white-space: pre-line;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  // ── ここだけ編集すればOK（順番 = ストアの並び順） ──────────────
+  const SLIDES = [
+    { img: "images/01-memo.png",      cap: "朝の迷いが\nひとつ消える",     sub: "起きて10分、今日の一行が届く" },
+    { img: "images/02-pace.png",      cap: "今日のペースが\nすっと決まる", sub: "朝・昼・夜の過ごし方を提案" },
+    { img: "images/03-journal.png",   cap: "夜にそっと\n一日を手放す",     sub: "気分をひとことだけ残す" },
+    { img: "images/04-action.png",    cap: "続けるほど\n自分がわかる",     sub: "小さな朝の習慣が、積み上がる" },
+    { img: "images/05-relations.png", cap: "大切な人と\nほどよい距離で",   sub: "家族・推し・パートナーを登録" },
+    { img: "images/06-profile.png",   cap: "あなたの朝に\nぜんぶ寄り添う", sub: "MBTI・起床時間に合わせて整う" },
+  ];
+  // Dynamic Island を出すか（スクショ中央上が空いてる前提。重なるなら false に）
+  const SHOW_ISLAND = true;
+  // ───────────────────────────────────────────────
+
+  const root = document.getElementById("root");
+
+  // 表紙カード（1枚目）
+  const coverItem = document.createElement("div"); coverItem.className = "item";
+  const cover = document.createElement("div"); cover.className = "panel cover";
+  const ic = document.createElement("img"); ic.className = "cover-icon"; ic.src = "images/app-icon.png"; ic.alt = "";
+  const nm = document.createElement("div"); nm.className = "cover-name"; nm.textContent = "朝しるべ";
+  const tg = document.createElement("div"); tg.className = "cover-tagline"; tg.innerHTML = "朝を整えると<br>一日が変わる。";
+  cover.append(ic, nm, tg);
+  coverItem.appendChild(cover); root.appendChild(coverItem);
+
+  SLIDES.forEach((s) => {
+    const item = document.createElement("div"); item.className = "item";
+    const panel = document.createElement("div"); panel.className = "panel";
+
+    const cap = document.createElement("div"); cap.className = "cap";
+    cap.innerHTML = s.cap.split("\n").map(escapeHtml).join("<br>");
+
+    let sub = null;
+    if (s.sub) { sub = document.createElement("div"); sub.className = "sub"; sub.textContent = s.sub; }
+
+    const frame = document.createElement("div"); frame.className = "frame";
+    for (const c of ["act", "volup", "voldn", "pwr"]) {
+      const b = document.createElement("div"); b.className = "btn " + c; frame.appendChild(b);
+    }
+
+    const bezel = document.createElement("div"); bezel.className = "bezel";
+    const img = document.createElement("img");
+    img.src = s.img; img.alt = "";
+    img.onerror = () => {
+      const ph = document.createElement("div"); ph.className = "missing";
+      ph.textContent = s.img + " が無いよ\n（images フォルダに入れてね）";
+      bezel.replaceChild(ph, img);
+    };
+    bezel.appendChild(img);
+
+    const glare = document.createElement("div"); glare.className = "glare";
+    bezel.appendChild(glare);
+    if (SHOW_ISLAND) { const isl = document.createElement("div"); isl.className = "island"; bezel.appendChild(isl); }
+
+    frame.appendChild(bezel);
+
+    panel.appendChild(cap);
+    if (sub) panel.appendChild(sub);
+    panel.appendChild(frame);
+    item.appendChild(panel);
+    root.appendChild(item);
+  });
+
+  function escapeHtml(t) { const d = document.createElement("div"); d.textContent = t; return d.innerHTML; }
+</script>
+</body>
+</html>
