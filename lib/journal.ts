@@ -63,21 +63,7 @@ export const useJournal = create<JournalState>()(
           return { entries: rest };
         }),
       reset: () => set({ entries: {} }),
-      getStreak: () => {
-        const entries = get().entries;
-        if (Object.keys(entries).length === 0) return 0;
-        let streak = 0;
-        const today = new Date();
-        for (let i = 0; ; i++) {
-          const d = new Date(today);
-          d.setDate(d.getDate() - i);
-          // ローカル時刻ベース YYYY-MM-DD
-          const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-          if (entries[k]) streak++;
-          else break;
-        }
-        return streak;
-      },
+      getStreak: () => streakFrom(get().entries),
     }),
     { name: "asakizashi-journal", storage: createJSONStorage(() => AsyncStorage) }
   )
@@ -90,6 +76,23 @@ export function todayKey(): string {
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
+}
+
+/**
+ * 連続記録日数。
+ * 振り返りは夜に書くため、今日が未記入でも昨日まで続いていれば継続として数える
+ * （朝の時点で streak を 0 に見せない）。
+ */
+export function streakFrom(entries: Record<string, JournalEntry>, now: Date = new Date()): number {
+  let streak = 0;
+  const start = entries[localKey(now)] ? 0 : 1;
+  for (let i = start; ; i++) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    if (entries[localKey(d)]) streak++;
+    else break;
+  }
+  return streak;
 }
 
 export const MILESTONES = [3, 7, 14, 30, 60, 100, 365] as const;

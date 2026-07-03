@@ -7,7 +7,7 @@ import { useUser } from "../../lib/store";
 import { dayPillar, pillarToString } from "../../lib/bazi";
 import { paceForDay } from "../../lib/pace";
 import { applyTone } from "../../lib/tone";
-import { reiwaLabel } from "../../lib/dateUtils";
+import { reiwaLabel, localTodayAsUTC } from "../../lib/dateUtils";
 import { getDailyMessage, type DailyMessage } from "../../lib/interpretation";
 import { useSubscription } from "../../lib/subscription";
 import { useJournal } from "../../lib/journal";
@@ -36,7 +36,8 @@ export default function Today() {
   const [shareOpen, setShareOpen] = useState(false);
 
   // 今日の日付とユーザー情報から、その日の見え方を組み立てる
-  const today = dayPillar(new Date());
+  // dayPillar は UTC 日付成分で計算するため、ローカルの「今日」を正規化して渡す
+  const today = dayPillar(localTodayAsUTC());
   const userDayStr = pillars ? pillarToString(pillars.day) : "";
   const targetDayStr = `${today.stem}${today.branch}`;
 
@@ -91,11 +92,15 @@ export default function Today() {
   const todayKey = localDateKey();
   const morningReflection = buildMorningReflection(journalEntries[previousDateKey()]);
   const weeklyNudge = buildWeeklyNudge(streak, journalEntries);
-  const dailyRelation = pillars ? pickDailyRelation(relations, todayKey) : null;
-  const dailyRelationNudge = pillars && dailyRelation
+  // 「今日の大切な人」は登録さえあれば出す。相性はユーザーの生年月日がある時だけ反映し、
+  // 未入力時は neutral トーンで組む（登録済みなのに登録促しカードが出続けるのを防ぐ）
+  const dailyRelation = pickDailyRelation(relations, todayKey);
+  const dailyRelationNudge = dailyRelation
     ? buildRelationNudge(
         dailyRelation,
-        compatibility(pillars.year.branch, dailyRelation.pillars.year.branch),
+        pillars
+          ? compatibility(pillars.year.branch, dailyRelation.pillars.year.branch)
+          : { kind: "neutral", reason: "" },
         todayPaceEntries.find((r) => r.branch === dailyRelation.pillars.year.branch)?.position
       )
     : null;

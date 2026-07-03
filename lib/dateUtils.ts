@@ -45,3 +45,12 @@ export function isoDate(d: Date = new Date()): string {
   const day = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
+
+/**
+ * ローカルの年月日を UTC に正規化した Date を返す。
+ * dayPillar など UTC 日付成分で計算する関数へ「今日」を渡すときに使う
+ * （new Date() を直接渡すと JST 0〜9時は前日扱いになる）。
+ */
+export function localTodayAsUTC(now: Date = new Date()): Date {
+  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+}

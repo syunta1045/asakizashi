@@ -35,10 +35,14 @@ function profileToDb(p: UserProfile, authId: string, pillarsStr: { y: string; m:
   };
 }
 
-function dbToProfile(u: DbUser): Partial<UserProfile> {
-  const [y, m, d] = u.birth_date.split("-").map(Number);
+// export はテスト用（pure 関数）
+export function dbToProfile(u: DbUser): Partial<UserProfile> {
+  const [y, m, d] = (u.birth_date ?? "").split("-").map(Number);
   return {
     nickname: u.nickname,
+    // day_pillar 空文字 = 生年月日スキップで push されたユーザー（birth_date はダミー値）。
+    // birth_date は NOT NULL なので、入力有無のサーバー側の事実は day_pillar で判定する
+    birthDateProvided: (u.day_pillar ?? "") !== "",
     birthYear: y,
     birthMonth: m,
     birthDay: d,
@@ -91,6 +95,7 @@ export async function pullUserFromServer(): Promise<{ ok: boolean; error?: strin
   const store = useUser.getState();
   // フィールド毎に明示的に setField（型安全 + 不正フィールド黙殺の防止）
   if (profile.nickname !== undefined) store.setField("nickname", profile.nickname);
+  if (profile.birthDateProvided !== undefined) store.setField("birthDateProvided", profile.birthDateProvided);
   if (profile.birthYear !== undefined) store.setField("birthYear", profile.birthYear);
   if (profile.birthMonth !== undefined) store.setField("birthMonth", profile.birthMonth);
   if (profile.birthDay !== undefined) store.setField("birthDay", profile.birthDay);

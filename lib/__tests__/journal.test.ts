@@ -1,4 +1,4 @@
-import { pruneOldEntries, JOURNAL_RETENTION_DAYS, type JournalEntry } from "../journal";
+import { pruneOldEntries, streakFrom, JOURNAL_RETENTION_DAYS, type JournalEntry } from "../journal";
 
 function entry(date: string, mood: 0 | 1 | 2 | 3 = 0): JournalEntry {
   return { date, mood, note: "" };
@@ -45,5 +45,53 @@ describe("pruneOldEntries", () => {
     }, JOURNAL_RETENTION_DAYS, now);
     expect(out["2024-05-01"]).toBeDefined();
     expect(out["2023-01-01"]).toBeUndefined();
+  });
+});
+
+describe("streakFrom", () => {
+  // 朝7時 = 今日の振り返りはまだ書いていない時間帯
+  const morning = new Date("2026-07-03T07:00:00");
+
+  test("今日記入済みなら今日から数える", () => {
+    const entries = {
+      "2026-07-03": entry("2026-07-03"),
+      "2026-07-02": entry("2026-07-02"),
+      "2026-07-01": entry("2026-07-01"),
+    };
+    expect(streakFrom(entries, morning)).toBe(3);
+  });
+
+  test("今日未記入でも昨日まで続いていれば継続扱い（朝に0へ落とさない）", () => {
+    const entries = {
+      "2026-07-02": entry("2026-07-02"),
+      "2026-07-01": entry("2026-07-01"),
+    };
+    expect(streakFrom(entries, morning)).toBe(2);
+  });
+
+  test("今日も昨日も未記入なら0（猶予は1日だけ）", () => {
+    const entries = { "2026-07-01": entry("2026-07-01") };
+    expect(streakFrom(entries, morning)).toBe(0);
+  });
+
+  test("途中に空白日があればそこで途切れる", () => {
+    const entries = {
+      "2026-07-03": entry("2026-07-03"),
+      "2026-07-01": entry("2026-07-01"),
+    };
+    expect(streakFrom(entries, morning)).toBe(1);
+  });
+
+  test("空辞書は0", () => {
+    expect(streakFrom({}, morning)).toBe(0);
+  });
+
+  test("保存直後の再計算で+1になる（マイルストーン判定の前提）", () => {
+    const before = {
+      "2026-07-02": entry("2026-07-02"),
+      "2026-07-01": entry("2026-07-01"),
+    };
+    const after = { ...before, "2026-07-03": entry("2026-07-03") };
+    expect(streakFrom(after, morning)).toBe(streakFrom(before, morning) + 1);
   });
 });

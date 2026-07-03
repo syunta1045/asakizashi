@@ -170,8 +170,8 @@ export default function Settings() {
           <Section num="01" title="プロフィール" />
           <Group>
             <Pressable onPress={() => router.push("/edit/nickname")} accessibilityRole="button"><Row label="ニックネーム" value={u.nickname} arrow /></Pressable>
-            <Pressable onPress={() => router.push("/edit/birth")} accessibilityRole="button"><Row label="生年月日" value={`${u.birthYear}年${u.birthMonth}月${u.birthDay}日`} arrow /></Pressable>
-            <Pressable onPress={() => router.push("/edit/place")} accessibilityRole="button"><Row label="生まれた場所" value={u.birthPlace} arrow /></Pressable>
+            <Pressable onPress={() => router.push("/edit/birth")} accessibilityRole="button"><Row label="生年月日" value={u.birthDateProvided ? `${u.birthYear}年${u.birthMonth}月${u.birthDay}日` : "未入力（任意）"} arrow /></Pressable>
+            <Pressable onPress={() => router.push("/edit/place")} accessibilityRole="button"><Row label="生まれた場所" value={u.birthPlace || "未設定"} arrow /></Pressable>
             <Pressable onPress={() => router.push("/edit/mbti")} accessibilityRole="button"><Row label="MBTI" value={u.mbti || "未設定"} arrow /></Pressable>
             <Pressable onPress={() => router.push("/edit/blood")} accessibilityRole="button"><Row label="血液型" value={u.bloodType ? (u.bloodType === "unknown" ? "わからない" : `${u.bloodType}型`) : "—"} arrow /></Pressable>
             <Pressable onPress={() => router.push("/edit/gender")} accessibilityRole="button"><Row label="性別" value={genderLabel(u.gender)} arrow /></Pressable>

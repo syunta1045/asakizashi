@@ -18,8 +18,11 @@ export async function exportUserData(): Promise<{ ok: boolean; path?: string; er
       exportedAt: new Date().toISOString(),
       profile: {
         nickname: u.nickname,
-        birthDate: `${u.birthYear}-${String(u.birthMonth).padStart(2, "0")}-${String(u.birthDay).padStart(2, "0")}`,
-        birthPlace: u.birthPlace,
+        // 未入力ユーザーの store にはデフォルト値が入っているため、実データと誤認させない
+        birthDate: u.birthDateProvided
+          ? `${u.birthYear}-${String(u.birthMonth).padStart(2, "0")}-${String(u.birthDay).padStart(2, "0")}`
+          : null,
+        birthPlace: u.birthDateProvided ? u.birthPlace : "",
         mbti: u.mbti,
         bloodType: u.bloodType,
         gender: u.gender,

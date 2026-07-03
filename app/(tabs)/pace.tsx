@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import { useUser } from "../../lib/store";
 import { dayPillar } from "../../lib/bazi";
 import { paceForDay, paceComment } from "../../lib/pace";
+import { localTodayAsUTC } from "../../lib/dateUtils";
 import { C, morningGradient, F } from "../../lib/theme";
 
 const BASIS_NOTE = "生年月日は、朝のメッセージをあなた向けに整えるための入力です。結果を断定するものではなく、今日の過ごし方を考えるヒントとして使います。";
@@ -13,7 +14,8 @@ export default function Pace() {
   const router = useRouter();
   const { pillars } = useUser();
 
-  const today = dayPillar(new Date());
+  // dayPillar は UTC 日付成分で計算するため、ローカルの「今日」を正規化して渡す
+  const today = dayPillar(localTodayAsUTC());
   const paceEntries = paceForDay(today.branch);
   // 生年月日未入力時はデフォルトの「ほどよく進める」ペースを表示
   const myFlow = pillars

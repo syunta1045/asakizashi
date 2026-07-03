@@ -100,9 +100,11 @@ function BirthEditor() {
       u.computePillars();
     }
   }, [u.birthYear, u.birthMonth, dayMax]);
-  const onYear = (v: number) => { u.setField("birthYear", v); u.computePillars(); };
-  const onMonth = (v: number) => { u.setField("birthMonth", v); u.computePillars(); };
-  const onDay = (v: number) => { u.setField("birthDay", v); u.computePillars(); };
+  // オンボでスキップした人が後から入力する経路。値を選んだ時点で「入力済み」を立てないと
+  // computePillars が no-op になり、傾向メモ等が永久に解放されない
+  const onYear = (v: number) => { u.setField("birthDateProvided", true); u.setField("birthYear", v); u.computePillars(); };
+  const onMonth = (v: number) => { u.setField("birthDateProvided", true); u.setField("birthMonth", v); u.computePillars(); };
+  const onDay = (v: number) => { u.setField("birthDateProvided", true); u.setField("birthDay", v); u.computePillars(); };
   return (
     <View>
       <NumWheel label="年" values={Array.from({ length: currentYear - 1900 + 1 }, (_, i) => 1900 + i)} value={u.birthYear} onChange={onYear} />
