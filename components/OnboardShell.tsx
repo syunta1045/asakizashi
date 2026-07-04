@@ -19,7 +19,7 @@ type Props = {
   disabled?: boolean;
 };
 
-export function OnboardShell({ step, total = 7, title, sub, children, onNext, onSkip, ctaLabel = "次へ", disabled }: Props) {
+export function OnboardShell({ step, total = 3, title, sub, children, onNext, onSkip, ctaLabel = "次へ", disabled }: Props) {
   const router = useRouter();
   useEffect(() => { track("onboarding_step_completed", { step, total }); }, [step]);
   return (

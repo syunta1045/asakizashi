@@ -27,7 +27,7 @@ export default function ConfirmStep() {
   return (
     <LinearGradient colors={dawnGradient as unknown as [string, string, ...string[]]} style={s.bg}>
       <SafeAreaView style={s.safe} edges={["top","bottom"]}>
-        {/* Progress 7/7 */}
+        {/* Progress: 確認（name→wake-up→themes の3ステップの後） */}
         <View style={s.progressRow}>
           <Pressable onPress={() => router.back()} hitSlop={12} accessibilityRole="button">
             <Text style={s.back}>‹</Text>

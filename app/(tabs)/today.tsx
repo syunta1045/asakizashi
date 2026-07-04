@@ -8,6 +8,7 @@ import { dayPillar, pillarToString } from "../../lib/bazi";
 import { paceForDay } from "../../lib/pace";
 import { applyTone } from "../../lib/tone";
 import { reiwaLabel, localTodayAsUTC } from "../../lib/dateUtils";
+import { sanitizeDailyBody } from "../../lib/sanitize";
 import { getDailyMessage, type DailyMessage } from "../../lib/interpretation";
 import { useSubscription } from "../../lib/subscription";
 import { useJournal, longestStreakInRange } from "../../lib/journal";
@@ -455,23 +456,8 @@ function Section({ num, title }: { num: string; title: string }) {
   );
 }
 
-function formatDailyBody(text: string) {
-  return text
-    .replace(/\r\n/g, "\n")
-    .replace(/[\u6728\u706b\u571f\u91d1\u6c34]\u306e\u6c17\u304c[^。\n]*。?/g, "")
-    .replace(/\u904b\u6c17/g, "調子")
-    .replace(/\u547d\u5f0f/g, "傾向")
-    .replace(/\u5e72\u652f/g, "生年月日")
-    .replace(/\u5341\u4e8c\u652f/g, "生まれ年")
-    .replace(/\u76f8\u6027/g, "距離感")
-    .replace(/\u30e9\u30c3\u30ad\u30fc/g, "整える")
-    .replace(/\u5409です/g, "おすすめです")
-    .replace(/\u5409。/g, "おすすめ。")
-    .replace(/\u5409/g, "おすすめ")
-    .split(/\n{2,}/)
-    .map((paragraph) => paragraph.replace(/\n/g, ""))
-    .join("\n\n");
-}
+// 占い語彙の中和は lib/sanitize.ts（テスト付き）に集約
+const formatDailyBody = sanitizeDailyBody;
 
 type DeepInsight = {
   key: "work" | "care" | "people" | "money";
