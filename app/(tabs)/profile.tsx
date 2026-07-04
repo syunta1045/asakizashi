@@ -21,13 +21,13 @@ export default function Profile() {
             <Text style={s.profileLead}>朝メモ・通知・振り返りを、あなたの生活リズムに合わせます。</Text>
 
             <View style={s.divider} />
-            <Row k="ニックネーム" v={u.nickname || "未設定"} />
-            <Row k="生年月日" v={u.birthDateProvided ? `${u.birthYear}年${u.birthMonth}月${u.birthDay}日` : "未入力（任意）"} />
-            <Row k="生まれた場所" v={u.birthDateProvided && u.birthPlace ? u.birthPlace : "—"} />
-            <Row k="MBTI" v={u.mbti || "未設定"} />
-            <Row k="血液型" v={u.bloodType ? (u.bloodType === "unknown" ? "わからない" : `${u.bloodType}型`) : "未設定"} />
-            <Row k="性別" v={genderLabel(u.gender)} />
-            <Row k="起床時間" v={`${u.wakeUpTime}（通知 ${notifyTimeFrom(u.wakeUpTime)}）`} />
+            <Row k="ニックネーム" v={u.nickname || "未設定"} onPress={() => router.push("/edit/nickname")} />
+            <Row k="生年月日" v={u.birthDateProvided ? `${u.birthYear}年${u.birthMonth}月${u.birthDay}日` : "未入力（任意）"} onPress={() => router.push("/edit/birth")} />
+            <Row k="生まれた場所" v={u.birthDateProvided && u.birthPlace ? u.birthPlace : "—"} onPress={() => router.push("/edit/place")} />
+            <Row k="MBTI" v={u.mbti || "未設定"} onPress={() => router.push("/edit/mbti")} />
+            <Row k="血液型" v={u.bloodType ? (u.bloodType === "unknown" ? "わからない" : `${u.bloodType}型`) : "未設定"} onPress={() => router.push("/edit/blood")} />
+            <Row k="性別" v={genderLabel(u.gender)} onPress={() => router.push("/edit/gender")} />
+            <Row k="起床時間" v={`${u.wakeUpTime}（通知 ${notifyTimeFrom(u.wakeUpTime)}）`} onPress={() => router.push("/edit/wakeup")} />
           </View>
 
           <Text style={s.sectionTitle}>今気になっていること</Text>
@@ -40,7 +40,7 @@ export default function Profile() {
 
           <View style={s.linkGroup}>
             <Pressable style={s.linkRow} onPress={() => router.push("/chart")} accessibilityRole="button">
-              <Text style={s.linkText}>自分のことを見る</Text>
+              <Text style={s.linkText}>傾向メモ</Text>
               <Text style={s.linkArrow}>›</Text>
             </Pressable>
             <Pressable style={s.linkRow} onPress={() => router.push("/calendar")} accessibilityRole="button">
@@ -62,7 +62,18 @@ export default function Profile() {
   );
 }
 
-function Row({ k, v }: { k: string; v: string }) {
+function Row({ k, v, onPress }: { k: string; v: string; onPress?: () => void }) {
+  if (onPress) {
+    return (
+      <Pressable style={s.row} onPress={onPress} accessibilityRole="button" accessibilityLabel={`${k}を編集`}>
+        <Text style={s.rowKey}>{k}</Text>
+        <View style={s.rowValWrap}>
+          <Text style={s.rowVal}>{v}</Text>
+          <Text style={s.rowArrow}>›</Text>
+        </View>
+      </Pressable>
+    );
+  }
   return (
     <View style={s.row}>
       <Text style={s.rowKey}>{k}</Text>
@@ -84,9 +95,11 @@ const s = StyleSheet.create({
   sectionLabel: { color: C.gold, fontSize: 9, letterSpacing: 4, fontFamily: F.serif },
   profileLead: { color: C.ink, fontSize: 14, lineHeight: 24, marginTop: 10, fontWeight: "700", fontFamily: F.serif },
   divider: { height: 1, backgroundColor: C.paperBorder, marginVertical: 16 },
-  row: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 6 },
+  row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 9, minHeight: 44 },
   rowKey: { color: "#9A6D2C", fontSize: 12, fontWeight: "800" },
+  rowValWrap: { flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 1 },
   rowVal: { color: C.ink, fontSize: 12, fontWeight: "700" },
+  rowArrow: { color: C.inkMuted, fontSize: 14 },
   sectionTitle: { color: "#FFF8EA", fontSize: 13, fontWeight: "800", letterSpacing: 3, marginTop: 24, marginBottom: 10, paddingHorizontal: 6, fontFamily: F.serif },
   themeRow: { flexDirection: "row", flexWrap: "wrap", gap: 6, paddingHorizontal: 8 },
   themeChip: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 14, backgroundColor: "#FFF8EA", borderWidth: 1, borderColor: "rgba(126,88,48,0.18)" },

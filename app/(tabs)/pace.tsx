@@ -33,12 +33,8 @@ export default function Pace() {
         </View>
 
         <ScrollView contentContainerStyle={s.list} showsVerticalScrollIndicator={false}>
-          <View style={s.basisNote}>
-            <Text style={s.basisNoteText}>{BASIS_NOTE}</Text>
-          </View>
-
           <View style={s.heroCard} accessibilityLabel={`今日のペースは${tempo.label}です`}>
-            <Text style={s.heroLabel}>今日のペース</Text>
+            <Text style={s.heroLabel}>けさ</Text>
             <Text style={s.heroTitle}>{tempo.label}</Text>
             <Text style={s.heroText}>{tempo.body}</Text>
             <View style={s.flowTrack}>
@@ -57,6 +53,8 @@ export default function Pace() {
           <Pressable style={s.cta} onPress={() => router.push("/journal")} accessibilityRole="button">
             <Text style={s.ctaText}>夜の振り返りを書く ›</Text>
           </Pressable>
+
+          <Text style={s.basisNoteText}>{BASIS_NOTE}</Text>
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
@@ -94,8 +92,7 @@ const s = StyleSheet.create({
   dateLabel: { color: "#FFF8EA", fontSize: 11, opacity: 0.96, letterSpacing: 3, fontFamily: F.serif, fontWeight: "700" },
   title: { color: C.white, fontSize: 24, fontWeight: "800", letterSpacing: 3, marginTop: 4, fontFamily: F.serif },
   list: { paddingHorizontal: 18, paddingBottom: 46, gap: 8 },
-  basisNote: { paddingVertical: 11, paddingHorizontal: 13, borderRadius: 12, backgroundColor: "rgba(255,248,234,0.24)", borderWidth: 1, borderColor: "rgba(255,248,234,0.34)", marginBottom: 2 },
-  basisNoteText: { color: "#FFF8EA", fontSize: 11, lineHeight: 18, fontWeight: "700", fontFamily: F.serif },
+  basisNoteText: { color: "#FFF8EA", fontSize: 10, lineHeight: 16, opacity: 0.8, marginTop: 14, paddingHorizontal: 4, fontWeight: "600", fontFamily: F.serif },
   heroCard: { backgroundColor: "#FFF8EA", borderRadius: 16, padding: 22, borderWidth: 1, borderColor: "rgba(126,88,48,0.2)", shadowColor: "#42231A", shadowOpacity: 0.1, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } },
   heroLabel: { color: C.gold, fontSize: 10, letterSpacing: 3, fontWeight: "800", fontFamily: F.serif },
   heroTitle: { color: C.red, fontSize: 28, lineHeight: 36, marginTop: 8, fontWeight: "800", fontFamily: F.serif },
