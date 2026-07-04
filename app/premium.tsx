@@ -109,9 +109,10 @@ export default function Premium() {
     : prices.yearly
       ? ""
       : "（月あたり ¥316）";
+  // フォールバックは既定価格(¥3,800/¥480)の実割引率 34% に合わせ、価格ロード前後で表示がブレないようにする
   const discount = prices.yearlyNum && prices.monthlyNum
     ? Math.max(0, Math.round((1 - prices.yearlyNum / (prices.monthlyNum * 12)) * 100))
-    : 33;
+    : 34;
 
   const ctaLabel = sub.isPremium
     ? (onTrial ? `お試し残り ${daysLeft} 日` : "ご利用中")

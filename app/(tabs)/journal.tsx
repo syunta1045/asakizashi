@@ -211,9 +211,6 @@ export default function Journal() {
             <Text style={s.celebTitle}>{celebrate?.title}</Text>
             <Text style={s.celebDesc}>{celebrate?.description}</Text>
             <View style={s.celebDivider} />
-            <Text style={s.celebMessage}>
-              続けることで、あなたの日々の調子が{"\n"}少しずつ見えやすくなります。
-            </Text>
             {celebrate && celebrate.days >= 7 && (
               <Pressable
                 style={s.celebLookback}

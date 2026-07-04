@@ -14,6 +14,11 @@ describe("sanitizeDailyBody", () => {
     expect(sanitizeDailyBody("今日は凶です。")).toContain("控えめ");
   });
 
+  test("占い・鑑定・五行・用神・忌神 も中和する", () => {
+    const out = sanitizeDailyBody("今日の占いと鑑定。五行では用神と忌神が鍵。");
+    ["占い", "鑑定", "五行", "用神", "忌神"].forEach((w) => expect(out).not.toContain(w));
+  });
+
   test("占い用語をセルフケア語彙へ置換する", () => {
     const out = sanitizeDailyBody("運気と相性、ラッキーカラー。");
     expect(out).toContain("調子");

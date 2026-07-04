@@ -60,7 +60,9 @@ export default function Today() {
   };
 
   const buildShareText = () =>
-    base ? `朝しるべの朝メモ — ${base.headline}\n\n${base.body}\n\n#朝しるべ #朝のセルフケア` : "";
+    base
+      ? `朝しるべの朝メモ — ${sanitizeDailyBody(base.headline)}\n\n${sanitizeDailyBody(base.body)}\n\n#朝しるべ #朝のセルフケア`
+      : "";
 
   const onShare = async () => {
     if (!base) return;
@@ -206,7 +208,8 @@ export default function Today() {
             </View>
 
             <View style={s.detailStrip}>
-              <Text style={s.detailText}>今日のペース</Text>
+              {/* 「今日のペース」はペースタブが別スコアで出すため、朝メモ側は「朝の調子」と別語にして食い違いを避ける */}
+              <Text style={s.detailText}>朝の調子</Text>
               <Text style={s.detailDot}>・</Text>
               <Text style={s.detailText}>{tempo.label}</Text>
             </View>
