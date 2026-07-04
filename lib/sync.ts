@@ -6,7 +6,7 @@
  * - サインイン時: ローカルがあれば push、なければ pull
  * - フィールド更新: ローカル即時更新 → 非同期で Supabase へ反映
  */
-import { useUser, registerProfileChangeHandler, type UserProfile } from "./store";
+import { useUser, registerProfileChangeHandler, withRemoteApply, type UserProfile } from "./store";
 import { supabase, isSupabaseConfigured, type DbUser, getSession } from "./supabase";
 import { pillarToString } from "./bazi";
 import { setUserId } from "./analytics";
@@ -93,20 +93,23 @@ export async function pullUserFromServer(): Promise<{ ok: boolean; error?: strin
 
   const profile = dbToProfile(data as DbUser);
   const store = useUser.getState();
-  // フィールド毎に明示的に setField（型安全 + 不正フィールド黙殺の防止）
-  if (profile.nickname !== undefined) store.setField("nickname", profile.nickname);
-  if (profile.birthDateProvided !== undefined) store.setField("birthDateProvided", profile.birthDateProvided);
-  if (profile.birthYear !== undefined) store.setField("birthYear", profile.birthYear);
-  if (profile.birthMonth !== undefined) store.setField("birthMonth", profile.birthMonth);
-  if (profile.birthDay !== undefined) store.setField("birthDay", profile.birthDay);
-  if (profile.birthPlace !== undefined) store.setField("birthPlace", profile.birthPlace);
-  if (profile.mbti !== undefined) store.setField("mbti", profile.mbti);
-  if (profile.bloodType !== undefined) store.setField("bloodType", profile.bloodType);
-  if (profile.gender !== undefined) store.setField("gender", profile.gender);
-  if (profile.wakeUpTime !== undefined) store.setField("wakeUpTime", profile.wakeUpTime);
-  if (profile.themes !== undefined) store.setField("themes", profile.themes);
-  store.computePillars();
-  store.finishOnboarding();
+  // サーバー適用中は push を抑止する（受け取った値をそのまま送り返す往復を避ける）。
+  // フィールド毎に明示的に setField（型安全 + 不正フィールド黙殺の防止）。
+  withRemoteApply(() => {
+    if (profile.nickname !== undefined) store.setField("nickname", profile.nickname);
+    if (profile.birthDateProvided !== undefined) store.setField("birthDateProvided", profile.birthDateProvided);
+    if (profile.birthYear !== undefined) store.setField("birthYear", profile.birthYear);
+    if (profile.birthMonth !== undefined) store.setField("birthMonth", profile.birthMonth);
+    if (profile.birthDay !== undefined) store.setField("birthDay", profile.birthDay);
+    if (profile.birthPlace !== undefined) store.setField("birthPlace", profile.birthPlace);
+    if (profile.mbti !== undefined) store.setField("mbti", profile.mbti);
+    if (profile.bloodType !== undefined) store.setField("bloodType", profile.bloodType);
+    if (profile.gender !== undefined) store.setField("gender", profile.gender);
+    if (profile.wakeUpTime !== undefined) store.setField("wakeUpTime", profile.wakeUpTime);
+    if (profile.themes !== undefined) store.setField("themes", profile.themes);
+    store.computePillars();
+    store.finishOnboarding();
+  });
   return { ok: true };
 }
 

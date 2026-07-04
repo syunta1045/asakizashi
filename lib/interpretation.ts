@@ -164,6 +164,22 @@ type CacheEnvelope = { msg: DailyMessage; cachedAt: number };
 // キャッシュ有効期間: 24時間。これを超えたら陳腐とみなし再取得
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
+// バージョンを上げると旧 `interp:vN:` キーが AsyncStorage に取り残される。
+// 起動時に1回だけ現行バージョン以外の interp キーを掃除する（実行済みフラグで再走を防ぐ）。
+const CACHE_SWEEP_FLAG = `interp:swept:v${INTERPRETATION_VERSION}`;
+export async function pruneStaleInterpretationCache(): Promise<void> {
+  try {
+    if (await AsyncStorage.getItem(CACHE_SWEEP_FLAG)) return;
+    const keys = await AsyncStorage.getAllKeys();
+    const currentPrefix = `interp:v${INTERPRETATION_VERSION}:`;
+    const stale = keys.filter((k) => k.startsWith("interp:v") && !k.startsWith(currentPrefix));
+    if (stale.length > 0) await AsyncStorage.multiRemove(stale);
+    await AsyncStorage.setItem(CACHE_SWEEP_FLAG, "1");
+  } catch {
+    // 掃除は best-effort。失敗しても本処理には影響させない
+  }
+}
+
 async function readCache(user: string, target: string): Promise<DailyMessage | null> {
   try {
     const raw = await AsyncStorage.getItem(cacheKey(user, target));

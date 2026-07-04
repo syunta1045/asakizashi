@@ -9,7 +9,7 @@ jest.mock("@react-native-async-storage/async-storage", () =>
   require("@react-native-async-storage/async-storage/jest/async-storage-mock")
 );
 
-import { useUser } from "../store";
+import { useUser, registerProfileChangeHandler, withRemoteApply } from "../store";
 
 describe("birthDateProvided と computePillars", () => {
   beforeEach(() => {
@@ -35,5 +35,28 @@ describe("birthDateProvided と computePillars", () => {
     u.computePillars();
     expect(useUser.getState().pillars).not.toBeNull();
     expect(useUser.getState().dayPillarStr).not.toBe("");
+  });
+});
+
+describe("withRemoteApply（pull 往復の抑止）", () => {
+  test("サーバー適用中の setField は push を発火せず、通常の setField は発火する", () => {
+    jest.useFakeTimers();
+    const store = useUser.getState();
+    store.reset();
+    store.finishOnboarding(); // isOnboarded = true（push 発火の前提）
+    let pushCount = 0;
+    registerProfileChangeHandler(async () => { pushCount++; });
+
+    // pull 適用中は 800ms 経っても push しない
+    withRemoteApply(() => { store.setField("nickname", "サーバー値"); });
+    jest.advanceTimersByTime(1000);
+    expect(pushCount).toBe(0);
+
+    // ユーザーの手入力はデバウンス後に 1 回 push する
+    store.setField("nickname", "手入力");
+    jest.advanceTimersByTime(1000);
+    expect(pushCount).toBe(1);
+
+    jest.useRealTimers();
   });
 });

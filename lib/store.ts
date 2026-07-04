@@ -73,6 +73,9 @@ export const useUser = create<UserState>()(
 
       setField: (k, v) => {
         set({ [k]: v } as Partial<UserState>);
+        // サーバー適用中（pull）は push を発火しない。受け取ったばかりの値を
+        // そのままサーバーへ upsert し返す無駄往復とレースを避ける。
+        if (applyingRemote) return;
         // 既ログインなら sync layer の onProfileChanged コールバックを呼ぶ（800ms デバウンスで連打を吸収）
         if (get().isOnboarded && onProfileChanged) {
           schedulePush();
@@ -118,6 +121,17 @@ export const useUser = create<UserState>()(
 let onProfileChanged: (() => Promise<void>) | null = null;
 export function registerProfileChangeHandler(fn: () => Promise<void>) {
   onProfileChanged = fn;
+}
+
+// pull 適用中は setField からの push を抑止する。sync.applyServerProfile が囲う。
+let applyingRemote = false;
+export function withRemoteApply<T>(fn: () => T): T {
+  applyingRemote = true;
+  try {
+    return fn();
+  } finally {
+    applyingRemote = false;
+  }
 }
 
 // setField 連打を 800ms 単位でまとめて 1 回だけ push

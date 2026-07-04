@@ -111,6 +111,23 @@ Deno.serve(async (req) => {
 
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
+  // app_user_id は RevenueCat appUserID = Supabase の auth uid。
+  // subscriptions.user_id は users(id)（内部PK）への FK なので、auth_id から変換する。
+  const { data: userRow, error: lookupError } = await supabase
+    .from("users")
+    .select("id")
+    .eq("auth_id", e.app_user_id)
+    .maybeSingle();
+  if (lookupError) {
+    console.error("user lookup error:", lookupError);
+    return new Response(lookupError.message, { status: 500 });
+  }
+  if (!userRow) {
+    // 未同期ユーザー（サインイン前の購入等）。リトライさせず 200 でログのみ。
+    console.warn(`[webhook] no users row for auth_id=${e.app_user_id}, skipped`);
+    return new Response("ok (no user)");
+  }
+
   const planMap: Record<string, "premium_monthly" | "premium_yearly"> = {
     premium_monthly: "premium_monthly",
     premium_yearly: "premium_yearly",
@@ -125,7 +142,7 @@ Deno.serve(async (req) => {
   const expires = e.expiration_at_ms ? new Date(e.expiration_at_ms).toISOString() : null;
 
   const { error } = await supabase.from("subscriptions").upsert({
-    user_id: e.app_user_id,
+    user_id: userRow.id,
     plan,
     status,
     expires_at: expires,

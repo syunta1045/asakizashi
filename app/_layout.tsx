@@ -7,6 +7,7 @@ import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { restoreSession } from "../lib/sync";
+import { pruneStaleInterpretationCache } from "../lib/interpretation";
 import { registerPushToken, ensureNotificationsScheduled } from "../lib/notifications";
 import { track } from "../lib/analytics";
 import { initSentry, wrap } from "../lib/sentry";
@@ -62,6 +63,8 @@ function RootLayout() {
         });
       // プッシュトークン登録（fire-and-forget、未許可でも続行）
       registerPushToken().catch(() => {});
+      // 旧バージョンの朝メモキャッシュを掃除（fire-and-forget）
+      pruneStaleInterpretationCache().catch(() => {});
       await SplashScreen.hideAsync().catch(() => {});
       setReady(true);
     })();

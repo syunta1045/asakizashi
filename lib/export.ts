@@ -34,13 +34,20 @@ export async function exportUserData(): Promise<{ ok: boolean; path?: string; er
       journal: Object.values(journal),
     };
 
-    const path = `${(FileSystem as any).documentDirectory}asakizashi-export-${Date.now()}.json`;
+    // 個人データを含むため、永続の documentDirectory ではなく cacheDirectory に書き、
+    // 共有後に必ず削除する（端末に平文の個人情報ファイルを残さない）
+    const dir = (FileSystem as any).cacheDirectory ?? (FileSystem as any).documentDirectory;
+    const path = `${dir}asakizashi-export-${Date.now()}.json`;
     await FileSystem.writeAsStringAsync(path, JSON.stringify(payload, null, 2));
 
-    if (await Sharing.isAvailableAsync()) {
-      await Sharing.shareAsync(path, { mimeType: "application/json" });
+    try {
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(path, { mimeType: "application/json" });
+      }
+    } finally {
+      await FileSystem.deleteAsync(path, { idempotent: true }).catch(() => {});
     }
-    return { ok: true, path };
+    return { ok: true };
   } catch (e: unknown) {
     return { ok: false, error: errorMessage(e) };
   }

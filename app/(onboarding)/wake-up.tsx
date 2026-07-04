@@ -33,7 +33,14 @@ function NumWheel({ values, value, onChange, unit, format = (v: number) => Strin
         onContentSizeChange={scrollToValue}
       >
         {values.map((v) => (
-          <Pressable key={v} onPress={() => onChange(v)} style={[s.wheelCell, v === value && s.wheelCellOn]} accessibilityRole="button">
+          <Pressable
+            key={v}
+            onPress={() => onChange(v)}
+            style={[s.wheelCell, v === value && s.wheelCellOn]}
+            accessibilityRole="button"
+            accessibilityLabel={`${v}${unit}`}
+            accessibilityState={{ selected: v === value }}
+          >
             <Text style={[s.wheelText, v === value && s.wheelTextOn]}>{format(v)}</Text>
           </Pressable>
         ))}
