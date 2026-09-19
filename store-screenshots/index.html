@@ -99,12 +99,12 @@
 <script>
   // ── ここだけ編集すればOK（順番 = ストアの並び順） ──────────────
   const SLIDES = [
-    { img: "images/01-memo.png",      cap: "朝の迷いが\nひとつ消える",     sub: "起きて10分、今日の一行が届く" },
-    { img: "images/02-pace.png",      cap: "今日のペースが\nすっと決まる", sub: "朝・昼・夜の過ごし方を提案" },
-    { img: "images/03-journal.png",   cap: "夜にそっと\n一日を手放す",     sub: "気分をひとことだけ残す" },
-    { img: "images/04-action.png",    cap: "続けるほど\n自分がわかる",     sub: "小さな朝の習慣が、積み上がる" },
-    { img: "images/05-relations.png", cap: "大切な人と\nほどよい距離で",   sub: "家族・推し・パートナーを登録" },
-    { img: "images/06-profile.png",   cap: "あなたの朝に\nぜんぶ寄り添う", sub: "MBTI・起床時間に合わせて整う" },
+    { img: "images/01-memo.png",      cap: "毎朝、今日の\n一行が届く",     sub: "起きて少しあと、迷わず動き出せる" },
+    { img: "images/02-pace.png",      cap: "今日のペースが\nすっと決まる", sub: "朝・昼・夜、無理のない過ごし方" },
+    { img: "images/03-journal.png",   cap: "夜は気分を\nひとことだけ",     sub: "1日の終わりに、そっと記録する" },
+    { img: "images/04-action.png",    cap: "続けるほど、\n自分がわかる",   sub: "連続記録と気分の波が積み上がる" },
+    { img: "images/05-relations.png", cap: "大切な人と\nほどよい距離で",   sub: "家族・推し・パートナーの記録" },
+    { img: "images/06-profile.png",   cap: "あなたの朝に\n寄り添う",       sub: "起床時間や関心に、そっと合わせて" },
   ];
   // Dynamic Island を出すか（スクショ中央上が空いてる前提。重なるなら false に）
   const SHOW_ISLAND = true;
@@ -117,7 +117,7 @@
   const cover = document.createElement("div"); cover.className = "panel cover";
   const ic = document.createElement("img"); ic.className = "cover-icon"; ic.src = "images/app-icon.png"; ic.alt = "";
   const nm = document.createElement("div"); nm.className = "cover-name"; nm.textContent = "朝しるべ";
-  const tg = document.createElement("div"); tg.className = "cover-tagline"; tg.innerHTML = "朝を整えると<br>一日が変わる。";
+  const tg = document.createElement("div"); tg.className = "cover-tagline"; tg.innerHTML = "毎朝1分で、<br>今日を整える。";
   cover.append(ic, nm, tg);
   coverItem.appendChild(cover); root.appendChild(coverItem);
 

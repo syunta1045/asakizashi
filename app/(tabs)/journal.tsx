@@ -7,6 +7,7 @@ import { useJournal, MOOD_LABELS, MOOD_MARKS, todayKey, nextMilestone, reachedMi
 import { useUser } from "../../lib/store";
 import { scheduleMorningNotification } from "../../lib/notifications";
 import { haptics } from "../../lib/haptics";
+import { maybeRequestReview } from "../../lib/review";
 import { C, morningGradient, F } from "../../lib/theme";
 
 export default function Journal() {
@@ -50,6 +51,12 @@ export default function Journal() {
         days: newStreak,
       });
     }
+  };
+
+  // お祝いを閉じる = 達成を見届けた高揚した瞬間。ここで（この版につき一度だけ）レビュー依頼。
+  const dismissCelebrate = () => {
+    setCelebrate(null);
+    maybeRequestReview();
   };
 
   const list = Object.values(entries).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 30);
@@ -203,9 +210,9 @@ export default function Journal() {
         visible={!!celebrate}
         transparent
         animationType="fade"
-        onRequestClose={() => setCelebrate(null)}
+        onRequestClose={dismissCelebrate}
       >
-        <Pressable style={s.celebBg} onPress={() => setCelebrate(null)} accessibilityLabel="閉じる">
+        <Pressable style={s.celebBg} onPress={dismissCelebrate} accessibilityLabel="閉じる">
           <View style={s.celebCard}>
             <Text style={s.celebSparkle}>✦   ☀   ✦</Text>
             <Text style={s.celebTitle}>{celebrate?.title}</Text>
@@ -223,7 +230,7 @@ export default function Journal() {
                 </Text>
               </Pressable>
             )}
-            <Pressable style={s.celebClose} onPress={() => setCelebrate(null)} accessibilityRole="button">
+            <Pressable style={s.celebClose} onPress={dismissCelebrate} accessibilityRole="button">
               <Text style={s.celebCloseText}>ありがとう</Text>
             </Pressable>
           </View>

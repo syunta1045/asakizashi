@@ -31,6 +31,7 @@ export type EventName =
   | "sign_out"
   | "revenuecat_init_failed"
   | "notifications_rescheduled"
+  | "review_prompt_shown"
   | "account_deleted";
 
 type Props = Record<string, string | number | boolean | null>;
